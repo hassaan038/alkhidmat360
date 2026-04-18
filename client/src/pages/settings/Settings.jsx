@@ -5,41 +5,27 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import {
-  Settings as SettingsIcon,
-  User,
-  KeyRound,
-  Trash2,
-  Loader2,
-  AlertTriangle,
-  CheckCircle2,
+  Settings as SettingsIcon, User, KeyRound, Trash2, AlertTriangle, CheckCircle2,
+  Mail, Phone, CreditCard, Lock, ShieldAlert,
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import FormSection, { FormGrid, FormField } from '../../components/ui/FormSection';
+import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
-import { SkeletonCard } from '../../components/common/Skeleton';
+import Badge from '../../components/ui/Badge';
+import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import * as userService from '../../services/userService';
 import useAuthStore from '../../store/authStore';
-import { formatApiError, formatDate } from '../../lib/utils';
-
-// ============================================
-// SCHEMAS
-// ============================================
+import { cn, formatApiError, formatDate } from '../../lib/utils';
 
 const profileSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email'),
-  phoneNumber: z
-    .string()
-    .min(10, 'Phone must be at least 10 digits')
-    .max(20, 'Phone is too long'),
-  cnic: z
-    .string()
-    .min(13, 'CNIC must be at least 13 digits')
-    .max(15, 'CNIC is too long')
-    .optional()
-    .or(z.literal('')),
+  phoneNumber: z.string().min(10).max(20),
+  cnic: z.string().min(13).max(15).optional().or(z.literal('')),
 });
 
 const passwordSchema = z
@@ -53,20 +39,14 @@ const passwordSchema = z
     message: 'Passwords do not match',
   });
 
-const inputClass =
-  'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent';
-
-// ============================================
-// PROFILE SECTION
-// ============================================
+const TABS = [
+  { id: 'profile', label: 'Profile', icon: User },
+  { id: 'security', label: 'Security', icon: KeyRound },
+  { id: 'danger', label: 'Danger zone', icon: ShieldAlert },
+];
 
 function ProfileSection({ profile, onUpdated }) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting, isDirty },
-  } = useForm({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting, isDirty } } = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: profile.fullName || '',
@@ -96,125 +76,51 @@ function ProfileSection({ profile, onUpdated }) {
   };
 
   return (
-    <Card className="shadow-soft">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <User className="w-5 h-5 text-primary-600" />
-          Profile
-        </CardTitle>
-        <CardDescription>
-          Your account details. Updates take effect immediately.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name <span className="text-error">*</span>
-              </label>
-              <input {...register('fullName')} className={inputClass} />
-              {errors.fullName && (
-                <p className="mt-1 text-xs text-error">{errors.fullName.message}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email <span className="text-error">*</span>
-              </label>
-              <input type="email" {...register('email')} className={inputClass} />
-              {errors.email && (
-                <p className="mt-1 text-xs text-error">{errors.email.message}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number <span className="text-error">*</span>
-              </label>
-              <input
-                type="tel"
-                {...register('phoneNumber')}
-                className={inputClass}
-                placeholder="03001234567"
-              />
-              {errors.phoneNumber && (
-                <p className="mt-1 text-xs text-error">{errors.phoneNumber.message}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                CNIC (Optional)
-              </label>
-              <input
-                {...register('cnic')}
-                className={inputClass}
-                placeholder="13 digits, no dashes"
-              />
-              {errors.cnic && (
-                <p className="mt-1 text-xs text-error">{errors.cnic.message}</p>
-              )}
-            </div>
-          </div>
+    <FormSection title="Profile" icon={User} description="Your account details. Updates take effect immediately.">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormGrid cols={2}>
+          <FormField label="Full name" required htmlFor="fn" error={errors.fullName?.message}>
+            <Input id="fn" leftIcon={User} {...register('fullName')} />
+          </FormField>
+          <FormField label="Email" required htmlFor="em" error={errors.email?.message}>
+            <Input id="em" type="email" leftIcon={Mail} {...register('email')} />
+          </FormField>
+          <FormField label="Phone number" required htmlFor="ph" error={errors.phoneNumber?.message}>
+            <Input id="ph" type="tel" leftIcon={Phone} {...register('phoneNumber')} placeholder="03001234567" />
+          </FormField>
+          <FormField label="CNIC" hint="Optional · 13 digits no dashes" htmlFor="cn" error={errors.cnic?.message}>
+            <Input id="cn" leftIcon={CreditCard} {...register('cnic')} />
+          </FormField>
+        </FormGrid>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100 text-sm text-gray-600">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100 text-sm text-gray-600">
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500">Account type:</span>
+            <Badge variant="primary" size="sm">{profile.userType}</Badge>
+          </div>
+          {profile.createdAt && (
             <div>
-              <span className="text-gray-500">Account type:</span>{' '}
-              <span className="font-medium text-gray-900">{profile.userType}</span>
+              <span className="text-gray-500">Member since:</span>{' '}
+              <span className="font-medium text-gray-900">{formatDate(profile.createdAt)}</span>
             </div>
-            {profile.createdAt && (
-              <div>
-                <span className="text-gray-500">Member since:</span>{' '}
-                <span className="font-medium text-gray-900">
-                  {formatDate(profile.createdAt)}
-                </span>
-              </div>
-            )}
-          </div>
+          )}
+        </div>
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => reset()}
-              disabled={isSubmitting || !isDirty}
-            >
-              Discard
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting || !isDirty}
-              className="bg-primary-600 hover:bg-primary-700 text-white"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving…
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Save Changes
-                </>
-              )}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="outline" onClick={() => reset()} disabled={isSubmitting || !isDirty}>
+            Discard
+          </Button>
+          <Button type="submit" loading={isSubmitting} disabled={!isDirty} leftIcon={CheckCircle2}>
+            Save changes
+          </Button>
+        </div>
+      </form>
+    </FormSection>
   );
 }
 
-// ============================================
-// PASSWORD SECTION
-// ============================================
-
 function PasswordSection() {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm({
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(passwordSchema),
   });
 
@@ -229,89 +135,28 @@ function PasswordSection() {
   };
 
   return (
-    <Card className="shadow-soft">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <KeyRound className="w-5 h-5 text-primary-600" />
-          Change Password
-        </CardTitle>
-        <CardDescription>
-          Keep your account secure by using a strong password you don't reuse elsewhere.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Current Password <span className="text-error">*</span>
-            </label>
-            <input
-              type="password"
-              {...register('currentPassword')}
-              className={inputClass}
-            />
-            {errors.currentPassword && (
-              <p className="mt-1 text-xs text-error">
-                {errors.currentPassword.message}
-              </p>
-            )}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                New Password <span className="text-error">*</span>
-              </label>
-              <input
-                type="password"
-                {...register('newPassword')}
-                className={inputClass}
-              />
-              {errors.newPassword && (
-                <p className="mt-1 text-xs text-error">{errors.newPassword.message}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm New Password <span className="text-error">*</span>
-              </label>
-              <input
-                type="password"
-                {...register('confirmPassword')}
-                className={inputClass}
-              />
-              {errors.confirmPassword && (
-                <p className="mt-1 text-xs text-error">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex justify-end pt-2 border-t border-gray-200">
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-primary-600 hover:bg-primary-700 text-white"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Updating…
-                </>
-              ) : (
-                'Update Password'
-              )}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <FormSection title="Change password" icon={KeyRound} description="Keep your account secure with a strong, unique password.">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <FormField label="Current password" required htmlFor="cp" error={errors.currentPassword?.message}>
+          <Input id="cp" type="password" leftIcon={Lock} {...register('currentPassword')} />
+        </FormField>
+        <FormGrid cols={2}>
+          <FormField label="New password" required htmlFor="np" error={errors.newPassword?.message}>
+            <Input id="np" type="password" leftIcon={Lock} {...register('newPassword')} placeholder="At least 6 characters" />
+          </FormField>
+          <FormField label="Confirm new password" required htmlFor="cpw" error={errors.confirmPassword?.message}>
+            <Input id="cpw" type="password" leftIcon={Lock} {...register('confirmPassword')} />
+          </FormField>
+        </FormGrid>
+        <div className="flex justify-end pt-2">
+          <Button type="submit" loading={isSubmitting} leftIcon={CheckCircle2}>
+            Update password
+          </Button>
+        </div>
+      </form>
+    </FormSection>
   );
 }
-
-// ============================================
-// DANGER ZONE
-// ============================================
 
 function DangerZone() {
   const navigate = useNavigate();
@@ -321,23 +166,20 @@ function DangerZone() {
   const [confirmation, setConfirmation] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const reset = () => {
+  const resetState = () => {
     setPassword('');
     setConfirmation('');
   };
 
   const handleDelete = async () => {
     if (confirmation !== 'DELETE') {
-      toast.error('Type DELETE to confirm', {
-        description: 'The confirmation text must match exactly.',
-      });
+      toast.error('Type DELETE to confirm', { description: 'The confirmation text must match exactly.' });
       return;
     }
     setSubmitting(true);
     try {
       await userService.deleteMyAccount({ password, confirmation });
       toast.success('Account deleted');
-      // Server cleared the session; clear client state too and bounce.
       logout?.();
       navigate('/login', { replace: true });
     } catch (err) {
@@ -348,106 +190,69 @@ function DangerZone() {
   };
 
   return (
-    <Card className="shadow-soft border-error/40">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-error-dark">
-          <Trash2 className="w-5 h-5" />
-          Danger Zone
-        </CardTitle>
-        <CardDescription>
-          Permanently delete your account and all of your data. This action can't be undone.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Alert variant="warning" className="mb-4">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <p className="text-xs">
-              Deleting your account also removes every donation, application, booking,
-              and submission tied to it. There is no recovery.
-            </p>
-          </div>
-        </Alert>
+    <FormSection
+      title="Delete account"
+      icon={Trash2}
+      description="Permanently delete your account and all of your data. This action can't be undone."
+      className="border-error/40"
+    >
+      <Alert variant="warning" className="mb-4">
+        <div className="flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <p className="text-xs">
+            Deleting your account also removes every donation, application, booking, and submission tied to it. There is no recovery.
+          </p>
+        </div>
+      </Alert>
 
-        {!open ? (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setOpen(true)}
-            className="border-red-300 text-red-600 hover:bg-red-50"
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Delete My Account
-          </Button>
-        ) : (
-          <div className="space-y-3 border border-error/30 rounded-lg p-4 bg-error-light/30">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm with your password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Type <strong>DELETE</strong> to confirm
-              </label>
-              <input
-                value={confirmation}
-                onChange={(e) => setConfirmation(e.target.value)}
-                className={inputClass}
-                placeholder="DELETE"
-              />
-            </div>
-            <div className="flex justify-end gap-2 pt-2 border-t border-error/30">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  reset();
-                  setOpen(false);
-                }}
-                disabled={submitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                onClick={handleDelete}
-                disabled={submitting || !password || confirmation !== 'DELETE'}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Deleting…
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Permanently delete
-                  </>
-                )}
-              </Button>
-            </div>
+      {!open ? (
+        <Button
+          type="button"
+          variant="outline"
+          leftIcon={Trash2}
+          onClick={() => setOpen(true)}
+          className="border-error/40 text-error-dark hover:bg-error-light/60"
+        >
+          Delete my account
+        </Button>
+      ) : (
+        <div className="space-y-3 border border-error/30 rounded-xl p-4 bg-error-light/30">
+          <FormField label="Confirm with your password" htmlFor="pw">
+            <Input id="pw" type="password" leftIcon={Lock} value={password} onChange={(e) => setPassword(e.target.value)} />
+          </FormField>
+          <FormField label={<>Type <strong className="font-bold">DELETE</strong> to confirm</>} htmlFor="conf">
+            <Input id="conf" value={confirmation} onChange={(e) => setConfirmation(e.target.value)} placeholder="DELETE" />
+          </FormField>
+          <div className="flex justify-end gap-2 pt-2 border-t border-error/30">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => { resetState(); setOpen(false); }}
+              disabled={submitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              leftIcon={Trash2}
+              loading={submitting}
+              onClick={handleDelete}
+              disabled={!password || confirmation !== 'DELETE'}
+            >
+              Permanently delete
+            </Button>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      )}
+    </FormSection>
   );
 }
-
-// ============================================
-// PAGE
-// ============================================
 
 export default function Settings() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState('profile');
   const setUser = useAuthStore((s) => s.setUser);
 
   const load = async () => {
@@ -469,42 +274,62 @@ export default function Settings() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
-              <SettingsIcon className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-              <p className="text-gray-600 mt-1">
-                Manage your profile, password and account.
-              </p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="max-w-4xl space-y-6">
+        <PageHeader
+          icon={SettingsIcon}
+          accent="primary"
+          title="Settings"
+          description="Manage your profile, password, and account."
+        />
 
         {loading || !profile ? (
-          <SkeletonCard />
+          <SkeletonStatCard />
         ) : (
-          <FadeIn direction="up" delay={100}>
-            <div className="space-y-6">
-              <ProfileSection
-                profile={profile}
-                onUpdated={(next) => {
-                  setProfile(next);
-                  // Keep auth store + sidebar header in sync with renamed fields.
-                  if (typeof setUser === 'function') {
-                    setUser(next);
-                  }
-                }}
-              />
-              <PasswordSection />
-              <DangerZone />
+          <>
+            {/* Tabs */}
+            <div className="border-b border-gray-200">
+              <nav className="flex gap-1 overflow-x-auto -mb-px">
+                {TABS.map((t) => {
+                  const Icon = t.icon;
+                  const active = tab === t.id;
+                  const isDanger = t.id === 'danger';
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setTab(t.id)}
+                      className={cn(
+                        'relative inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium whitespace-nowrap rounded-t-lg border-b-2 transition-colors cursor-pointer',
+                        active
+                          ? isDanger
+                            ? 'border-error text-error-dark'
+                            : 'border-primary-600 text-primary-700'
+                          : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </nav>
             </div>
-          </FadeIn>
+
+            <div>
+              {tab === 'profile' && (
+                <ProfileSection
+                  profile={profile}
+                  onUpdated={(next) => {
+                    setProfile(next);
+                    if (typeof setUser === 'function') setUser(next);
+                  }}
+                />
+              )}
+              {tab === 'security' && <PasswordSection />}
+              {tab === 'danger' && <DangerZone />}
+            </div>
+          </>
         )}
-      </div>
+      </PageContainer>
     </DashboardLayout>
   );
 }
