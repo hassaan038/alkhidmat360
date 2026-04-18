@@ -22,6 +22,7 @@ import {
   ListChecks,
   HandCoins,
   Coins,
+  LifeBuoy,
 } from 'lucide-react';
 
 // Qurbani items shown to non-admin users when the flag is on
@@ -124,6 +125,18 @@ const menuItems = {
       path: '/dashboard/user/zakat-pay',
       description: 'Calculate and pay zakat',
     },
+    {
+      label: 'Sadqa / Donation',
+      icon: Heart,
+      path: '/dashboard/user/sadqa',
+      description: 'Give a general donation',
+    },
+    {
+      label: 'Disaster Relief',
+      icon: LifeBuoy,
+      path: '/dashboard/user/disaster-relief',
+      description: 'Support flood, earthquake & shelter',
+    },
   ],
   BENEFICIARY: [
     {
@@ -216,6 +229,18 @@ const menuItems = {
       icon: Coins,
       path: '/dashboard/admin/zakat-applications',
       description: 'Review beneficiary requests',
+    },
+    {
+      label: 'Sadqa Donations',
+      icon: Heart,
+      path: '/dashboard/admin/sadqa',
+      description: 'Confirm general donations',
+    },
+    {
+      label: 'Disaster Relief',
+      icon: LifeBuoy,
+      path: '/dashboard/admin/disaster-relief',
+      description: 'Confirm campaign donations',
     },
   ],
 };

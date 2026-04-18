@@ -47,6 +47,8 @@ model User {
   fitranaCollections    Fitrana[]
   zakatPayments         ZakatPayment[]
   zakatApplications     ZakatApplication[]
+  sadqaDonations        Sadqa[]
+  disasterDonations     DisasterDonation[]
 
   @@index([email])
   @@index([userType])
@@ -488,6 +490,63 @@ model ZakatApplication {
 
   @@index([userId])
   @@index([status])
+}
+
+// Sadqa / general donation — no specific cause, just a free-form gift.
+// Same deferred-write payment flow as the rest of the donor stack.
+model Sadqa {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  donorName       String
+  donorPhone      String
+  donorEmail      String?
+  amount          Decimal   @db.Decimal(15, 2)
+  purpose         String?                                    // optional free text or category
+  notes           String?   @db.Text
+
+  paymentMarked   Boolean   @default(false)
+  paymentMarkedAt DateTime?
+  paymentScreenshotUrl String?
+
+  status          String    @default("pending")              // pending, confirmed, rejected
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// Disaster relief donation — donor picks a campaign (floods, earthquake,
+// shelter, medical, general). campaignKey is a string so adding new
+// campaigns later is a code-only change. campaignLabel snapshots the
+// human-readable name at submission time so the record stays
+// meaningful even if the labels change later.
+model DisasterDonation {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  donorName       String
+  donorPhone      String
+  donorEmail      String?
+  campaignKey     String                                     // e.g. 'floods', 'earthquake', 'shelter', 'medical', 'general'
+  campaignLabel   String                                     // snapshot of label at submission time
+  amount          Decimal   @db.Decimal(15, 2)
+  notes           String?   @db.Text
+
+  paymentMarked   Boolean   @default(false)
+  paymentMarkedAt DateTime?
+  paymentScreenshotUrl String?
+
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([campaignKey])
 }
 
 // ============================================

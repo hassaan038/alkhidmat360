@@ -44,6 +44,10 @@ import ZakatPayment from './pages/zakat/ZakatPayment';
 import ZakatApplication from './pages/zakat/ZakatApplication';
 import AdminZakatPayments from './pages/admin/AdminZakatPayments';
 import AdminZakatApplications from './pages/admin/AdminZakatApplications';
+import Sadqa from './pages/donor/Sadqa';
+import DisasterRelief from './pages/donor/DisasterRelief';
+import AdminSadqa from './pages/admin/AdminSadqa';
+import AdminDisasterRelief from './pages/admin/AdminDisasterRelief';
 
 // Protected Route Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -213,6 +217,26 @@ function App() {
             }
           />
           <Route
+            path="/dashboard/user/sadqa"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['DONOR']}>
+                  <Sadqa />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/user/disaster-relief"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['DONOR']}>
+                  <DisasterRelief />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/dashboard/user/zakat-apply"
             element={
               <ProtectedRoute>
@@ -354,6 +378,26 @@ function App() {
               <ProtectedRoute>
                 <RoleBasedRoute allowedRoles={['ADMIN']}>
                   <AdminZakatApplications />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/admin/sadqa"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['ADMIN']}>
+                  <AdminSadqa />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/admin/disaster-relief"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['ADMIN']}>
+                  <AdminDisasterRelief />
                 </RoleBasedRoute>
               </ProtectedRoute>
             }

@@ -20,6 +20,11 @@ import {
   zakatPaymentStatusSchema,
   zakatApplicationStatusSchema,
 } from '../validators/zakatValidator.js';
+import * as extraDonationController from '../controllers/extraDonationController.js';
+import {
+  sadqaStatusSchema,
+  disasterDonationStatusSchema,
+} from '../validators/extraDonationValidator.js';
 
 const router = express.Router();
 
@@ -208,6 +213,24 @@ router.patch(
   '/zakat/applications/:id/status',
   validateRequest(zakatApplicationStatusSchema),
   zakatController.adminUpdateApplicationStatus
+);
+
+// ============================================
+// SADQA + DISASTER DONATIONS
+// ============================================
+
+router.get('/sadqa', extraDonationController.adminListSadqas);
+router.patch(
+  '/sadqa/:id/status',
+  validateRequest(sadqaStatusSchema),
+  extraDonationController.adminUpdateSadqaStatus
+);
+
+router.get('/disaster-donations', extraDonationController.adminListDisasterDonations);
+router.patch(
+  '/disaster-donations/:id/status',
+  validateRequest(disasterDonationStatusSchema),
+  extraDonationController.adminUpdateDisasterDonationStatus
 );
 
 export default router;

@@ -204,6 +204,18 @@ All 3 paid donor endpoints follow the same deferred-write pattern: form validate
 | POST | `/applications` | + requireRole('BENEFICIARY') | uploadZakatDoc.single('cnicDocument') → createZakatApplicationSchema → zakatController.createApplication (multipart; optional CNIC photo) |
 | GET | `/applications/me` | + requireRole('BENEFICIARY') | zakatController.getMyApplications |
 
+### `/api/sadqa` (requireAuth + requireRole('DONOR'))
+| Method | Path | Handler |
+|--------|------|---------|
+| POST | `/` | uploadPaymentScreenshot.single('paymentScreenshot') → createSadqaSchema → extraDonationController.createSadqa (multipart; deferred-write payment popup) |
+| GET | `/me` | extraDonationController.getMySadqas |
+
+### `/api/disaster-donations` (requireAuth + requireRole('DONOR'))
+| Method | Path | Handler |
+|--------|------|---------|
+| POST | `/` | uploadPaymentScreenshot.single('paymentScreenshot') → createDisasterDonationSchema → extraDonationController.createDisasterDonation (multipart; client picks campaignKey + sends snapshot campaignLabel) |
+| GET | `/me` | extraDonationController.getMyDisasterDonations |
+
 ### `/api/config` (requireAuth)
 | Method | Path | Auth | Handler |
 |--------|------|------|---------|
@@ -255,6 +267,10 @@ All 3 paid donor endpoints follow the same deferred-write pattern: form validate
 | PATCH | `/zakat/payments/:id/status` | zakatPaymentStatusSchema → zakatController.adminUpdatePaymentStatus (pending\|confirmed\|rejected) |
 | GET | `/zakat/applications` | zakatController.adminListApplications (beneficiary applications, includes user) |
 | PATCH | `/zakat/applications/:id/status` | zakatApplicationStatusSchema → zakatController.adminUpdateApplicationStatus (pending\|under_review\|approved\|rejected) |
+| GET | `/sadqa` | extraDonationController.adminListSadqas (general donations, includes user) |
+| PATCH | `/sadqa/:id/status` | sadqaStatusSchema → extraDonationController.adminUpdateSadqaStatus (pending\|confirmed\|rejected) |
+| GET | `/disaster-donations` | extraDonationController.adminListDisasterDonations (campaign donations, includes user) |
+| PATCH | `/disaster-donations/:id/status` | disasterDonationStatusSchema → extraDonationController.adminUpdateDisasterDonationStatus |
 
 Admin list endpoints include nested `user: { id, email, fullName, phoneNumber }`.
 
@@ -527,6 +543,34 @@ timestamps
 - Beneficiary-only via `requireRole('BENEFICIARY')`.
 - Multipart route — optional `cnicDocument` image attached via mobile camera (`capture="environment"`). Stored under `/uploads/zakat-docs/`.
 
+### Sadqa (generic donor donation)
+```
+id, userId (FK cascade),
+donorName, donorPhone, donorEmail?,
+amount Decimal(15,2), purpose? String, notes? Text,
+paymentMarked Bool default false, paymentMarkedAt?, paymentScreenshotUrl?,
+status String default 'pending',  // pending, confirmed, rejected
+timestamps
+@@index([userId]) @@index([status])
+```
+- Donor-only. No specific cause — free-form gift with optional purpose tag.
+- Same deferred-write payment flow as the rest of the donor stack.
+
+### DisasterDonation (donor → specific disaster relief campaign)
+```
+id, userId (FK cascade),
+donorName, donorPhone, donorEmail?,
+campaignKey String,            // 'floods'|'earthquake'|'shelter'|'medical'|'general'
+campaignLabel String,          // snapshot of human-readable name at submit time
+amount Decimal(15,2), notes? Text,
+paymentMarked Bool default false, paymentMarkedAt?, paymentScreenshotUrl?,
+status String default 'pending',
+timestamps
+@@index([userId]) @@index([status]) @@index([campaignKey])
+```
+- Donor-only. 5 campaigns hardcoded in `client/src/pages/donor/DisasterRelief.jsx` `CAMPAIGNS` array — based on Alkhidmat's actual disaster relief programs (floods, earthquake, tent villages, mobile health units, general fund). Update this list as campaigns change.
+- `campaignLabel` is snapshotted at submission so the historical record stays meaningful even if the label changes later.
+
 ### Session (mapped to runtime express-mysql-session table — do not write from Prisma)
 ```
 sessionId String @id @map("session_id") @db.VarChar(128)
@@ -579,6 +623,8 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/user/fitrana` | Fitrana (calculator + deferred payment modal + own list) | DONOR, BENEFICIARY, VOLUNTEER |
 | `/dashboard/user/zakat-pay` | ZakatPayment (calculator + deferred payment modal) | DONOR |
 | `/dashboard/user/zakat-apply` | ZakatApplication (eligibility application form) | BENEFICIARY |
+| `/dashboard/user/sadqa` | Sadqa (free-form donation + payment modal) | DONOR |
+| `/dashboard/user/disaster-relief` | DisasterRelief (campaign picker + payment modal) | DONOR |
 | `/dashboard/admin` | AdminDashboard | ADMIN |
 | `/dashboard/admin/users` | UserManagement | ADMIN |
 | `/dashboard/admin/donations` | DonationsManagement | ADMIN |
@@ -590,6 +636,8 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/admin/fitrana` | AdminFitrana (confirm/reject) | ADMIN |
 | `/dashboard/admin/zakat-payments` | AdminZakatPayments (confirm/reject donor zakat) | ADMIN |
 | `/dashboard/admin/zakat-applications` | AdminZakatApplications (review beneficiary requests) | ADMIN |
+| `/dashboard/admin/sadqa` | AdminSadqa (confirm/reject sadqa donations) | ADMIN |
+| `/dashboard/admin/disaster-relief` | AdminDisasterRelief (confirm/reject campaign donations) | ADMIN |
 | `/dashboard/admin/qurbani-settings` | QurbaniModuleSettings (toggle + bank details) | ADMIN |
 | `/dashboard/admin/create-admin` | CreateAdmin | ADMIN |
 | `*` | 404 page | — |
@@ -627,6 +675,7 @@ One file per backend resource. All import the shared `api.js` — **do not creat
 - `qurbaniSkinPickupService.js` — createSkinPickup, getMySkinPickups + admin: adminListSkinPickups, adminUpdateSkinPickupStatus
 - `fitranaService.js` — createFitrana, getMyFitranas + admin: adminListFitranas, adminUpdateFitranaStatus
 - `zakatService.js` — createZakatPayment, getMyZakatPayments (donor) + createZakatApplication, getMyZakatApplications (beneficiary) + 4 admin endpoints
+- `extraDonationService.js` — createSadqa, getMySadqas, createDisasterDonation, getMyDisasterDonations + 4 admin endpoints
 
 ### Stores (`store/`)
 - `authStore.js` — auth state (see Auth store section above)
@@ -685,11 +734,13 @@ pages/
   qurbani/      QurbaniModule.jsx (listings grid), MyHissaBookings.jsx,
                 SkinPickup.jsx (form + own list), Fitrana.jsx (calculator + payment)
   zakat/        ZakatPayment.jsx (donor calculator), ZakatApplication.jsx (beneficiary form)
+  donor/        ...existing forms..., Sadqa.jsx, DisasterRelief.jsx
   admin/        UserManagement.jsx, DonationsManagement.jsx, ApplicationsManagement.jsx,
                 VolunteersManagement.jsx, CreateAdmin.jsx,
                 QurbaniListings.jsx, QurbaniBookings.jsx, QurbaniModuleSettings.jsx,
                 QurbaniSkinPickups.jsx, AdminFitrana.jsx,
-                AdminZakatPayments.jsx, AdminZakatApplications.jsx
+                AdminZakatPayments.jsx, AdminZakatApplications.jsx,
+                AdminSadqa.jsx, AdminDisasterRelief.jsx
 ```
 
 ### Form pattern (all form pages)
