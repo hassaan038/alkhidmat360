@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Coins, Check, X } from 'lucide-react';
+import { Coins } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import FadeIn from '../../components/animations/FadeIn';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
 import { SkeletonTable } from '../../components/common/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as zakatService from '../../services/zakatService';
@@ -14,7 +13,6 @@ import { imageUrl } from '../../lib/imageUrl';
 export default function AdminZakatPayments() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -34,19 +32,6 @@ export default function AdminZakatPayments() {
     load();
   }, []);
 
-  const handleStatus = async (id, status) => {
-    setUpdatingId(id);
-    try {
-      await zakatService.adminUpdateZakatPaymentStatus(id, status);
-      toast.success('Status updated');
-      load();
-    } catch (err) {
-      toast.error('Update failed', { description: formatApiError(err) });
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -58,8 +43,8 @@ export default function AdminZakatPayments() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Zakat Payments</h1>
               <p className="text-sm text-gray-600">
-                Confirm or reject donor zakat payments. Wealth breakdown captured at the time of
-                submission is preserved on the record.
+                A read-only log of donor zakat payments. Wealth breakdown captured at submission
+                is preserved on the record. No approval action needed — payments auto-confirm.
               </p>
             </div>
           </div>
@@ -91,7 +76,6 @@ export default function AdminZakatPayments() {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid?</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Screenshot</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -147,29 +131,6 @@ export default function AdminZakatPayments() {
                             >
                               {p.status}
                             </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            {p.status === 'pending' && (
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleStatus(p.id, 'confirmed')}
-                                  disabled={updatingId === p.id}
-                                  className="bg-green-600 hover:bg-green-700 text-white"
-                                >
-                                  <Check className="w-3 h-3 mr-1" /> Confirm
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleStatus(p.id, 'rejected')}
-                                  disabled={updatingId === p.id}
-                                  className="border-red-300 text-red-600 hover:bg-red-50"
-                                >
-                                  <X className="w-3 h-3 mr-1" /> Reject
-                                </Button>
-                              </div>
-                            )}
                           </td>
                         </tr>
                       ))}

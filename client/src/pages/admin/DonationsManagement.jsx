@@ -175,8 +175,10 @@ export default function DonationsManagement() {
                 <DataTable
                   columns={columns[activeTab]}
                   data={data}
-                  onStatusUpdate={handleStatusUpdate}
-                  type={activeTab}
+                  // Skin collection still needs scheduling/approval. The
+                  // other three are pure cash donations — admin sees them
+                  // as a log only (auto-confirmed on payment).
+                  onStatusUpdate={activeTab === 'skin' ? handleStatusUpdate : undefined}
                 />
               )}
             </CardContent>

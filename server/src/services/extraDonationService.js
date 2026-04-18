@@ -23,6 +23,8 @@ export async function createSadqa(userId, data) {
     paymentScreenshotUrl = null,
   } = data;
 
+  // Cash donation — auto-confirm on payment so admin doesn't have to
+  // approve every sadqa. Admin still sees the record for reconciliation.
   return prisma.sadqa.create({
     data: {
       userId,
@@ -35,6 +37,7 @@ export async function createSadqa(userId, data) {
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
       paymentScreenshotUrl: paymentScreenshotUrl || null,
+      status: paymentMarked ? 'confirmed' : 'pending',
     },
   });
 }
@@ -78,6 +81,9 @@ export async function createDisasterDonation(userId, data) {
     paymentScreenshotUrl = null,
   } = data;
 
+  // Cash donation — auto-confirm on payment so admin doesn't have to
+  // approve every campaign donation. Admin still sees the record for
+  // reconciliation + campaign reporting.
   return prisma.disasterDonation.create({
     data: {
       userId,
@@ -91,6 +97,7 @@ export async function createDisasterDonation(userId, data) {
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
       paymentScreenshotUrl: paymentScreenshotUrl || null,
+      status: paymentMarked ? 'confirmed' : 'pending',
     },
   });
 }

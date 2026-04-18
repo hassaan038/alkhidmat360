@@ -10,6 +10,9 @@ const prisma = new PrismaClient();
 export async function createQurbaniDonation(userId, donationData) {
   const { deliveryDate, paymentMarked = false, ...rest } = donationData;
 
+  // Cash donation — auto-confirm when the donor marks payment so admin
+  // doesn't have to approve every cash gift. Admin still sees the record
+  // (with screenshot) for reconciliation.
   const donation = await prisma.qurbaniDonation.create({
     data: {
       userId,
@@ -17,6 +20,7 @@ export async function createQurbaniDonation(userId, donationData) {
       deliveryDate: deliveryDate ? new Date(deliveryDate) : null,
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
+      status: paymentMarked ? 'confirmed' : 'pending',
     },
   });
 
@@ -38,12 +42,15 @@ export async function getUserQurbaniDonations(userId) {
 
 export async function createRationDonation(userId, donationData) {
   const { paymentMarked = false, ...rest } = donationData;
+  // Cash donation — auto-confirm on payment so admin doesn't have to
+  // approve. Distribution side is still tracked separately by ops.
   const donation = await prisma.rationDonation.create({
     data: {
       userId,
       ...rest,
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
+      status: paymentMarked ? 'confirmed' : 'pending',
     },
   });
 
@@ -93,6 +100,8 @@ export async function getUserSkinCollections(userId) {
 export async function createOrphanSponsorship(userId, sponsorshipData) {
   const { startDate, paymentMarked = false, ...rest } = sponsorshipData;
 
+  // Auto-confirm — first-month cash payment lands as a confirmed record.
+  // Recipient assignment is handled out-of-band by the ops team.
   const sponsorship = await prisma.orphanSponsorship.create({
     data: {
       userId,
@@ -100,6 +109,7 @@ export async function createOrphanSponsorship(userId, sponsorshipData) {
       startDate: startDate ? new Date(startDate) : null,
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
+      status: paymentMarked ? 'confirmed' : 'pending',
     },
   });
 

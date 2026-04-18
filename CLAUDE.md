@@ -159,6 +159,11 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 
 All 3 paid donor endpoints follow the same deferred-write pattern: form validates locally, opens `<PaymentConfirmModal>`, only writes to DB when user clicks "I've Paid" with `paymentMarked: true`.
 
+**Auto-confirm policy** (cash donations don't need admin approval):
+When `paymentMarked === true` on creation, the service sets `status: 'confirmed'` immediately for these models: QurbaniDonation (flat), RationDonation, OrphanSponsorship, Fitrana, ZakatPayment, Sadqa, DisasterDonation. Admin pages for these surface them as a read-only log (no Confirm/Reject buttons). The PATCH `/status` admin endpoints still exist but are not wired into any UI for these types — keep them for back-fills or corrections via Prisma Studio.
+
+**Modules that DO require admin action** (no auto-confirm): SkinCollection (free pickup needs scheduling), QurbaniSkinPickup (same), QurbaniHissaBooking (slot allocation against a listing), VolunteerTask, LoanApplication, RamadanRationApplication, OrphanRegistration, ZakatApplication.
+
 ### `/api/applications` (all require requireAuth + requireRole('BENEFICIARY'))
 | Method | Path | Handler |
 |--------|------|---------|

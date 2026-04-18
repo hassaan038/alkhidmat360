@@ -96,7 +96,7 @@ export default function DataTable({ columns, data, onStatusUpdate }) {
                     <StatusBadge status={row.status} />
                   </td>
                   <td className="px-4 py-3">
-                    {row.status === 'pending' && (
+                    {row.status === 'pending' && onStatusUpdate && (
                       pendingAction?.id === row.id ? (
                         <div className="flex items-center gap-2 text-sm">
                           <span className="text-gray-700">

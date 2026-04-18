@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Heart, Check, X } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import FadeIn from '../../components/animations/FadeIn';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
 import { SkeletonTable } from '../../components/common/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as extraDonationService from '../../services/extraDonationService';
@@ -14,7 +13,6 @@ import { imageUrl } from '../../lib/imageUrl';
 export default function AdminSadqa() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -34,19 +32,6 @@ export default function AdminSadqa() {
     load();
   }, []);
 
-  const handleStatus = async (id, status) => {
-    setUpdatingId(id);
-    try {
-      await extraDonationService.adminUpdateSadqaStatus(id, status);
-      toast.success('Status updated');
-      load();
-    } catch (err) {
-      toast.error('Update failed', { description: formatApiError(err) });
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -58,7 +43,8 @@ export default function AdminSadqa() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Sadqa Donations</h1>
               <p className="text-sm text-gray-600">
-                Confirm or reject general sadqa donations from donors.
+                A read-only log of general sadqa donations. Auto-confirmed on payment —
+                no approval action needed.
               </p>
             </div>
           </div>
@@ -89,7 +75,6 @@ export default function AdminSadqa() {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid?</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Screenshot</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -142,29 +127,6 @@ export default function AdminSadqa() {
                             >
                               {s.status}
                             </span>
-                          </td>
-                          <td className="px-4 py-3">
-                            {s.status === 'pending' && (
-                              <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleStatus(s.id, 'confirmed')}
-                                  disabled={updatingId === s.id}
-                                  className="bg-green-600 hover:bg-green-700 text-white"
-                                >
-                                  <Check className="w-3 h-3 mr-1" /> Confirm
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleStatus(s.id, 'rejected')}
-                                  disabled={updatingId === s.id}
-                                  className="border-red-300 text-red-600 hover:bg-red-50"
-                                >
-                                  <X className="w-3 h-3 mr-1" /> Reject
-                                </Button>
-                              </div>
-                            )}
                           </td>
                         </tr>
                       ))}
