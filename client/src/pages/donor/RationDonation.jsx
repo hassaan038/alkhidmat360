@@ -43,6 +43,7 @@ const packageTypes = [
 export default function RationDonation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState('');
+  const [customMode, setCustomMode] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [pendingPayload, setPendingPayload] = useState(null);
 
@@ -65,8 +66,15 @@ export default function RationDonation() {
 
   const handlePackageSelect = (pkg) => {
     setSelectedPackage(pkg.id);
-    setValue('packageType', pkg.name);
+    setCustomMode(false);
+    setValue('packageType', pkg.name, { shouldValidate: true });
     setValue('amount', pkg.price * (quantity || 1));
+  };
+
+  const enableCustom = () => {
+    setSelectedPackage('');
+    setCustomMode(true);
+    setValue('packageType', '', { shouldValidate: false });
   };
 
   // Stage payload locally; actual submission happens when user clicks
@@ -101,6 +109,7 @@ export default function RationDonation() {
       await createRationDonation(fd);
       reset();
       setSelectedPackage('');
+      setCustomMode(false);
       setPendingPayload(null);
     } finally {
       setIsSubmitting(false);
@@ -169,17 +178,44 @@ export default function RationDonation() {
                     </label>
                   ))}
                 </div>
-                <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Or enter custom package type
-                  </label>
-                  <input
-                    type="text"
-                    {...register('packageType')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
-                    placeholder="e.g., Ramadan Special Package"
-                  />
-                </div>
+                {!customMode && (
+                  <button
+                    type="button"
+                    onClick={enableCustom}
+                    className="mt-3 text-sm text-primary-600 hover:text-primary-700 font-medium underline-offset-2 hover:underline"
+                  >
+                    None of these fit? Enter a custom package instead
+                  </button>
+                )}
+                {customMode && (
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Custom package type
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCustomMode(false);
+                          setValue('packageType', '', { shouldValidate: false });
+                        }}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Use one of the packages above instead
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      {...register('packageType')}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      placeholder="e.g., Ramadan Special Package"
+                      autoFocus
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      You'll set the amount yourself in the next field.
+                    </p>
+                  </div>
+                )}
                 {errors.packageType && (
                   <p className="mt-1 text-sm text-error">{errors.packageType.message}</p>
                 )}
@@ -335,6 +371,7 @@ export default function RationDonation() {
                   onClick={() => {
                     reset();
                     setSelectedPackage('');
+                    setCustomMode(false);
                   }}
                   disabled={isSubmitting}
                   className="hover:scale-105 transition-all duration-200"

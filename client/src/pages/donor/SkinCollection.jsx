@@ -43,6 +43,7 @@ const skinTypes = [
 export default function SkinCollection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSkin, setSelectedSkin] = useState('');
+  const [customMode, setCustomMode] = useState(false);
 
   const {
     register,
@@ -59,7 +60,14 @@ export default function SkinCollection() {
 
   const handleSkinSelect = (skin) => {
     setSelectedSkin(skin.id);
-    setValue('animalType', skin.name);
+    setCustomMode(false);
+    setValue('animalType', skin.name, { shouldValidate: true });
+  };
+
+  const enableCustom = () => {
+    setSelectedSkin('');
+    setCustomMode(true);
+    setValue('animalType', '', { shouldValidate: false });
   };
 
   const onSubmit = async (data) => {
@@ -71,6 +79,7 @@ export default function SkinCollection() {
       });
       reset();
       setSelectedSkin('');
+      setCustomMode(false);
     } catch (error) {
       toast.error('Submission Failed', {
         description: error.response?.data?.message || 'Please try again later',
@@ -137,17 +146,41 @@ export default function SkinCollection() {
                     </label>
                   ))}
                 </div>
-                <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Or enter custom animal type
-                  </label>
-                  <input
-                    type="text"
-                    {...register('animalType')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
-                    placeholder="e.g., Mixed Animal Skins"
-                  />
-                </div>
+                {!customMode && (
+                  <button
+                    type="button"
+                    onClick={enableCustom}
+                    className="mt-3 text-sm text-primary-600 hover:text-primary-700 font-medium underline-offset-2 hover:underline"
+                  >
+                    Don't see your animal? Enter a custom type instead
+                  </button>
+                )}
+                {customMode && (
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Custom animal type
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCustomMode(false);
+                          setValue('animalType', '', { shouldValidate: false });
+                        }}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Use one of the options above instead
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      {...register('animalType')}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      placeholder="e.g., Mixed Animal Skins"
+                      autoFocus
+                    />
+                  </div>
+                )}
                 {errors.animalType && (
                   <p className="mt-1 text-sm text-error">{errors.animalType.message}</p>
                 )}
@@ -278,6 +311,7 @@ export default function SkinCollection() {
                   onClick={() => {
                     reset();
                     setSelectedSkin('');
+                    setCustomMode(false);
                   }}
                   disabled={isSubmitting}
                   className="hover:scale-105 transition-all duration-200"

@@ -61,6 +61,7 @@ const sponsorshipTypes = [
 export default function OrphanSponsorship() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedType, setSelectedType] = useState('');
+  const [customMode, setCustomMode] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [pendingPayload, setPendingPayload] = useState(null);
 
@@ -85,10 +86,17 @@ export default function OrphanSponsorship() {
 
   const handleTypeSelect = (type) => {
     setSelectedType(type.id);
-    setValue('sponsorshipType', type.name);
+    setCustomMode(false);
+    setValue('sponsorshipType', type.name, { shouldValidate: true });
     setValue('monthlyAmount', type.monthlyAmount);
     const total = type.monthlyAmount * (duration || 1);
     setValue('totalAmount', total);
+  };
+
+  const enableCustom = () => {
+    setSelectedType('');
+    setCustomMode(true);
+    setValue('sponsorshipType', '', { shouldValidate: false });
   };
 
   // Auto-calculate total when duration changes
@@ -119,6 +127,7 @@ export default function OrphanSponsorship() {
       await createOrphanSponsorship(fd);
       reset();
       setSelectedType('');
+      setCustomMode(false);
       setPendingPayload(null);
     } finally {
       setIsSubmitting(false);
@@ -187,17 +196,44 @@ export default function OrphanSponsorship() {
                     </label>
                   ))}
                 </div>
-                <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Or enter custom sponsorship type
-                  </label>
-                  <input
-                    type="text"
-                    {...register('sponsorshipType')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
-                    placeholder="e.g., Specialized Educational Support"
-                  />
-                </div>
+                {!customMode && (
+                  <button
+                    type="button"
+                    onClick={enableCustom}
+                    className="mt-3 text-sm text-primary-600 hover:text-primary-700 font-medium underline-offset-2 hover:underline"
+                  >
+                    None of these fit? Enter a custom sponsorship type instead
+                  </button>
+                )}
+                {customMode && (
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Custom sponsorship type
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCustomMode(false);
+                          setValue('sponsorshipType', '', { shouldValidate: false });
+                        }}
+                        className="text-xs text-gray-500 hover:text-gray-700"
+                      >
+                        Use one of the packages above instead
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      {...register('sponsorshipType')}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      placeholder="e.g., Specialized Educational Support"
+                      autoFocus
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      You'll set the monthly amount yourself in the next field.
+                    </p>
+                  </div>
+                )}
                 {errors.sponsorshipType && (
                   <p className="mt-1 text-sm text-error">{errors.sponsorshipType.message}</p>
                 )}
@@ -410,6 +446,7 @@ export default function OrphanSponsorship() {
                   onClick={() => {
                     reset();
                     setSelectedType('');
+                    setCustomMode(false);
                   }}
                   disabled={isSubmitting}
                   className="hover:scale-105 transition-all duration-200"
