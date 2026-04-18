@@ -96,6 +96,10 @@ const useAuthStore = create((set) => ({
 
   // Clear error
   clearError: () => set({ error: null }),
+
+  // Replace the cached user object (used after profile updates so the
+  // header / sidebar reflect renamed fields immediately).
+  setUser: (next) => set({ user: next }),
 }));
 
 export default useAuthStore;

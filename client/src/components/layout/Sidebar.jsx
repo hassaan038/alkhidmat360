@@ -137,6 +137,12 @@ const menuItems = {
       path: '/dashboard/user/disaster-relief',
       description: 'Support flood, earthquake & shelter',
     },
+    {
+      label: 'Settings',
+      icon: Settings,
+      path: '/dashboard/settings',
+      description: 'Profile, password, account',
+    },
   ],
   BENEFICIARY: [
     {
@@ -168,6 +174,12 @@ const menuItems = {
       path: '/dashboard/user/zakat-apply',
       description: 'Request zakat assistance',
     },
+    {
+      label: 'Settings',
+      icon: Settings,
+      path: '/dashboard/settings',
+      description: 'Profile, password, account',
+    },
   ],
   VOLUNTEER: [
     {
@@ -180,6 +192,12 @@ const menuItems = {
       icon: HandHeart,
       path: '/dashboard/user/volunteer-task',
       description: 'Register for tasks',
+    },
+    {
+      label: 'Settings',
+      icon: Settings,
+      path: '/dashboard/settings',
+      description: 'Profile, password, account',
     },
   ],
   ADMIN: [
@@ -241,6 +259,12 @@ const menuItems = {
       icon: LifeBuoy,
       path: '/dashboard/admin/disaster-relief',
       description: 'Confirm campaign donations',
+    },
+    {
+      label: 'Settings',
+      icon: Settings,
+      path: '/dashboard/settings',
+      description: 'Profile, password, account',
     },
   ],
 };

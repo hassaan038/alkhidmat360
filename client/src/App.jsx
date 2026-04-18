@@ -48,6 +48,7 @@ import Sadqa from './pages/donor/Sadqa';
 import DisasterRelief from './pages/donor/DisasterRelief';
 import AdminSadqa from './pages/admin/AdminSadqa';
 import AdminDisasterRelief from './pages/admin/AdminDisasterRelief';
+import Settings from './pages/settings/Settings';
 
 // Protected Route Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -398,6 +399,18 @@ function App() {
               <ProtectedRoute>
                 <RoleBasedRoute allowedRoles={['ADMIN']}>
                   <AdminDisasterRelief />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Settings — universal across all 4 user types */}
+          <Route
+            path="/dashboard/settings"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['DONOR', 'BENEFICIARY', 'VOLUNTEER', 'ADMIN']}>
+                  <Settings />
                 </RoleBasedRoute>
               </ProtectedRoute>
             }

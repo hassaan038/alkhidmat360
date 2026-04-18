@@ -1,6 +1,92 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+import { ApiError } from '../utils/ApiResponse.js';
 
 const prisma = new PrismaClient();
+
+// ============================================
+// PROFILE / SETTINGS
+// ============================================
+
+const PROFILE_SELECT = {
+  id: true,
+  email: true,
+  fullName: true,
+  phoneNumber: true,
+  cnic: true,
+  userType: true,
+  isActive: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
+export async function getProfile(userId) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: PROFILE_SELECT,
+  });
+  if (!user) throw new ApiError(404, 'User not found');
+  return user;
+}
+
+export async function updateProfile(userId, data) {
+  const { fullName, email, phoneNumber, cnic } = data;
+
+  // Email uniqueness check (if changing)
+  if (email !== undefined) {
+    const existing = await prisma.user.findFirst({
+      where: { email, NOT: { id: userId } },
+    });
+    if (existing) throw new ApiError(400, 'Email already in use');
+  }
+
+  // CNIC uniqueness check (if provided and changing)
+  if (cnic) {
+    const existing = await prisma.user.findFirst({
+      where: { cnic, NOT: { id: userId } },
+    });
+    if (existing) throw new ApiError(400, 'CNIC already in use');
+  }
+
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      ...(fullName !== undefined && { fullName }),
+      ...(email !== undefined && { email }),
+      ...(phoneNumber !== undefined && { phoneNumber }),
+      ...(cnic !== undefined && { cnic: cnic || null }),
+    },
+    select: PROFILE_SELECT,
+  });
+}
+
+export async function changePassword(userId, currentPassword, newPassword) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new ApiError(404, 'User not found');
+
+  const ok = await bcrypt.compare(currentPassword, user.password);
+  if (!ok) throw new ApiError(401, 'Current password is incorrect');
+
+  const hashed = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({
+    where: { id: userId },
+    data: { password: hashed },
+  });
+  return { ok: true };
+}
+
+export async function deleteAccount(userId, password) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new ApiError(404, 'User not found');
+
+  const ok = await bcrypt.compare(password, user.password);
+  if (!ok) throw new ApiError(401, 'Password is incorrect');
+
+  // Cascade is configured at the schema level — deleting the user wipes
+  // all of their related records (donations, applications, bookings, etc).
+  await prisma.user.delete({ where: { id: userId } });
+  return { ok: true };
+}
 
 /**
  * Get user-specific dashboard statistics based on user type

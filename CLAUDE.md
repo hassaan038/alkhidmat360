@@ -229,6 +229,10 @@ All 3 paid donor endpoints follow the same deferred-write pattern: form validate
 |--------|------|---------|
 | GET | `/dashboard/stats` | userController.getDashboardStats |
 | GET | `/dashboard/activities?limit=10` | userController.getRecentActivities |
+| GET | `/me/profile` | userController.getMyProfile (full user record sans password) |
+| PATCH | `/me/profile` | updateProfileSchema → userController.updateMyProfile (fullName, email, phoneNumber, cnic — uniqueness checked server-side) |
+| POST | `/me/change-password` | changePasswordSchema → userController.changeMyPassword (verifies currentPassword via bcrypt) |
+| DELETE | `/me` | deleteAccountSchema → userController.deleteMyAccount (requires password + literal "DELETE" confirmation; cascades all relations and tears down the session) |
 
 ### `/api/admin` (all require requireAuth + requireRole('ADMIN'))
 | Method | Path | Handler |
@@ -638,6 +642,7 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/admin/zakat-applications` | AdminZakatApplications (review beneficiary requests) | ADMIN |
 | `/dashboard/admin/sadqa` | AdminSadqa (confirm/reject sadqa donations) | ADMIN |
 | `/dashboard/admin/disaster-relief` | AdminDisasterRelief (confirm/reject campaign donations) | ADMIN |
+| `/dashboard/settings` | Settings (profile + password + delete account) | DONOR, BENEFICIARY, VOLUNTEER, ADMIN |
 | `/dashboard/admin/qurbani-settings` | QurbaniModuleSettings (toggle + bank details) | ADMIN |
 | `/dashboard/admin/create-admin` | CreateAdmin | ADMIN |
 | `*` | 404 page | — |
@@ -654,8 +659,12 @@ Root `/` redirects to `/login`.
 
 ```js
 state:   { user, loading: true, error, isAuthenticated: false }
-actions: login(email, password), signup(userData), logout(), checkAuth(), clearError()
+actions: login(email, password), signup(userData), logout(), checkAuth(),
+         clearError(), setUser(next)
 ```
+`setUser(next)` is used by the Settings page after a profile update so the
+header / sidebar reflect renamed fields without waiting for the next
+`checkAuth()` cycle.
 
 `checkAuth()` hits `GET /auth/me` on every page load to validate existing session.
 
@@ -665,7 +674,7 @@ One file per backend resource. All import the shared `api.js` — **do not creat
 
 - `api.js` — axios with `baseURL = VITE_API_URL || http://localhost:5000/api`, `withCredentials: true`, response interceptor → rejects with `{ message, errors, status }`
 - `authService.js` — signup, login, logout, getCurrentUser
-- `userService.js` — getDashboardStats, getRecentActivities(limit)
+- `userService.js` — getDashboardStats, getRecentActivities(limit), getMyProfile, updateMyProfile, changeMyPassword, deleteMyAccount
 - `donationService.js` — CRUD for qurbani, ration, skinCollection, orphanSponsorship
 - `applicationService.js` — CRUD for loan, ramadanRation, orphanRegistration
 - `volunteerService.js` — createVolunteerTask, getVolunteerTasks
@@ -735,6 +744,7 @@ pages/
                 SkinPickup.jsx (form + own list), Fitrana.jsx (calculator + payment)
   zakat/        ZakatPayment.jsx (donor calculator), ZakatApplication.jsx (beneficiary form)
   donor/        ...existing forms..., Sadqa.jsx, DisasterRelief.jsx
+  settings/     Settings.jsx (profile + change password + delete account; same component for all 4 roles)
   admin/        UserManagement.jsx, DonationsManagement.jsx, ApplicationsManagement.jsx,
                 VolunteersManagement.jsx, CreateAdmin.jsx,
                 QurbaniListings.jsx, QurbaniBookings.jsx, QurbaniModuleSettings.jsx,

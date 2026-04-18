@@ -18,7 +18,36 @@ export async function getRecentActivities(limit = 10) {
   return response.data;
 }
 
+// ============================================
+// PROFILE / SETTINGS
+// ============================================
+
+export async function getMyProfile() {
+  const response = await api.get('/users/me/profile');
+  return response.data;
+}
+
+export async function updateMyProfile(payload) {
+  const response = await api.patch('/users/me/profile', payload);
+  return response.data;
+}
+
+export async function changeMyPassword(payload) {
+  const response = await api.post('/users/me/change-password', payload);
+  return response.data;
+}
+
+export async function deleteMyAccount(payload) {
+  // axios delete with body needs the `data` config key
+  const response = await api.delete('/users/me', { data: payload });
+  return response.data;
+}
+
 export default {
   getDashboardStats,
   getRecentActivities,
+  getMyProfile,
+  updateMyProfile,
+  changeMyPassword,
+  deleteMyAccount,
 };
