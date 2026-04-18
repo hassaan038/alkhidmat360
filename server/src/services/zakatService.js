@@ -35,9 +35,9 @@ export async function createZakatPayment(userId, data) {
   if (!nisabBasis) throw new ApiError(400, 'nisabBasis is required');
   if (zakatAmount == null) throw new ApiError(400, 'zakatAmount is required');
 
-  // Cash donation — auto-confirm on payment so admin doesn't have to
-  // approve every zakat payment. Admin still sees the record + breakdown
-  // for reconciliation.
+  // Religious obligation (not a free-form gift) — admin verifies the
+  // payment before confirming, so status stays 'pending' regardless of
+  // paymentMarked. Admin's Confirm/Reject UI handles the rest.
   return prisma.zakatPayment.create({
     data: {
       userId,
@@ -59,7 +59,6 @@ export async function createZakatPayment(userId, data) {
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
       paymentScreenshotUrl: paymentScreenshotUrl || null,
-      status: paymentMarked ? 'confirmed' : 'pending',
     },
   });
 }

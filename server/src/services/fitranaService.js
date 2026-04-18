@@ -27,8 +27,9 @@ export async function createFitrana(userId, data) {
 
   const totalAmount = Number(numberOfPeople) * Number(amountPerPerson);
 
-  // Cash donation — auto-confirm on payment so admin doesn't have to
-  // approve every fitrana. Admin still sees the record for reconciliation.
+  // Religious obligation (not a free-form gift) — admin verifies the
+  // payment before confirming, so status stays 'pending' regardless of
+  // paymentMarked. Admin's Confirm/Reject UI handles the rest.
   return prisma.fitrana.create({
     data: {
       userId,
@@ -41,7 +42,6 @@ export async function createFitrana(userId, data) {
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
       paymentScreenshotUrl: paymentScreenshotUrl || null,
-      status: paymentMarked ? 'confirmed' : 'pending',
     },
   });
 }

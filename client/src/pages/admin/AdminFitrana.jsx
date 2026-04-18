@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { HandCoins } from 'lucide-react';
+import { HandCoins, Check, X } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import FadeIn from '../../components/animations/FadeIn';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 import { SkeletonTable } from '../../components/common/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as fitranaService from '../../services/fitranaService';
@@ -22,6 +23,7 @@ const BASIS_LABEL = {
 export default function AdminFitrana() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -41,6 +43,19 @@ export default function AdminFitrana() {
     load();
   }, []);
 
+  const handleStatus = async (id, status) => {
+    setUpdatingId(id);
+    try {
+      await fitranaService.adminUpdateFitranaStatus(id, status);
+      toast.success('Status updated');
+      load();
+    } catch (err) {
+      toast.error('Update failed', { description: formatApiError(err) });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
@@ -52,9 +67,9 @@ export default function AdminFitrana() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Fitrana Submissions</h1>
               <p className="text-sm text-gray-600">
-                A read-only log of fitrana payments. Per-person amount and basis used at the
-                time of submission are preserved. No approval action needed — donations
-                auto-confirm on payment.
+                Verify the bank transfer (use the screenshot if attached) and Confirm or
+                Reject. Per-person amount and basis used at the time of submission are
+                preserved on the record.
               </p>
             </div>
           </div>
@@ -87,6 +102,7 @@ export default function AdminFitrana() {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid?</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Screenshot</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -146,6 +162,29 @@ export default function AdminFitrana() {
                             >
                               {f.status}
                             </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {f.status === 'pending' && (
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleStatus(f.id, 'confirmed')}
+                                  disabled={updatingId === f.id}
+                                  className="bg-green-600 hover:bg-green-700 text-white"
+                                >
+                                  <Check className="w-3 h-3 mr-1" /> Confirm
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleStatus(f.id, 'rejected')}
+                                  disabled={updatingId === f.id}
+                                  className="border-red-300 text-red-600 hover:bg-red-50"
+                                >
+                                  <X className="w-3 h-3 mr-1" /> Reject
+                                </Button>
+                              </div>
+                            )}
                           </td>
                         </tr>
                       ))}
