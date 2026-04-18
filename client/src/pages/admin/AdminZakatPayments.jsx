@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Coins, Check, X } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import { Card } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { SkeletonTable } from '../../components/common/Skeleton';
+import { StatusBadge } from '../../components/ui/Badge';
+import { SkeletonRow } from '../../components/ui/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as zakatService from '../../services/zakatService';
-import { cn, formatCurrency, getStatusColor, formatApiError } from '../../lib/utils';
+import { formatCurrency, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
 
 export default function AdminZakatPayments() {
@@ -49,54 +51,40 @@ export default function AdminZakatPayments() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg flex items-center justify-center">
-              <Coins className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Zakat Payments</h1>
-              <p className="text-sm text-gray-600">
-                Verify the bank transfer (use the screenshot if attached) and Confirm or
-                Reject. Wealth breakdown captured at submission is preserved on the record.
-              </p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="space-y-6">
+        <PageHeader
+          icon={Coins}
+          accent="zakat"
+          title="Zakat Payments"
+          description="Verify the bank transfer (use the screenshot if attached) and Confirm or Reject."
+        />
 
-        <FadeIn direction="up" delay={100}>
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-lg">All Payments</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Card className="overflow-hidden">
               {loading ? (
-                <SkeletonTable rows={5} />
+                <div className="p-5 space-y-2">
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
+                </div>
               ) : items.length === 0 ? (
                 <EmptyState
+                  icon={Coins}
+                  tone="zakat"
                   title="No zakat payments yet"
                   description="Donor submissions will appear here."
                 />
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full">
+                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donor</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wealth</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nisab</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zakat</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid?</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Screenshot</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <Th>#</Th><Th>Donor</Th><Th>Wealth</Th><Th>Nisab</Th>
+                        <Th>Zakat</Th><Th>Paid?</Th><Th>Screenshot</Th><Th>Status</Th><Th>Actions</Th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-100">
                       {items.map((p) => (
-                        <tr key={p.id} className="hover:bg-gray-50 align-top">
+                        <tr key={p.id} className="transition-colors hover:bg-zakat-50/40 align-top">
                           <td className="px-4 py-3 text-sm font-medium text-gray-900">#{p.id}</td>
                           <td className="px-4 py-3 text-sm">
                             <div className="font-medium text-gray-900">{p.user?.fullName || '—'}</div>
@@ -139,34 +127,16 @@ export default function AdminZakatPayments() {
                             )}
                           </td>
                           <td className="px-4 py-3">
-                            <span
-                              className={cn(
-                                'inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-medium capitalize',
-                                getStatusColor(p.status)
-                              )}
-                            >
-                              {p.status}
-                            </span>
+                            <StatusBadge status={p.status} size="sm" />
                           </td>
                           <td className="px-4 py-3">
                             {p.status === 'pending' && (
                               <div className="flex gap-2">
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleStatus(p.id, 'confirmed')}
-                                  disabled={updatingId === p.id}
-                                  className="bg-green-600 hover:bg-green-700 text-white"
-                                >
-                                  <Check className="w-3 h-3 mr-1" /> Confirm
+                                <Button size="sm" variant="success" leftIcon={Check} onClick={() => handleStatus(p.id, 'confirmed')} disabled={updatingId === p.id}>
+                                  Confirm
                                 </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleStatus(p.id, 'rejected')}
-                                  disabled={updatingId === p.id}
-                                  className="border-red-300 text-red-600 hover:bg-red-50"
-                                >
-                                  <X className="w-3 h-3 mr-1" /> Reject
+                                <Button size="sm" variant="outline" leftIcon={X} onClick={() => handleStatus(p.id, 'rejected')} disabled={updatingId === p.id} className="border-error/40 text-error-dark hover:bg-error-light/60">
+                                  Reject
                                 </Button>
                               </div>
                             )}
@@ -177,10 +147,16 @@ export default function AdminZakatPayments() {
                   </table>
                 </div>
               )}
-            </CardContent>
           </Card>
-        </FadeIn>
-      </div>
+      </PageContainer>
     </DashboardLayout>
+  );
+}
+
+function Th({ children }) {
+  return (
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+      {children}
+    </th>
   );
 }

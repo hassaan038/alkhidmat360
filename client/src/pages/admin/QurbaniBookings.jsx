@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { ClipboardList, Check, X, ChevronDown, ChevronUp } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import { Card } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { SkeletonTable } from '../../components/common/Skeleton';
+import { StatusBadge } from '../../components/ui/Badge';
+import { SkeletonRow } from '../../components/ui/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as qurbaniModuleService from '../../services/qurbaniModuleService';
-import { cn, formatCurrency, formatDate, getStatusColor, formatApiError } from '../../lib/utils';
+import { formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
 
 export default function QurbaniBookings() {
@@ -52,57 +54,46 @@ export default function QurbaniBookings() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        <FadeIn direction="up" delay={0}>
-          <div className="mb-6 flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg flex items-center justify-center">
-              <ClipboardList className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Qurbani Bookings</h1>
-              <p className="text-sm text-gray-600">Review hissa bookings and confirm payments</p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="space-y-6">
+        <PageHeader
+          icon={ClipboardList}
+          accent="qurbani"
+          title="Qurbani Bookings"
+          description="Review hissa bookings and confirm payments."
+        />
 
-        <FadeIn direction="up" delay={100}>
-          <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle>All Bookings</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Card className="overflow-hidden">
               {loading ? (
-                <SkeletonTable rows={5} />
+                <div className="p-5 space-y-2">
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
+                </div>
               ) : bookings.length === 0 ? (
                 <EmptyState
+                  icon={ClipboardList}
+                  tone="qurbani"
                   title="No bookings yet"
                   description="Bookings will appear here as users reserve hissas."
                 />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Listing</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hissas</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid?</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pickup</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        <th className="px-4 py-3"></th>
+                        <Th>#</Th><Th>User</Th><Th>Listing</Th>
+                        <Th>Hissas</Th><Th>Amount</Th><Th>Paid?</Th>
+                        <Th>Pickup</Th><Th>Status</Th><Th>Actions</Th><Th></Th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-100">
                       {bookings.map((b) => {
                         const total =
                           parseFloat(b.totalAmount ?? 0) ||
                           (b.hissaCount ?? 0) * parseFloat(b.listing?.pricePerHissa ?? 0);
                         return (
                           <>
-                            <tr key={b.id} className="hover:bg-gray-50">
+                            <tr key={b.id} className="transition-colors hover:bg-qurbani-50/40">
                               <td className="px-4 py-3 text-sm font-medium text-gray-900">#{b.id}</td>
                               <td className="px-4 py-3 text-sm text-gray-700">
                                 <div className="font-medium text-gray-900">
@@ -136,34 +127,16 @@ export default function QurbaniBookings() {
                                 {b.listing?.pickupDate ? formatDate(b.listing.pickupDate) : '—'}
                               </td>
                               <td className="px-4 py-3">
-                                <span
-                                  className={cn(
-                                    'inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-medium capitalize',
-                                    getStatusColor(b.status)
-                                  )}
-                                >
-                                  {b.status}
-                                </span>
+                                <StatusBadge status={b.status} size="sm" />
                               </td>
                               <td className="px-4 py-3">
                                 {b.status === 'pending' && (
                                   <div className="flex gap-2">
-                                    <Button
-                                      size="sm"
-                                      onClick={() => handleStatus(b.id, 'confirmed')}
-                                      disabled={updatingId === b.id}
-                                      className="bg-green-600 hover:bg-green-700 text-white"
-                                    >
-                                      <Check className="w-3 h-3 mr-1" /> Confirm
+                                    <Button size="sm" variant="success" leftIcon={Check} onClick={() => handleStatus(b.id, 'confirmed')} disabled={updatingId === b.id}>
+                                      Confirm
                                     </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleStatus(b.id, 'rejected')}
-                                      disabled={updatingId === b.id}
-                                      className="border-red-300 text-red-600 hover:bg-red-50"
-                                    >
-                                      <X className="w-3 h-3 mr-1" /> Reject
+                                    <Button size="sm" variant="outline" leftIcon={X} onClick={() => handleStatus(b.id, 'rejected')} disabled={updatingId === b.id} className="border-error/40 text-error-dark hover:bg-error-light/60">
+                                      Reject
                                     </Button>
                                   </div>
                                 )}
@@ -172,8 +145,8 @@ export default function QurbaniBookings() {
                                 <button
                                   type="button"
                                   onClick={() => toggleExpand(b.id)}
-                                  className="text-gray-400 hover:text-gray-600"
-                                  aria-label="Expand row"
+                                  className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
+                                  aria-label={expanded === b.id ? 'Collapse row' : 'Expand row'}
                                 >
                                   {expanded === b.id ? (
                                     <ChevronUp className="w-5 h-5" />
@@ -232,10 +205,16 @@ export default function QurbaniBookings() {
                   </table>
                 </div>
               )}
-            </CardContent>
           </Card>
-        </FadeIn>
-      </div>
+      </PageContainer>
     </DashboardLayout>
+  );
+}
+
+function Th({ children }) {
+  return (
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+      {children}
+    </th>
   );
 }

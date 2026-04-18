@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Settings, Loader2, Power } from 'lucide-react';
+import { Settings, Power, Save, Banknote } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/Card';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import FormSection, { FormField } from '../../components/ui/FormSection';
 import Button from '../../components/ui/Button';
+import { Textarea } from '../../components/ui/Input';
+import Badge from '../../components/ui/Badge';
 import * as systemConfigService from '../../services/systemConfigService';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
-import { formatApiError } from '../../lib/utils';
+import { formatApiError, cn } from '../../lib/utils';
 
 export default function QurbaniModuleSettings() {
   const refreshFlag = useQurbaniModuleStore((s) => s.refreshFlag);
@@ -23,17 +26,13 @@ export default function QurbaniModuleSettings() {
     systemConfigService
       .getQurbaniModuleFlag()
       .then((res) => setEnabled(!!res.data?.enabled))
-      .catch((err) =>
-        toast.error('Failed to load booking status', { description: formatApiError(err) })
-      )
+      .catch((err) => toast.error('Failed to load booking status', { description: formatApiError(err) }))
       .finally(() => setLoadingFlag(false));
 
     systemConfigService
       .getBankDetails()
       .then((res) => setBankDetails(res.data?.bankDetails || ''))
-      .catch((err) =>
-        toast.error('Failed to load bank details', { description: formatApiError(err) })
-      )
+      .catch((err) => toast.error('Failed to load bank details', { description: formatApiError(err) }))
       .finally(() => setLoadingBank(false));
   }, []);
 
@@ -44,7 +43,6 @@ export default function QurbaniModuleSettings() {
       await systemConfigService.updateQurbaniModuleFlag(next);
       setEnabled(next);
       toast.success(`Qurbani booking ${next ? 'activated' : 'deactivated'}`);
-      // Refresh store so sidebar reacts
       await refreshFlag();
     } catch (error) {
       toast.error('Update failed', { description: formatApiError(error) });
@@ -67,114 +65,74 @@ export default function QurbaniModuleSettings() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg flex items-center justify-center">
-              <Settings className="w-6 h-6 text-white" />
-            </div>
+      <PageContainer className="max-w-3xl space-y-6">
+        <PageHeader
+          icon={Settings}
+          accent="qurbani"
+          title="Qurbani Booking Settings"
+          description="Control booking visibility and payment instructions."
+          meta={
+            !loadingFlag && (
+              <Badge variant={enabled ? 'success' : 'neutral'} size="sm" dot>
+                {enabled ? 'Module active' : 'Module inactive'}
+              </Badge>
+            )
+          }
+        />
+
+        <FormSection title="Booking status" icon={Power} description="When inactive, users will not see the Qurbani Booking links in their sidebar.">
+          <div className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50/60">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Qurbani Booking Settings</h1>
-              <p className="text-sm text-gray-600">
-                Control booking visibility and payment instructions
+              <p className="text-sm font-semibold text-gray-900">Booking active</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {loadingFlag ? 'Loading…' : enabled ? 'Users can book hissas right now.' : 'The module is hidden from end users.'}
               </p>
             </div>
-          </div>
-        </FadeIn>
-
-        {/* Module Toggle */}
-        <FadeIn direction="up" delay={100}>
-          <Card className="shadow-soft mb-6">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Power className="w-5 h-5 text-primary-600" />
-                Booking Status
-              </CardTitle>
-              <CardDescription>
-                When inactive, users will not see the Qurbani Booking link in their sidebar.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <div>
-                  <p className="font-medium text-gray-900">Booking Active</p>
-                  <p className="text-sm text-gray-500 mt-0.5">
-                    Status:{' '}
-                    {loadingFlag ? (
-                      <span className="text-gray-400">Loading…</span>
-                    ) : enabled ? (
-                      <span className="text-success-dark font-medium">Active</span>
-                    ) : (
-                      <span className="text-gray-600 font-medium">Inactive</span>
-                    )}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleToggle}
-                  disabled={loadingFlag || savingFlag}
-                  className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 ${
-                    enabled ? 'bg-primary-600' : 'bg-gray-300'
-                  }`}
-                  aria-label="Toggle qurbani booking"
-                >
-                  <span
-                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
-                      enabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-            </CardContent>
-          </Card>
-        </FadeIn>
-
-        {/* Bank Details */}
-        <FadeIn direction="up" delay={150}>
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-lg">Bank Details</CardTitle>
-              <CardDescription>
-                Shown to users on the payment screen after they create a booking.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loadingBank ? (
-                <div className="h-32 bg-gray-100 rounded-lg animate-pulse" />
-              ) : (
-                <>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Bank account instructions
-                  </label>
-                  <textarea
-                    value={bankDetails}
-                    onChange={(e) => setBankDetails(e.target.value)}
-                    rows={8}
-                    placeholder={`Bank: Meezan Bank\nAccount Title: Alkhidmat Foundation\nAccount #: 01234567890\nIBAN: PK00MEZN0001234567890`}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent font-mono text-sm"
-                  />
-                  <div className="flex justify-end mt-4">
-                    <Button
-                      type="button"
-                      onClick={handleSaveBank}
-                      disabled={savingBank}
-                      className="bg-primary-600 hover:bg-primary-700 text-white"
-                    >
-                      {savingBank ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...
-                        </>
-                      ) : (
-                        'Save Bank Details'
-                      )}
-                    </Button>
-                  </div>
-                </>
+            <button
+              type="button"
+              onClick={handleToggle}
+              disabled={loadingFlag || savingFlag}
+              aria-label="Toggle qurbani booking"
+              aria-pressed={enabled}
+              className={cn(
+                'relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-qurbani-500 focus-visible:ring-offset-2 cursor-pointer disabled:opacity-50',
+                enabled ? 'bg-qurbani-600' : 'bg-gray-300'
               )}
-            </CardContent>
-          </Card>
-        </FadeIn>
-      </div>
+            >
+              <span
+                className={cn(
+                  'inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform',
+                  enabled ? 'translate-x-6' : 'translate-x-1'
+                )}
+              />
+            </button>
+          </div>
+        </FormSection>
+
+        <FormSection title="Bank details" icon={Banknote} description="Shown to users on the payment screen after they create a booking.">
+          {loadingBank ? (
+            <div className="h-32 bg-gray-100 rounded-lg animate-pulse" />
+          ) : (
+            <>
+              <FormField label="Bank account instructions" htmlFor="bd">
+                <Textarea
+                  id="bd"
+                  value={bankDetails}
+                  onChange={(e) => setBankDetails(e.target.value)}
+                  rows={8}
+                  placeholder={`Bank: Meezan Bank\nAccount Title: Alkhidmat Foundation\nAccount #: 01234567890\nIBAN: PK00MEZN0001234567890`}
+                  className="font-mono text-sm"
+                />
+              </FormField>
+              <div className="flex justify-end mt-4">
+                <Button type="button" leftIcon={Save} loading={savingBank} onClick={handleSaveBank}>
+                  Save bank details
+                </Button>
+              </div>
+            </>
+          )}
+        </FormSection>
+      </PageContainer>
     </DashboardLayout>
   );
 }
