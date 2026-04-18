@@ -1,27 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Heart } from 'lucide-react';
+import { Drumstick } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
 import ListingCard from '../../components/qurbani/ListingCard';
 import HissaSelector from '../../components/qurbani/HissaSelector';
-import { SkeletonCard } from '../../components/common/Skeleton';
+import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 
 export default function QurbaniModule() {
-  const {
-    moduleEnabled,
-    listings,
-    loading,
-    fetchFlag,
-    fetchListings,
-  } = useQurbaniModuleStore();
-
+  const { moduleEnabled, listings, loading, fetchFlag, fetchListings } = useQurbaniModuleStore();
   const [selected, setSelected] = useState(null);
 
-  useEffect(() => {
-    fetchFlag();
-  }, [fetchFlag]);
+  useEffect(() => { fetchFlag(); }, [fetchFlag]);
 
   useEffect(() => {
     if (moduleEnabled === true) {
@@ -29,75 +21,51 @@ export default function QurbaniModule() {
     }
   }, [moduleEnabled, fetchListings]);
 
-  const handleBook = (listing) => setSelected(listing);
-  const handleClose = () => setSelected(null);
-
   const flagLoading = moduleEnabled === null;
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        {/* Header */}
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
-              <Heart className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Qurbani Booking</h1>
-              <p className="text-gray-600 mt-1">
-                Book your hissas in this Eid's shared qurbani animals
-              </p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="space-y-6">
+        <PageHeader
+          icon={Drumstick}
+          accent="qurbani"
+          title="Qurbani Booking"
+          description="Book your hissas in this Eid's shared qurbani animals. Every hissa feeds multiple families."
+        />
 
-        {/* Content */}
         {flagLoading || (moduleEnabled === true && loading) ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
+            {Array.from({ length: 6 }).map((_, i) => (<SkeletonStatCard key={i} />))}
           </div>
         ) : moduleEnabled === false ? (
-          <FadeIn direction="up" delay={100}>
-            <EmptyState
-              title="Qurbani booking is currently closed"
-              description="Qurbani bookings are not open right now. Please check back closer to Eid-ul-Adha."
-            />
-          </FadeIn>
+          <EmptyState
+            icon={Drumstick}
+            tone="qurbani"
+            title="Qurbani booking is currently closed"
+            description="Qurbani bookings are not open right now. Please check back closer to Eid-ul-Adha."
+          />
         ) : listings.length === 0 ? (
-          <FadeIn direction="up" delay={100}>
-            <EmptyState
-              title="No active qurbanis"
-              description="No qurbanis are open for booking right now. Check back soon."
-            />
-          </FadeIn>
+          <EmptyState
+            icon={Drumstick}
+            tone="qurbani"
+            title="No active qurbanis"
+            description="No qurbanis are open for booking right now. Check back soon."
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {listings.map((listing, idx) => (
-              <FadeIn key={listing.id} direction="up" delay={Math.min(idx * 60, 300)}>
-                <ListingCard listing={listing} onBook={handleBook} />
-              </FadeIn>
+            {listings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} onBook={setSelected} />
             ))}
           </div>
         )}
 
-        {/* Booking modal */}
         <HissaSelector
           listing={selected}
           open={!!selected}
-          onClose={() => {
-            handleClose();
-            // Refresh listings to reflect updated booked count
-            fetchListings();
-          }}
-          onSubmitted={() => {
-            // Trigger background refresh so availability updates
-            fetchListings();
-          }}
+          onClose={() => { setSelected(null); fetchListings(); }}
+          onSubmitted={() => { fetchListings(); }}
         />
-      </div>
+      </PageContainer>
     </DashboardLayout>
   );
 }
