@@ -105,3 +105,12 @@ export async function updateVolunteerTaskStatus(id, status) {
   const response = await api.patch(`/admin/volunteers/tasks/${id}/status`, { status });
   return response.data;
 }
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+
+export async function getUsers() {
+  const response = await api.get('/admin/users');
+  return response.data;
+}

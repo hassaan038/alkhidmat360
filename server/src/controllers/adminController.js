@@ -217,6 +217,15 @@ export const updateVolunteerTaskStatus = asyncHandler(async (req, res) => {
 });
 
 // ============================================
+// USER MANAGEMENT
+// ============================================
+
+export const getUsers = asyncHandler(async (req, res) => {
+  const result = await adminService.getAllUsers();
+  res.status(200).json(new ApiResponse(200, result, 'Users fetched successfully'));
+});
+
+// ============================================
 // ADMIN USER MANAGEMENT
 // ============================================
 

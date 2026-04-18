@@ -16,6 +16,13 @@ export async function getDashboardStats() {
     pendingDonations,
     pendingApplications,
     pendingVolunteers,
+    qurbani,
+    ration,
+    skin,
+    sponsorship,
+    loan,
+    ramadan,
+    orphan,
   ] = await Promise.all([
     // Total donations across all types
     Promise.all([
@@ -52,6 +59,17 @@ export async function getDashboardStats() {
 
     // Pending volunteer tasks
     prisma.volunteerTask.count({ where: { status: 'pending' } }),
+
+    // Per-type donation counts
+    prisma.qurbaniDonation.count(),
+    prisma.rationDonation.count(),
+    prisma.skinCollection.count(),
+    prisma.orphanSponsorship.count(),
+
+    // Per-type application counts
+    prisma.loanApplication.count(),
+    prisma.ramadanRationApplication.count(),
+    prisma.orphanRegistration.count(),
   ]);
 
   return {
@@ -61,6 +79,8 @@ export async function getDashboardStats() {
     pendingDonations,
     pendingApplications,
     pendingVolunteers,
+    donationsByType: { qurbani, ration, skin, sponsorship },
+    applicationsByType: { loan, ramadan, orphan },
   };
 }
 
@@ -293,4 +313,34 @@ export async function createAdminUser(adminData) {
   // Remove password from response
   const { password, ...adminWithoutPassword } = admin;
   return adminWithoutPassword;
+}
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+
+export async function getAllUsers() {
+  const users = await prisma.user.findMany({
+    select: {
+      id: true,
+      email: true,
+      fullName: true,
+      phoneNumber: true,
+      cnic: true,
+      userType: true,
+      isActive: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const counts = {
+    total: users.length,
+    donors: users.filter(u => u.userType === 'DONOR').length,
+    beneficiaries: users.filter(u => u.userType === 'BENEFICIARY').length,
+    volunteers: users.filter(u => u.userType === 'VOLUNTEER').length,
+    admins: users.filter(u => u.userType === 'ADMIN').length,
+  };
+
+  return { users, counts };
 }

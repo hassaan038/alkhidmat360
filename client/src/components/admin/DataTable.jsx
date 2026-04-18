@@ -28,9 +28,11 @@ const StatusBadge = ({ status }) => {
 export default function DataTable({ columns, data, onStatusUpdate, type }) {
   const [expandedRow, setExpandedRow] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null);
 
   const handleStatusUpdate = async (id, newStatus) => {
     setUpdatingId(id);
+    setPendingAction(null);
     try {
       await onStatusUpdate(id, newStatus);
       toast.success('Status updated successfully');
@@ -94,27 +96,52 @@ export default function DataTable({ columns, data, onStatusUpdate, type }) {
                   </td>
                   <td className="px-4 py-3">
                     {row.status === 'pending' && (
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleStatusUpdate(row.id, 'approved')}
-                          disabled={updatingId === row.id}
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          <Check className="w-3 h-3 mr-1" />
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleStatusUpdate(row.id, 'rejected')}
-                          disabled={updatingId === row.id}
-                          className="border-red-300 text-red-600 hover:bg-red-50"
-                        >
-                          <X className="w-3 h-3 mr-1" />
-                          Reject
-                        </Button>
-                      </div>
+                      pendingAction?.id === row.id ? (
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-gray-700">
+                            Confirm {pendingAction.action}?
+                          </span>
+                          <Button
+                            size="sm"
+                            onClick={() => handleStatusUpdate(row.id, pendingAction.action === 'approve' ? 'approved' : 'rejected')}
+                            disabled={updatingId === row.id}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            Yes, Confirm
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setPendingAction(null)}
+                            disabled={updatingId === row.id}
+                            className="border-gray-300 text-gray-600 hover:bg-gray-50"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => setPendingAction({ id: row.id, action: 'approve' })}
+                            disabled={updatingId === row.id}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                          >
+                            <Check className="w-3 h-3 mr-1" />
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setPendingAction({ id: row.id, action: 'reject' })}
+                            disabled={updatingId === row.id}
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                          >
+                            <X className="w-3 h-3 mr-1" />
+                            Reject
+                          </Button>
+                        </div>
+                      )
                     )}
                   </td>
                   <td className="px-4 py-3">

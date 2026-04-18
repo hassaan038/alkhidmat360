@@ -16,15 +16,16 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      // Server responded with error
       const message = error.response.data?.message || 'An error occurred';
       const errors = error.response.data?.errors || [];
+      const status = error.response.status;
 
-      return Promise.reject({
-        message,
-        errors,
-        status: error.response.status,
-      });
+      // Session expired — redirect to login, but only outside auth routes
+      if (status === 401 && !error.config?.url?.includes('/auth/')) {
+        window.location.href = '/login';
+      }
+
+      return Promise.reject({ message, errors, status });
     } else if (error.request) {
       // Request made but no response
       return Promise.reject({
