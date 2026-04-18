@@ -4,18 +4,17 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import {
   Heart,
-  TrendingUp,
   Clock,
   CheckCircle,
   XCircle,
   ArrowRight,
   Sparkles,
-  Loader2,
 } from 'lucide-react';
-import Button from '../../components/ui/Button';
 import { Link } from 'react-router-dom';
 import * as userService from '../../services/userService';
 import CharacterLaptop from '../../components/illustrations/CharacterLaptop';
+import { SkeletonCard } from '../../components/common/Skeleton';
+import EmptyState from '../../components/common/EmptyState';
 
 export default function UserDashboard() {
   const { user } = useAuthStore();
@@ -172,9 +171,12 @@ export default function UserDashboard() {
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {loading ? (
-            <div className="col-span-4 flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
-            </div>
+            <>
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </>
           ) : stats ? (
             stats.map((stat) => {
               const Icon = stat.icon;
@@ -228,15 +230,10 @@ export default function UserDashboard() {
             <CardTitle>Recent Activity</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-8 h-8 text-gray-400" />
-              </div>
-              <p className="text-gray-600 mb-4">No activity yet</p>
-              <p className="text-sm text-gray-500">
-                Your submissions and activities will appear here
-              </p>
-            </div>
+            <EmptyState
+              title="No recent activity"
+              description="Your submissions will appear here."
+            />
           </CardContent>
         </Card>
       </div>

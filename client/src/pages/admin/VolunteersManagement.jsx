@@ -3,7 +3,6 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import {
   HandHeart,
-  Loader2,
   Mail,
   Phone,
   CreditCard,
@@ -17,6 +16,8 @@ import {
 } from 'lucide-react';
 import * as adminService from '../../services/adminService';
 import FadeIn from '../../components/animations/FadeIn';
+import { SkeletonTable } from '../../components/common/Skeleton';
+import EmptyState from '../../components/common/EmptyState';
 
 export default function VolunteersManagement() {
   const [loading, setLoading] = useState(true);
@@ -204,24 +205,18 @@ export default function VolunteersManagement() {
 
             <CardContent className="p-0">
               {loading ? (
-                <div className="flex items-center justify-center py-16">
-                  <div className="text-center">
-                    <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto mb-4" />
-                    <p className="text-gray-600">Loading volunteers...</p>
-                  </div>
+                <div className="p-6">
+                  <SkeletonTable rows={5} />
                 </div>
               ) : filteredVolunteers.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="w-10 h-10 text-gray-400" />
-                  </div>
-                  <p className="text-gray-600 font-medium mb-2">No volunteers found</p>
-                  <p className="text-sm text-gray-500">
-                    {searchTerm || filterStatus !== 'all'
-                      ? 'Try adjusting your search or filters'
-                      : 'No volunteers have registered yet'}
-                  </p>
-                </div>
+                <EmptyState
+                  title={searchTerm || filterStatus !== 'all' ? 'No volunteers found' : 'No tasks yet'}
+                  description={
+                    searchTerm || filterStatus !== 'all'
+                      ? 'Try adjusting your search or filters.'
+                      : 'Submissions will appear here once users start submitting.'
+                  }
+                />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">

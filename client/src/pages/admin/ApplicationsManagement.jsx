@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import DataTable from '../../components/admin/DataTable';
-import { FileText, Loader2 } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import * as adminService from '../../services/adminService';
 import FadeIn from '../../components/animations/FadeIn';
+import { SkeletonTable } from '../../components/common/Skeleton';
+import EmptyState from '../../components/common/EmptyState';
 
 export default function ApplicationsManagement() {
   const [activeTab, setActiveTab] = useState('loan');
@@ -148,9 +150,12 @@ export default function ApplicationsManagement() {
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-yellow-600" />
-                </div>
+                <SkeletonTable rows={5} />
+              ) : data.length === 0 ? (
+                <EmptyState
+                  title="No applications yet"
+                  description="Submissions will appear here once users start submitting."
+                />
               ) : (
                 <DataTable
                   columns={columns[activeTab]}
