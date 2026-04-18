@@ -1,0 +1,32 @@
+{
+  "name": "alkhidmat360-server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/server.js",
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "db:push": "npx prisma db push",
+    "db:migrate": "npx prisma migrate dev",
+    "db:studio": "npx prisma studio",
+    "db:seed": "node prisma/seed.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "@prisma/client": "^6.2.0",
+    "prisma": "^6.2.0",
+    "bcryptjs": "^2.4.3",
+    "express-session": "^1.18.1",
+    "express-mysql-session": "^3.0.3",
+    "mysql2": "^3.12.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
