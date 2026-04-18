@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Coins, ChevronDown, ChevronUp } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { SkeletonTable } from '../../components/common/Skeleton';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import { Card } from '../../components/ui/Card';
+import { Select } from '../../components/ui/Input';
+import { SkeletonRow } from '../../components/ui/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as zakatService from '../../services/zakatService';
-import { cn, formatCurrency, getStatusColor, formatApiError } from '../../lib/utils';
+import { formatCurrency, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
 
 const STATUS_OPTIONS = ['pending', 'under_review', 'approved', 'rejected'];
@@ -53,55 +55,43 @@ export default function AdminZakatApplications() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg flex items-center justify-center">
-              <Coins className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Zakat Applications</h1>
-              <p className="text-sm text-gray-600">
-                Review beneficiary applications and move them through pending → under review →
-                approved or rejected.
-              </p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="space-y-6">
+        <PageHeader
+          icon={Coins}
+          accent="zakat"
+          title="Zakat Applications"
+          description="Review beneficiary applications and progress them through pending → under review → approved / rejected."
+        />
 
-        <FadeIn direction="up" delay={100}>
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-lg">All Applications</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Card className="overflow-hidden">
               {loading ? (
-                <SkeletonTable rows={5} />
+                <div className="p-5 space-y-2">
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
+                </div>
               ) : items.length === 0 ? (
                 <EmptyState
+                  icon={Coins}
+                  tone="zakat"
                   title="No zakat applications yet"
                   description="Beneficiary submissions will appear here."
                 />
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full">
+                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Applicant</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CNIC</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Family</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Income</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3"></th>
+                        <Th>#</Th><Th>Applicant</Th><Th>CNIC</Th>
+                        <Th>Family</Th><Th>Income</Th><Th>Status</Th><Th></Th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-100">
                       {items.map((a) => {
                         const cnicDoc = imageUrl(a.cnicDocumentUrl);
                         return (
                           <>
-                            <tr key={a.id} className="hover:bg-gray-50 align-top">
+                            <tr key={a.id} className="transition-colors hover:bg-zakat-50/40 align-top">
                               <td className="px-4 py-3 text-sm font-medium text-gray-900">#{a.id}</td>
                               <td className="px-4 py-3 text-sm">
                                 <div className="font-medium text-gray-900">{a.applicantName}</div>
@@ -119,28 +109,25 @@ export default function AdminZakatApplications() {
                                 </div>
                               </td>
                               <td className="px-4 py-3">
-                                <select
+                                <Select
                                   value={a.status}
                                   onChange={(e) => handleStatus(a.id, e.target.value)}
                                   disabled={updatingId === a.id}
-                                  className={cn(
-                                    'text-xs font-medium px-2.5 py-1 rounded-full border bg-white capitalize cursor-pointer',
-                                    getStatusColor(a.status)
-                                  )}
+                                  className="h-8 text-xs capitalize w-[140px]"
                                 >
                                   {STATUS_OPTIONS.map((s) => (
                                     <option key={s} value={s} className="capitalize">
                                       {s.replace('_', ' ')}
                                     </option>
                                   ))}
-                                </select>
+                                </Select>
                               </td>
                               <td className="px-4 py-3">
                                 <button
                                   type="button"
                                   onClick={() => toggleExpand(a.id)}
-                                  className="text-gray-400 hover:text-gray-600"
-                                  aria-label="Expand row"
+                                  className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
+                                  aria-label={expanded === a.id ? 'Collapse row' : 'Expand row'}
                                 >
                                   {expanded === a.id ? (
                                     <ChevronUp className="w-5 h-5" />
@@ -215,10 +202,16 @@ export default function AdminZakatApplications() {
                   </table>
                 </div>
               )}
-            </CardContent>
           </Card>
-        </FadeIn>
-      </div>
+      </PageContainer>
     </DashboardLayout>
+  );
+}
+
+function Th({ children }) {
+  return (
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+      {children}
+    </th>
   );
 }

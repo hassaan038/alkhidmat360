@@ -13,10 +13,11 @@ import {
   ListChecks,
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import { Card } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { SkeletonTable } from '../../components/common/Skeleton';
+import { SkeletonRow } from '../../components/ui/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as qurbaniModuleService from '../../services/qurbaniModuleService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
@@ -272,36 +273,30 @@ export default function QurbaniListings() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        <FadeIn direction="up" delay={0}>
-          <div className="mb-6 flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg flex items-center justify-center">
-                <ListChecks className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Qurbani Listings</h1>
-                <p className="text-sm text-gray-600">
-                  Manage animal listings available for hissa booking
-                </p>
-              </div>
-            </div>
-            <Button onClick={openCreate} className="bg-primary-600 hover:bg-primary-700 text-white">
-              <Plus className="w-4 h-4 mr-2" /> Create Listing
+      <PageContainer className="space-y-6">
+        <PageHeader
+          icon={ListChecks}
+          accent="qurbani"
+          title="Qurbani Listings"
+          description="Manage animal listings available for hissa booking."
+          actions={
+            <Button leftIcon={Plus} onClick={openCreate}>
+              Create listing
             </Button>
-          </div>
-        </FadeIn>
+          }
+        />
 
-        <FadeIn direction="up" delay={100}>
-          <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle>All Listings</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Card className="overflow-hidden">
               {loading ? (
-                <SkeletonTable rows={5} />
+                <div className="p-5 space-y-2">
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
+                </div>
               ) : listings.length === 0 ? (
                 <EmptyState
+                  icon={ListChecks}
+                  tone="qurbani"
                   title="No listings yet"
                   description="Create your first listing to start accepting hissa bookings."
                   action={{ label: 'Create Listing', onClick: openCreate }}
@@ -394,10 +389,8 @@ export default function QurbaniListings() {
                   </table>
                 </div>
               )}
-            </CardContent>
           </Card>
-        </FadeIn>
-      </div>
+      </PageContainer>
 
       {/* Create / Edit Modal */}
       {modalMode && (

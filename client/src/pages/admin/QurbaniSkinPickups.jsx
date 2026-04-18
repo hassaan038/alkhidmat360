@@ -2,29 +2,17 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Scissors, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { SkeletonTable } from '../../components/common/Skeleton';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import { Card } from '../../components/ui/Card';
+import { Select } from '../../components/ui/Input';
+import { SkeletonRow } from '../../components/ui/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as qurbaniSkinPickupService from '../../services/qurbaniSkinPickupService';
-import { cn, formatDate, formatApiError } from '../../lib/utils';
+import { formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
 
 const STATUS_OPTIONS = ['pending', 'scheduled', 'collected', 'cancelled'];
-
-const STATUS_BADGE_CLASS = (status) => {
-  switch (status) {
-    case 'scheduled':
-      return 'bg-info-light text-info-dark border-info';
-    case 'collected':
-      return 'bg-success-light text-success-dark border-success';
-    case 'cancelled':
-      return 'bg-error-light text-error-dark border-error';
-    case 'pending':
-    default:
-      return 'bg-warning-light text-warning-dark border-warning';
-  }
-};
 
 function osmLink(lat, lng) {
   return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=18/${lat}/${lng}`;
@@ -71,57 +59,45 @@ export default function QurbaniSkinPickups() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg flex items-center justify-center">
-              <Scissors className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Skin Pickup Requests</h1>
-              <p className="text-sm text-gray-600">
-                Schedule, mark collected, or cancel skin collection requests.
-              </p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="space-y-6">
+        <PageHeader
+          icon={Scissors}
+          accent="qurbani"
+          title="Skin Pickup Requests"
+          description="Schedule, mark collected, or cancel skin collection requests."
+        />
 
-        <FadeIn direction="up" delay={100}>
-          <Card className="shadow-soft">
-            <CardHeader>
-              <CardTitle className="text-lg">All Requests</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <Card className="overflow-hidden">
               {loading ? (
-                <SkeletonTable rows={5} />
+                <div className="p-5 space-y-2">
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
+                </div>
               ) : pickups.length === 0 ? (
                 <EmptyState
+                  icon={Scissors}
+                  tone="qurbani"
                   title="No pickup requests yet"
                   description="Requests submitted by users will appear here."
                 />
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full">
+                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skins</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address / Map</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preferred</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3"></th>
+                        <Th>#</Th><Th>User</Th><Th>Phone</Th><Th>Skins</Th>
+                        <Th>Address / Map</Th><Th>Preferred</Th><Th>Status</Th><Th></Th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="divide-y divide-gray-100">
                       {pickups.map((p) => {
                         const lat = p.latitude != null ? Number(p.latitude) : null;
                         const lng = p.longitude != null ? Number(p.longitude) : null;
                         const hasCoords = lat != null && lng != null;
                         return (
                           <>
-                            <tr key={p.id} className="hover:bg-gray-50 align-top">
+                            <tr key={p.id} className="transition-colors hover:bg-qurbani-50/40 align-top">
                               <td className="px-4 py-3 text-sm font-medium text-gray-900">#{p.id}</td>
                               <td className="px-4 py-3 text-sm">
                                 <div className="font-medium text-gray-900">
@@ -153,28 +129,25 @@ export default function QurbaniSkinPickups() {
                                 {p.preferredDate ? formatDate(p.preferredDate) : '—'}
                               </td>
                               <td className="px-4 py-3">
-                                <select
+                                <Select
                                   value={p.status}
                                   onChange={(e) => handleStatusChange(p.id, e.target.value)}
                                   disabled={updatingId === p.id}
-                                  className={cn(
-                                    'text-xs font-medium px-2.5 py-1 rounded-full border bg-white capitalize cursor-pointer',
-                                    STATUS_BADGE_CLASS(p.status)
-                                  )}
+                                  className="h-8 text-xs capitalize w-[130px]"
                                 >
                                   {STATUS_OPTIONS.map((s) => (
                                     <option key={s} value={s} className="capitalize">
                                       {s}
                                     </option>
                                   ))}
-                                </select>
+                                </Select>
                               </td>
                               <td className="px-4 py-3">
                                 <button
                                   type="button"
                                   onClick={() => toggleExpand(p.id)}
-                                  className="text-gray-400 hover:text-gray-600"
-                                  aria-label="Expand row"
+                                  className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
+                                  aria-label={expanded === p.id ? 'Collapse row' : 'Expand row'}
                                 >
                                   {expanded === p.id ? (
                                     <ChevronUp className="w-5 h-5" />
@@ -233,10 +206,16 @@ export default function QurbaniSkinPickups() {
                   </table>
                 </div>
               )}
-            </CardContent>
           </Card>
-        </FadeIn>
-      </div>
+      </PageContainer>
     </DashboardLayout>
+  );
+}
+
+function Th({ children }) {
+  return (
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+      {children}
+    </th>
   );
 }
