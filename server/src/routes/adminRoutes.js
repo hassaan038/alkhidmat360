@@ -15,6 +15,11 @@ import * as qurbaniSkinPickupController from '../controllers/qurbaniSkinPickupCo
 import { skinPickupStatusUpdateSchema } from '../validators/qurbaniSkinPickupValidator.js';
 import * as fitranaController from '../controllers/fitranaController.js';
 import { fitranaStatusUpdateSchema } from '../validators/fitranaValidator.js';
+import * as zakatController from '../controllers/zakatController.js';
+import {
+  zakatPaymentStatusSchema,
+  zakatApplicationStatusSchema,
+} from '../validators/zakatValidator.js';
 
 const router = express.Router();
 
@@ -185,6 +190,24 @@ router.patch(
   '/fitrana/:id/status',
   validateRequest(fitranaStatusUpdateSchema),
   fitranaController.adminUpdateFitranaStatus
+);
+
+// ============================================
+// ZAKAT — PAYMENTS (donor) + APPLICATIONS (beneficiary)
+// ============================================
+
+router.get('/zakat/payments', zakatController.adminListPayments);
+router.patch(
+  '/zakat/payments/:id/status',
+  validateRequest(zakatPaymentStatusSchema),
+  zakatController.adminUpdatePaymentStatus
+);
+
+router.get('/zakat/applications', zakatController.adminListApplications);
+router.patch(
+  '/zakat/applications/:id/status',
+  validateRequest(zakatApplicationStatusSchema),
+  zakatController.adminUpdateApplicationStatus
 );
 
 export default router;

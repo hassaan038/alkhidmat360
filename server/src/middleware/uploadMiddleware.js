@@ -11,9 +11,10 @@ const __dirname = path.dirname(__filename);
 const qurbaniUploadDir = path.resolve(__dirname, '../../uploads/qurbani');
 const skinPickupUploadDir = path.resolve(__dirname, '../../uploads/skin-pickup');
 const paymentUploadDir = path.resolve(__dirname, '../../uploads/payments');
+const zakatDocsUploadDir = path.resolve(__dirname, '../../uploads/zakat-docs');
 
 // Ensure directories exist
-for (const dir of [qurbaniUploadDir, skinPickupUploadDir, paymentUploadDir]) {
+for (const dir of [qurbaniUploadDir, skinPickupUploadDir, paymentUploadDir, zakatDocsUploadDir]) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -95,8 +96,32 @@ export const uploadPaymentScreenshot = multer({
   },
 });
 
+// ============================================
+// ZAKAT APPLICATION DOCUMENT UPLOAD (e.g. CNIC photo)
+// ============================================
+
+const zakatDocsStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, zakatDocsUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `zakat-doc-${uniqueSuffix}${ext}`);
+  },
+});
+
+export const uploadZakatDoc = multer({
+  storage: zakatDocsStorage,
+  fileFilter: imageFileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
 export default {
   uploadQurbaniPhoto,
   uploadSkinPickupPhoto,
   uploadPaymentScreenshot,
+  uploadZakatDoc,
 };

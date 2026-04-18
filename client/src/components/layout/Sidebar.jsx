@@ -21,6 +21,7 @@ import {
   Settings,
   ListChecks,
   HandCoins,
+  Coins,
 } from 'lucide-react';
 
 // Qurbani items shown to non-admin users when the flag is on
@@ -117,6 +118,12 @@ const menuItems = {
       path: '/dashboard/user/orphan-sponsorship',
       description: 'Sponsor an orphan',
     },
+    {
+      label: 'Zakat',
+      icon: Coins,
+      path: '/dashboard/user/zakat-pay',
+      description: 'Calculate and pay zakat',
+    },
   ],
   BENEFICIARY: [
     {
@@ -141,6 +148,12 @@ const menuItems = {
       icon: Baby,
       path: '/dashboard/user/orphan',
       description: 'Register as guardian',
+    },
+    {
+      label: 'Apply for Zakat',
+      icon: Coins,
+      path: '/dashboard/user/zakat-apply',
+      description: 'Request zakat assistance',
     },
   ],
   VOLUNTEER: [
@@ -191,6 +204,18 @@ const menuItems = {
       icon: HandHeart,
       path: '/dashboard/admin/volunteers',
       description: 'Manage volunteers',
+    },
+    {
+      label: 'Zakat Payments',
+      icon: Coins,
+      path: '/dashboard/admin/zakat-payments',
+      description: 'Confirm donor zakat',
+    },
+    {
+      label: 'Zakat Applications',
+      icon: Coins,
+      path: '/dashboard/admin/zakat-applications',
+      description: 'Review beneficiary requests',
     },
   ],
 };

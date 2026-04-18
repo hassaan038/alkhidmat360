@@ -114,7 +114,8 @@ Module-gating middleware: `requireQurbaniModuleActive` (in `middleware/qurbaniMo
 File upload middleware (in `middleware/uploadMiddleware.js`):
 - `uploadQurbaniPhoto` — multer disk storage at `server/uploads/qurbani/`, image-only, 5 MB cap. Use as `.single('photo')`.
 - `uploadSkinPickupPhoto` — multer disk storage at `server/uploads/skin-pickup/`, image-only, 5 MB cap. Use as `.single('housePhoto')`.
-- `uploadPaymentScreenshot` — multer disk storage at `server/uploads/payments/`, image-only, 5 MB cap. Use as `.single('paymentScreenshot')`. Used by qurbani booking POST, qurbani mark-paid POST, and fitrana POST so users can optionally attach proof of bank transfer.
+- `uploadPaymentScreenshot` — multer disk storage at `server/uploads/payments/`, image-only, 5 MB cap. Use as `.single('paymentScreenshot')`. Used by qurbani booking POST, qurbani mark-paid POST, fitrana POST, and zakat payment POST so users can optionally attach proof of bank transfer.
+- `uploadZakatDoc` — multer disk storage at `server/uploads/zakat-docs/`, image-only, 5 MB cap. Use as `.single('cnicDocument')`. Used by beneficiary zakat application POST for an optional CNIC photo.
 
 All must run BEFORE `validateRequest` so Zod sees text fields. Validators must use `z.coerce.number()` for numeric multipart fields, and `z.union([z.boolean(), z.string()]).transform(v => v === 'true' || v === true)` for boolean fields like `paymentMarked` (multipart sends "true"/"false" as strings).
 
@@ -193,6 +194,14 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 | POST | `/` | createFitranaSchema → fitranaController.createFitrana (accepts paymentMarked: true to record + flag in one shot) |
 | GET | `/me` | fitranaController.getMyFitranas |
 
+### `/api/zakat` (requireAuth, role-gated per endpoint)
+| Method | Path | Auth | Handler |
+|--------|------|------|---------|
+| POST | `/payments` | + requireRole('DONOR') | uploadPaymentScreenshot.single('paymentScreenshot') → createZakatPaymentSchema → zakatController.createPayment (multipart; optional screenshot) |
+| GET | `/payments/me` | + requireRole('DONOR') | zakatController.getMyPayments |
+| POST | `/applications` | + requireRole('BENEFICIARY') | uploadZakatDoc.single('cnicDocument') → createZakatApplicationSchema → zakatController.createApplication (multipart; optional CNIC photo) |
+| GET | `/applications/me` | + requireRole('BENEFICIARY') | zakatController.getMyApplications |
+
 ### `/api/config` (requireAuth)
 | Method | Path | Auth | Handler |
 |--------|------|------|---------|
@@ -240,6 +249,10 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 | PATCH | `/qurbani-skin-pickups/:id/status` | skinPickupStatusUpdateSchema → qurbaniSkinPickupController.adminUpdatePickupStatus (pending\|scheduled\|collected\|cancelled) |
 | GET | `/fitrana` | fitranaController.adminListFitranas (includes user) |
 | PATCH | `/fitrana/:id/status` | fitranaStatusUpdateSchema → fitranaController.adminUpdateFitranaStatus (pending\|confirmed\|rejected) |
+| GET | `/zakat/payments` | zakatController.adminListPayments (donor zakat payments, includes user) |
+| PATCH | `/zakat/payments/:id/status` | zakatPaymentStatusSchema → zakatController.adminUpdatePaymentStatus (pending\|confirmed\|rejected) |
+| GET | `/zakat/applications` | zakatController.adminListApplications (beneficiary applications, includes user) |
+| PATCH | `/zakat/applications/:id/status` | zakatApplicationStatusSchema → zakatController.adminUpdateApplicationStatus (pending\|under_review\|approved\|rejected) |
 
 Admin list endpoints include nested `user: { id, email, fullName, phoneNumber }`.
 
@@ -466,6 +479,45 @@ createdAt, updatedAt
 - Same deferred-write payment flow as Qurbani Booking — record only persists when user clicks "I've Paid" in the modal.
 - Same optional `paymentScreenshotUrl` mechanism — multipart field `paymentScreenshot`, stored under `/uploads/payments/<file>`.
 
+### ZakatPayment (donor calculator + payment)
+```
+id, userId (FK cascade),
+cashSavings, goldGrams, goldValue, silverGrams, silverValue,
+investments, businessAssets, otherAssets, liabilities  (all Decimal default 0)
+nisabBasis String,                  // 'gold' | 'silver'
+nisabThreshold Decimal,             // PKR snapshot at submission time
+totalWealth Decimal,                // sum of zakatables - liabilities
+zakatAmount Decimal,                // 0.025 × totalWealth (or 0 below nisab)
+contactPhone? String, notes? Text,
+paymentMarked Bool default false, paymentMarkedAt DateTime?,
+paymentScreenshotUrl? String,
+status String default 'pending',    // pending, confirmed, rejected
+timestamps
+@@index([userId]) @@index([status])
+```
+- Year-round, NOT gated by qurbani flag.
+- Donor-only via `requireRole('DONOR')` at the route layer.
+- Per-gram gold/silver rates (defaults: PKR 39000/g and 480/g) live in `client/src/pages/zakat/ZakatPayment.jsx` constants — donor can override inline if their reference rate differs. Update annually.
+- Nisab thresholds in grams are religious constants (gold 87.48g, silver 612.36g). Silver basis is the lower threshold and recommended.
+- Same deferred-write payment flow as fitrana — record only persists when user clicks "I've Paid". Multipart with optional `paymentScreenshot`.
+
+### ZakatApplication (beneficiary eligibility request)
+```
+id, userId (FK cascade),
+applicantName, applicantPhone, applicantCNIC (13 digits), applicantAddress Text,
+familyMembers Int, monthlyIncome Decimal,
+employmentStatus String,            // employed | self-employed | unemployed | student | retired | other
+housingStatus String,               // own | rent | family | other
+hasDisabledMembers Bool, disabilityDetails? Text,
+reasonForApplication Text, amountRequested? Decimal, additionalNotes? Text,
+cnicDocumentUrl? String,            // /uploads/zakat-docs/<file>
+status String default 'pending',    // pending, under_review, approved, rejected
+timestamps
+@@index([userId]) @@index([status])
+```
+- Beneficiary-only via `requireRole('BENEFICIARY')`.
+- Multipart route — optional `cnicDocument` image attached via mobile camera (`capture="environment"`). Stored under `/uploads/zakat-docs/`.
+
 ### Session (mapped to runtime express-mysql-session table — do not write from Prisma)
 ```
 sessionId String @id @map("session_id") @db.VarChar(128)
@@ -516,6 +568,8 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/user/qurbani-bookings` | MyHissaBookings | DONOR, BENEFICIARY, VOLUNTEER |
 | `/dashboard/user/qurbani-skin-pickup` | SkinPickup (form + own list, with geolocation) | DONOR, BENEFICIARY, VOLUNTEER |
 | `/dashboard/user/fitrana` | Fitrana (calculator + deferred payment modal + own list) | DONOR, BENEFICIARY, VOLUNTEER |
+| `/dashboard/user/zakat-pay` | ZakatPayment (calculator + deferred payment modal) | DONOR |
+| `/dashboard/user/zakat-apply` | ZakatApplication (eligibility application form) | BENEFICIARY |
 | `/dashboard/admin` | AdminDashboard | ADMIN |
 | `/dashboard/admin/users` | UserManagement | ADMIN |
 | `/dashboard/admin/donations` | DonationsManagement | ADMIN |
@@ -525,6 +579,8 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/admin/qurbani-bookings` | QurbaniBookings (approve/reject) | ADMIN |
 | `/dashboard/admin/qurbani-skin-pickups` | QurbaniSkinPickups (status updates) | ADMIN |
 | `/dashboard/admin/fitrana` | AdminFitrana (confirm/reject) | ADMIN |
+| `/dashboard/admin/zakat-payments` | AdminZakatPayments (confirm/reject donor zakat) | ADMIN |
+| `/dashboard/admin/zakat-applications` | AdminZakatApplications (review beneficiary requests) | ADMIN |
 | `/dashboard/admin/qurbani-settings` | QurbaniModuleSettings (toggle + bank details) | ADMIN |
 | `/dashboard/admin/create-admin` | CreateAdmin | ADMIN |
 | `*` | 404 page | — |
@@ -561,6 +617,7 @@ One file per backend resource. All import the shared `api.js` — **do not creat
 - `systemConfigService.js` — getQurbaniModuleFlag, updateQurbaniModuleFlag(enabled), getBankDetails, updateBankDetails(text)
 - `qurbaniSkinPickupService.js` — createSkinPickup, getMySkinPickups + admin: adminListSkinPickups, adminUpdateSkinPickupStatus
 - `fitranaService.js` — createFitrana, getMyFitranas + admin: adminListFitranas, adminUpdateFitranaStatus
+- `zakatService.js` — createZakatPayment, getMyZakatPayments (donor) + createZakatApplication, getMyZakatApplications (beneficiary) + 4 admin endpoints
 
 ### Stores (`store/`)
 - `authStore.js` — auth state (see Auth store section above)
@@ -613,10 +670,12 @@ pages/
   volunteer/    VolunteerTaskRegistration.jsx
   qurbani/      QurbaniModule.jsx (listings grid), MyHissaBookings.jsx,
                 SkinPickup.jsx (form + own list), Fitrana.jsx (calculator + payment)
+  zakat/        ZakatPayment.jsx (donor calculator), ZakatApplication.jsx (beneficiary form)
   admin/        UserManagement.jsx, DonationsManagement.jsx, ApplicationsManagement.jsx,
                 VolunteersManagement.jsx, CreateAdmin.jsx,
                 QurbaniListings.jsx, QurbaniBookings.jsx, QurbaniModuleSettings.jsx,
-                QurbaniSkinPickups.jsx, AdminFitrana.jsx
+                QurbaniSkinPickups.jsx, AdminFitrana.jsx,
+                AdminZakatPayments.jsx, AdminZakatApplications.jsx
 ```
 
 ### Form pattern (all form pages)

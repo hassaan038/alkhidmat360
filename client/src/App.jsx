@@ -40,6 +40,10 @@ import SkinPickup from './pages/qurbani/SkinPickup';
 import QurbaniSkinPickups from './pages/admin/QurbaniSkinPickups';
 import Fitrana from './pages/qurbani/Fitrana';
 import AdminFitrana from './pages/admin/AdminFitrana';
+import ZakatPayment from './pages/zakat/ZakatPayment';
+import ZakatApplication from './pages/zakat/ZakatApplication';
+import AdminZakatPayments from './pages/admin/AdminZakatPayments';
+import AdminZakatApplications from './pages/admin/AdminZakatApplications';
 
 // Protected Route Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -197,6 +201,28 @@ function App() {
             }
           />
 
+          {/* Zakat — separate pages for donor (pay) vs beneficiary (apply) */}
+          <Route
+            path="/dashboard/user/zakat-pay"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['DONOR']}>
+                  <ZakatPayment />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/user/zakat-apply"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['BENEFICIARY']}>
+                  <ZakatApplication />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+
           {/* Protected Routes - Admin Dashboard */}
           <Route
             path="/dashboard/admin"
@@ -308,6 +334,26 @@ function App() {
               <ProtectedRoute>
                 <RoleBasedRoute allowedRoles={['ADMIN']}>
                   <AdminFitrana />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/admin/zakat-payments"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['ADMIN']}>
+                  <AdminZakatPayments />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/admin/zakat-applications"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['ADMIN']}>
+                  <AdminZakatApplications />
                 </RoleBasedRoute>
               </ProtectedRoute>
             }

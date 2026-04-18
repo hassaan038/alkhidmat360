@@ -45,6 +45,8 @@ model User {
   qurbaniHissaBookings  QurbaniHissaBooking[]
   qurbaniSkinPickups    QurbaniSkinPickup[]
   fitranaCollections    Fitrana[]
+  zakatPayments         ZakatPayment[]
+  zakatApplications     ZakatApplication[]
 
   @@index([email])
   @@index([userType])
@@ -398,6 +400,79 @@ model Fitrana {
   status          String    @default("pending") // pending, confirmed, rejected
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// Zakat payment (donor) — calculator-driven submission with the same
+// deferred-write payment flow as fitrana. Year-round, NOT gated by the
+// qurbani flag. The detailed breakdown is preserved so the donor (and
+// admin) have a record of what was declared at submission time.
+model ZakatPayment {
+  id               Int       @id @default(autoincrement())
+  userId           Int
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  cashSavings      Decimal   @db.Decimal(15, 2) @default(0)
+  goldGrams        Decimal   @db.Decimal(10, 3) @default(0)
+  goldValue        Decimal   @db.Decimal(15, 2) @default(0)   // PKR equivalent of goldGrams
+  silverGrams      Decimal   @db.Decimal(10, 3) @default(0)
+  silverValue      Decimal   @db.Decimal(15, 2) @default(0)
+  investments      Decimal   @db.Decimal(15, 2) @default(0)
+  businessAssets   Decimal   @db.Decimal(15, 2) @default(0)
+  otherAssets      Decimal   @db.Decimal(15, 2) @default(0)
+  liabilities      Decimal   @db.Decimal(15, 2) @default(0)
+
+  nisabBasis       String                                     // 'gold' | 'silver'
+  nisabThreshold   Decimal   @db.Decimal(15, 2)               // PKR snapshot
+  totalWealth      Decimal   @db.Decimal(15, 2)               // sum of zakatable - liabilities
+  zakatAmount      Decimal   @db.Decimal(15, 2)               // 2.5% of totalWealth (or 0 if below nisab)
+
+  contactPhone     String?
+  notes            String?   @db.Text
+
+  paymentMarked    Boolean   @default(false)
+  paymentMarkedAt  DateTime?
+  paymentScreenshotUrl String?
+
+  status           String    @default("pending")              // pending, confirmed, rejected
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// Zakat application (beneficiary) — request to be considered eligible
+// for zakat assistance. Reviewed by admins; status flow follows the
+// same pending → under_review → approved/rejected pattern as the
+// existing beneficiary forms.
+model ZakatApplication {
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  applicantName      String
+  applicantPhone     String
+  applicantCNIC      String                                  // 13 digits (no dashes)
+  applicantAddress   String   @db.Text
+
+  familyMembers      Int
+  monthlyIncome      Decimal  @db.Decimal(10, 2)
+  employmentStatus   String                                  // employed | self-employed | unemployed | student | retired | other
+  housingStatus      String                                  // own | rent | family | other
+  hasDisabledMembers Boolean
+  disabilityDetails  String?  @db.Text
+
+  reasonForApplication String @db.Text
+  amountRequested    Decimal? @db.Decimal(10, 2)
+  additionalNotes    String?  @db.Text
+  cnicDocumentUrl    String?                                 // optional CNIC photo, /uploads/zakat-docs/<file>
+
+  status             String   @default("pending")            // pending, under_review, approved, rejected
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
