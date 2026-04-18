@@ -176,6 +176,12 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 | POST | `/bookings/:id/mark-paid` | qurbaniModuleController.markBookingPaid |
 | GET | `/bookings/me` | qurbaniModuleController.getMyBookings (includes nested listing) |
 
+### `/api/qurbani-skin-pickup` (requireAuth + requireQurbaniModuleActive — any authenticated user)
+| Method | Path | Handler |
+|--------|------|---------|
+| POST | `/` | createSkinPickupSchema → qurbaniSkinPickupController.createPickup |
+| GET | `/me` | qurbaniSkinPickupController.getMyPickups |
+
 ### `/api/config` (requireAuth)
 | Method | Path | Auth | Handler |
 |--------|------|------|---------|
@@ -219,6 +225,8 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 | PATCH | `/qurbani-listings/:id/status` | listingStatusUpdateSchema → qurbaniModuleController.adminUpdateListingStatus (DRAFT↔ACTIVE, ACTIVE→FULL/CLOSED, FULL→CLOSED) |
 | GET | `/qurbani-bookings` | qurbaniModuleController.adminListBookings (includes user + listing) |
 | PATCH | `/qurbani-bookings/:id/status` | bookingStatusUpdateSchema → qurbaniModuleController.adminUpdateBookingStatus (pending\|confirmed\|rejected) |
+| GET | `/qurbani-skin-pickups` | qurbaniSkinPickupController.adminListPickups (includes user) |
+| PATCH | `/qurbani-skin-pickups/:id/status` | skinPickupStatusUpdateSchema → qurbaniSkinPickupController.adminUpdatePickupStatus (pending\|scheduled\|collected\|cancelled) |
 
 Admin list endpoints include nested `user: { id, email, fullName, phoneNumber }`.
 
@@ -406,6 +414,22 @@ createdAt, updatedAt
 - Service helper `parseDedications` converts the stored JSON string back to an array on every read path so the client always gets a real array.
 - The `dedications` feature is currently disabled in the UI (always stored as `'[]'`) — column kept for backwards-compatibility with prior bookings.
 
+### QurbaniSkinPickup (free pickup of qurbani animal skin — gated by same flag)
+```
+id, userId (FK cascade),
+contactPhone, address Text,
+latitude Decimal(10,7)?, longitude Decimal(10,7)?,
+numberOfSkins Int @default(1),
+preferredDate DateTime?,
+additionalDetails? Text,
+status String @default("pending"),  // pending, scheduled, collected, cancelled
+createdAt, updatedAt
+@@index([userId]) @@index([status])
+```
+- Distinct from the year-round donor-only `SkinCollection` model. Available to all 3 user types when `qurbani_module_enabled` is true.
+- `latitude`/`longitude` populated client-side via `navigator.geolocation` (the "Use My Location" button); both nullable so users can submit address-only requests.
+- Status transitions free-form via `skinPickupStatusUpdateSchema`. UI rendered through OSM (no API key) — `osmEmbedUrl(lat,lng)` for the iframe preview, `osmLink(lat,lng)` for the "view on map" link.
+
 ### Session (mapped to runtime express-mysql-session table — do not write from Prisma)
 ```
 sessionId String @id @map("session_id") @db.VarChar(128)
@@ -454,6 +478,7 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/user/volunteer-task` | VolunteerTaskRegistration | VOLUNTEER |
 | `/dashboard/user/qurbani-module` | QurbaniModule (listings grid) | DONOR, BENEFICIARY, VOLUNTEER |
 | `/dashboard/user/qurbani-bookings` | MyHissaBookings | DONOR, BENEFICIARY, VOLUNTEER |
+| `/dashboard/user/qurbani-skin-pickup` | SkinPickup (form + own list, with geolocation) | DONOR, BENEFICIARY, VOLUNTEER |
 | `/dashboard/admin` | AdminDashboard | ADMIN |
 | `/dashboard/admin/users` | UserManagement | ADMIN |
 | `/dashboard/admin/donations` | DonationsManagement | ADMIN |
@@ -461,6 +486,7 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/admin/volunteers` | VolunteersManagement | ADMIN |
 | `/dashboard/admin/qurbani-listings` | QurbaniListings (CRUD + photo upload) | ADMIN |
 | `/dashboard/admin/qurbani-bookings` | QurbaniBookings (approve/reject) | ADMIN |
+| `/dashboard/admin/qurbani-skin-pickups` | QurbaniSkinPickups (status updates) | ADMIN |
 | `/dashboard/admin/qurbani-settings` | QurbaniModuleSettings (toggle + bank details) | ADMIN |
 | `/dashboard/admin/create-admin` | CreateAdmin | ADMIN |
 | `*` | 404 page | — |
@@ -495,6 +521,7 @@ One file per backend resource. All import the shared `api.js` — **do not creat
 - `adminService.js` — getDashboardStats, get/updateStatus for all 8 form types, getVolunteers
 - `qurbaniModuleService.js` — listActiveListings, getListing, createBooking, markBookingPaid, getMyBookings + admin: adminListListings, adminCreateListing(FormData), adminUpdateListing(FormData), adminDeleteListing, adminUpdateListingStatus, adminListBookings, adminUpdateBookingStatus
 - `systemConfigService.js` — getQurbaniModuleFlag, updateQurbaniModuleFlag(enabled), getBankDetails, updateBankDetails(text)
+- `qurbaniSkinPickupService.js` — createSkinPickup, getMySkinPickups + admin: adminListSkinPickups, adminUpdateSkinPickupStatus
 
 ### Stores (`store/`)
 - `authStore.js` — auth state (see Auth store section above)
@@ -544,10 +571,11 @@ pages/
   donor/        QurbaniDonation.jsx, RationDonation.jsx, SkinCollection.jsx, OrphanSponsorship.jsx
   beneficiary/  LoanApplication.jsx, RamadanRationApplication.jsx, OrphanRegistration.jsx
   volunteer/    VolunteerTaskRegistration.jsx
-  qurbani/      QurbaniModule.jsx (listings grid), MyHissaBookings.jsx
+  qurbani/      QurbaniModule.jsx (listings grid), MyHissaBookings.jsx, SkinPickup.jsx (form + own list)
   admin/        UserManagement.jsx, DonationsManagement.jsx, ApplicationsManagement.jsx,
                 VolunteersManagement.jsx, CreateAdmin.jsx,
-                QurbaniListings.jsx, QurbaniBookings.jsx, QurbaniModuleSettings.jsx
+                QurbaniListings.jsx, QurbaniBookings.jsx, QurbaniModuleSettings.jsx,
+                QurbaniSkinPickups.jsx
 ```
 
 ### Form pattern (all form pages)

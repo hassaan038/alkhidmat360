@@ -43,6 +43,7 @@ model User {
   orphanRegistrations   OrphanRegistration[]
   volunteerTasks        VolunteerTask[]
   qurbaniHissaBookings  QurbaniHissaBooking[]
+  qurbaniSkinPickups    QurbaniSkinPickup[]
 
   @@index([email])
   @@index([userType])
@@ -338,6 +339,31 @@ model QurbaniHissaBooking {
   updatedAt       DateTime @updatedAt
 
   @@index([listingId])
+  @@index([userId])
+  @@index([status])
+}
+
+// Skin pickup requests — same flag as Qurbani Booking, available to any
+// authenticated user. Lightweight form: contact + address (with optional
+// GPS coords) + a few details. Distinct from the existing donor-only
+// SkinCollection model.
+model QurbaniSkinPickup {
+  id                Int       @id @default(autoincrement())
+  userId            Int
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  contactPhone      String
+  address           String    @db.Text
+  latitude          Decimal?  @db.Decimal(10, 7)
+  longitude         Decimal?  @db.Decimal(10, 7)
+  numberOfSkins     Int       @default(1)
+  preferredDate     DateTime?
+  additionalDetails String?   @db.Text
+
+  status            String    @default("pending") // pending, scheduled, collected, cancelled
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
   @@index([userId])
   @@index([status])
 }

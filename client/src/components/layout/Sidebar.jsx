@@ -36,6 +36,12 @@ const qurbaniUserItems = [
     path: '/dashboard/user/qurbani-bookings',
     description: 'Track your bookings',
   },
+  {
+    label: 'Qurbani Skin Pickup',
+    icon: Scissors,
+    path: '/dashboard/user/qurbani-skin-pickup',
+    description: 'Free pickup of your qurbani animal skin',
+  },
 ];
 
 // Qurbani module items always shown to admin
@@ -51,6 +57,12 @@ const qurbaniAdminItems = [
     icon: ClipboardList,
     path: '/dashboard/admin/qurbani-bookings',
     description: 'Review hissa bookings',
+  },
+  {
+    label: 'Skin Pickups',
+    icon: Scissors,
+    path: '/dashboard/admin/qurbani-skin-pickups',
+    description: 'Schedule pickup requests',
   },
   {
     label: 'Qurbani Settings',

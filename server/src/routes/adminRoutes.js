@@ -11,6 +11,8 @@ import {
   listingStatusUpdateSchema,
   bookingStatusUpdateSchema,
 } from '../validators/qurbaniModuleValidator.js';
+import * as qurbaniSkinPickupController from '../controllers/qurbaniSkinPickupController.js';
+import { skinPickupStatusUpdateSchema } from '../validators/qurbaniSkinPickupValidator.js';
 
 const router = express.Router();
 
@@ -157,6 +159,18 @@ router.patch(
   '/qurbani-bookings/:id/status',
   validateRequest(bookingStatusUpdateSchema),
   qurbaniModuleController.adminUpdateBookingStatus
+);
+
+// ============================================
+// QURBANI MODULE — SKIN PICKUPS
+// ============================================
+
+router.get('/qurbani-skin-pickups', qurbaniSkinPickupController.adminListPickups);
+
+router.patch(
+  '/qurbani-skin-pickups/:id/status',
+  validateRequest(skinPickupStatusUpdateSchema),
+  qurbaniSkinPickupController.adminUpdatePickupStatus
 );
 
 export default router;
