@@ -39,7 +39,7 @@ export default function CreateAdmin() {
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      const { confirmPassword, ...adminData } = data;
+      const { confirmPassword: _confirmPassword, ...adminData } = data;
 
       await api.post('/admin/create-admin', adminData);
 

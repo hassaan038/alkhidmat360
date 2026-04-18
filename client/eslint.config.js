@@ -24,6 +24,12 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // react-hook-form's useForm() returns helpers (watch, register…) the
+      // React Compiler flags as "incompatible" because they aren't
+      // memoizable. The lib is used app-wide and the warning is a known
+      // false positive for this binding — silence project-wide rather than
+      // sprinkle 9 inline disable comments.
+      'react-hooks/incompatible-library': 'off',
     },
   },
 ])

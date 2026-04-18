@@ -26,6 +26,9 @@ export default function Login() {
     if (loading) {
       useAuthStore.setState({ loading: false });
     }
+    // Intentionally mount-only — we just want to clear a stale loading
+    // flag once on first render of the public page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e) => {

@@ -6,7 +6,6 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { createQurbaniDonation } from '../../services/donationService';
-import { toast } from 'sonner';
 import { Heart, Loader2 } from 'lucide-react';
 import FadeIn from '../../components/animations/FadeIn';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';

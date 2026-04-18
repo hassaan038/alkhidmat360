@@ -26,7 +26,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-export default function DataTable({ columns, data, onStatusUpdate, type }) {
+export default function DataTable({ columns, data, onStatusUpdate }) {
   const [expandedRow, setExpandedRow] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
@@ -37,7 +37,7 @@ export default function DataTable({ columns, data, onStatusUpdate, type }) {
     try {
       await onStatusUpdate(id, newStatus);
       toast.success('Status updated successfully');
-    } catch (error) {
+    } catch {
       toast.error('Failed to update status');
     } finally {
       setUpdatingId(null);
