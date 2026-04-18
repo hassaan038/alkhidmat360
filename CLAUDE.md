@@ -111,7 +111,11 @@ Validation middleware: `validateRequest(zodSchema)` (in `middleware/validationMi
 
 Module-gating middleware: `requireQurbaniModuleActive` (in `middleware/qurbaniModuleMiddleware.js`) — reads SystemConfig key `qurbani_module_enabled`, throws 403 unless `'true'` (admins bypass).
 
-File upload middleware: `uploadQurbaniPhoto` (in `middleware/uploadMiddleware.js`) — multer disk storage at `server/uploads/qurbani/`, image-only, 5 MB cap, unique filename. Use as `.single('photo')` BEFORE `validateRequest` so the body fields exist.
+File upload middleware (in `middleware/uploadMiddleware.js`):
+- `uploadQurbaniPhoto` — multer disk storage at `server/uploads/qurbani/`, image-only, 5 MB cap. Use as `.single('photo')`.
+- `uploadSkinPickupPhoto` — multer disk storage at `server/uploads/skin-pickup/`, image-only, 5 MB cap. Use as `.single('housePhoto')`.
+
+Both must run BEFORE `validateRequest` so Zod sees text fields. Validators must use `z.coerce.number()` for numeric multipart fields.
 
 ### Utilities (`utils/`)
 
@@ -179,7 +183,7 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 ### `/api/qurbani-skin-pickup` (requireAuth + requireQurbaniModuleActive — any authenticated user)
 | Method | Path | Handler |
 |--------|------|---------|
-| POST | `/` | createSkinPickupSchema → qurbaniSkinPickupController.createPickup |
+| POST | `/` | uploadSkinPickupPhoto.single('housePhoto') → createSkinPickupSchema → qurbaniSkinPickupController.createPickup (multipart; photo optional, address conditionally required when no GPS coords) |
 | GET | `/me` | qurbaniSkinPickupController.getMyPickups |
 
 ### `/api/config` (requireAuth)
@@ -411,6 +415,7 @@ createdAt, updatedAt
 @@index([listingId]) @@index([userId]) @@index([status])
 ```
 - `createBooking` runs in `prisma.$transaction` with `Prisma.TransactionIsolationLevel.Serializable`. Aggregates pending+confirmed `hissaCount`, rejects with 409 "Not enough hissas available" if overflow, auto-flips listing to FULL on capacity. P2034/serialization aborts surface as 409 "Booking conflict — please try again".
+- `createBookingSchema` accepts an optional `paymentMarked: boolean` (default false). The user-facing flow only writes the booking when the user clicks "I've Paid" in the modal — at that point the client posts `paymentMarked: true` so the slot is locked + flagged in a single transaction. Cancel/close at any point before that means **no DB write at all**.
 - Service helper `parseDedications` converts the stored JSON string back to an array on every read path so the client always gets a real array.
 - The `dedications` feature is currently disabled in the UI (always stored as `'[]'`) — column kept for backwards-compatibility with prior bookings.
 
@@ -422,12 +427,14 @@ latitude Decimal(10,7)?, longitude Decimal(10,7)?,
 numberOfSkins Int @default(1),
 preferredDate DateTime?,
 additionalDetails? Text,
+housePhotoUrl? String,  // /uploads/skin-pickup/<file> — optional, captured via mobile camera
 status String @default("pending"),  // pending, scheduled, collected, cancelled
 createdAt, updatedAt
 @@index([userId]) @@index([status])
 ```
 - Distinct from the year-round donor-only `SkinCollection` model. Available to all 3 user types when `qurbani_module_enabled` is true.
-- `latitude`/`longitude` populated client-side via `navigator.geolocation` (the "Use My Location" button); both nullable so users can submit address-only requests.
+- `latitude`/`longitude` populated client-side via `navigator.geolocation` (the "Use My Location" button); both nullable so users can submit address-only requests. Address is conditionally required: enforced via Zod `superRefine` when no coordinates are present.
+- Optional `housePhoto` uploaded via multer (`uploadSkinPickupPhoto`) to `server/uploads/skin-pickup/`; field name on multipart body is `housePhoto`. Mobile form uses `<input capture="environment">` for direct camera capture.
 - Status transitions free-form via `skinPickupStatusUpdateSchema`. UI rendered through OSM (no API key) — `osmEmbedUrl(lat,lng)` for the iframe preview, `osmLink(lat,lng)` for the "view on map" link.
 
 ### Session (mapped to runtime express-mysql-session table — do not write from Prisma)

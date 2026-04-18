@@ -79,7 +79,7 @@ export async function getListingById(id) {
 // USER: BOOKINGS
 // ============================================
 
-export async function createBooking(userId, { listingId, hissaCount, notes }) {
+export async function createBooking(userId, { listingId, hissaCount, notes, paymentMarked = false }) {
   try {
     const booking = await prisma.$transaction(
       async (tx) => {
@@ -125,6 +125,8 @@ export async function createBooking(userId, { listingId, hissaCount, notes }) {
             totalAmount,
             status: 'pending',
             notes: notes || null,
+            paymentMarked,
+            paymentMarkedAt: paymentMarked ? new Date() : null,
           },
         });
 

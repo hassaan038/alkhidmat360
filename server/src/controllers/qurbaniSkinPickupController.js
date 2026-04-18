@@ -8,7 +8,13 @@ import * as qurbaniSkinPickupService from '../services/qurbaniSkinPickupService.
 
 export const createPickup = asyncHandler(async (req, res) => {
   const userId = req.session.userId;
-  const pickup = await qurbaniSkinPickupService.createPickup(userId, req.body);
+
+  const payload = { ...req.body };
+  if (req.file) {
+    payload.housePhotoUrl = `/uploads/skin-pickup/${req.file.filename}`;
+  }
+
+  const pickup = await qurbaniSkinPickupService.createPickup(userId, payload);
 
   res.status(201).json(
     new ApiResponse(201, { pickup }, 'Skin collection request submitted')

@@ -9,10 +9,13 @@ const __dirname = path.dirname(__filename);
 
 // Resolve uploads dir: server/uploads/qurbani
 const qurbaniUploadDir = path.resolve(__dirname, '../../uploads/qurbani');
+const skinPickupUploadDir = path.resolve(__dirname, '../../uploads/skin-pickup');
 
-// Ensure directory exists
-if (!fs.existsSync(qurbaniUploadDir)) {
-  fs.mkdirSync(qurbaniUploadDir, { recursive: true });
+// Ensure directories exist
+for (const dir of [qurbaniUploadDir, skinPickupUploadDir]) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
 }
 
 // ============================================
@@ -45,6 +48,30 @@ export const uploadQurbaniPhoto = multer({
   },
 });
 
+// ============================================
+// SKIN PICKUP HOUSE PHOTO UPLOAD
+// ============================================
+
+const skinPickupStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, skinPickupUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `skin-pickup-${uniqueSuffix}${ext}`);
+  },
+});
+
+export const uploadSkinPickupPhoto = multer({
+  storage: skinPickupStorage,
+  fileFilter: imageFileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
 export default {
   uploadQurbaniPhoto,
+  uploadSkinPickupPhoto,
 };

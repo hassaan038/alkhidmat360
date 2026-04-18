@@ -48,6 +48,7 @@ export const createBookingSchema = z.object({
     .int()
     .min(1, 'Must book at least 1 hissa')
     .max(7, 'Cannot book more than 7 hissas'),
+  paymentMarked: z.boolean().optional().default(false),
   notes: z.string().optional(),
 });
 

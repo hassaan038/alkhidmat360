@@ -1,7 +1,11 @@
 import api from './api';
 
-export const createSkinPickup = (payload) =>
-  api.post('/qurbani-skin-pickup', payload).then((r) => r.data);
+export const createSkinPickup = (formData) =>
+  api
+    .post('/qurbani-skin-pickup', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    .then((r) => r.data);
 
 export const getMySkinPickups = () =>
   api.get('/qurbani-skin-pickup/me').then((r) => r.data);

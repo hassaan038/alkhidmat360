@@ -8,6 +8,7 @@ import { SkeletonTable } from '../../components/common/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as qurbaniSkinPickupService from '../../services/qurbaniSkinPickupService';
 import { cn, formatDate, formatApiError } from '../../lib/utils';
+import { imageUrl } from '../../lib/imageUrl';
 
 const STATUS_OPTIONS = ['pending', 'scheduled', 'collected', 'cancelled'];
 
@@ -185,23 +186,41 @@ export default function QurbaniSkinPickups() {
                             {expanded === p.id && (
                               <tr key={`${p.id}-details`}>
                                 <td colSpan={8} className="px-4 py-4 bg-gray-50">
-                                  <div className="space-y-1 text-sm text-gray-800">
-                                    <div>
-                                      <span className="text-gray-500">Coordinates:</span>{' '}
-                                      {hasCoords
-                                        ? `${lat.toFixed(5)}, ${lng.toFixed(5)}`
-                                        : 'Not provided'}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-1 text-sm text-gray-800">
+                                      <div>
+                                        <span className="text-gray-500">Coordinates:</span>{' '}
+                                        {hasCoords
+                                          ? `${lat.toFixed(5)}, ${lng.toFixed(5)}`
+                                          : 'Not provided'}
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">Notes:</span>{' '}
+                                        {p.additionalDetails || '—'}
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">Submitted:</span>{' '}
+                                        {p.createdAt
+                                          ? new Date(p.createdAt).toLocaleString()
+                                          : '—'}
+                                      </div>
                                     </div>
-                                    <div>
-                                      <span className="text-gray-500">Notes:</span>{' '}
-                                      {p.additionalDetails || '—'}
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">Submitted:</span>{' '}
-                                      {p.createdAt
-                                        ? new Date(p.createdAt).toLocaleString()
-                                        : '—'}
-                                    </div>
+                                    {p.housePhotoUrl && (
+                                      <div>
+                                        <p className="text-xs text-gray-500 mb-1">House photo</p>
+                                        <a
+                                          href={imageUrl(p.housePhotoUrl)}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          <img
+                                            src={imageUrl(p.housePhotoUrl)}
+                                            alt="House"
+                                            className="w-full max-w-xs h-40 object-cover rounded-lg border border-gray-200 hover:opacity-90 transition"
+                                          />
+                                        </a>
+                                      </div>
+                                    )}
                                   </div>
                                 </td>
                               </tr>

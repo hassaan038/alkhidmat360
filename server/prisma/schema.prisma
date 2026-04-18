@@ -359,6 +359,7 @@ model QurbaniSkinPickup {
   numberOfSkins     Int       @default(1)
   preferredDate     DateTime?
   additionalDetails String?   @db.Text
+  housePhotoUrl     String?   // optional photo of the house/landmark, served from /uploads/skin-pickup/
 
   status            String    @default("pending") // pending, scheduled, collected, cancelled
   createdAt         DateTime  @default(now())

@@ -11,7 +11,10 @@ import {
   X as XIcon,
   Calendar,
   Phone,
+  Camera,
+  Image as ImageIcon,
 } from 'lucide-react';
+import { imageUrl } from '../../lib/imageUrl';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import FadeIn from '../../components/animations/FadeIn';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -68,6 +71,7 @@ function PickupCard({ pickup }) {
   const lat = pickup.latitude != null ? Number(pickup.latitude) : null;
   const lng = pickup.longitude != null ? Number(pickup.longitude) : null;
   const hasCoords = lat != null && lng != null;
+  const photo = imageUrl(pickup.housePhotoUrl);
 
   return (
     <Card className="shadow-soft hover:shadow-medium transition-shadow duration-300">
@@ -124,6 +128,18 @@ function PickupCard({ pickup }) {
               {pickup.additionalDetails}
             </p>
           )}
+
+          {photo && (
+            <div className="pt-2 border-t border-gray-100">
+              <a href={photo} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={photo}
+                  alt="House"
+                  className="w-full h-32 object-cover rounded-md border border-gray-200 hover:opacity-90 transition"
+                />
+              </a>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -136,6 +152,8 @@ export default function SkinPickup() {
   const [loadingPickups, setLoadingPickups] = useState(true);
   const [coords, setCoords] = useState(null); // { lat, lng }
   const [locating, setLocating] = useState(false);
+  const [housePhoto, setHousePhoto] = useState(null);
+  const [housePhotoPreview, setHousePhotoPreview] = useState(null);
 
   const {
     register,
@@ -205,6 +223,31 @@ export default function SkinPickup() {
     );
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0] || null;
+    setHousePhoto(file);
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setHousePhotoPreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return url;
+      });
+    } else {
+      setHousePhotoPreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+    }
+  };
+
+  const clearPhoto = () => {
+    setHousePhoto(null);
+    setHousePhotoPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+  };
+
   const onSubmit = async (data) => {
     const trimmedAddress = (data.address || '').trim();
     const hasCoords = coords != null;
@@ -219,22 +262,24 @@ export default function SkinPickup() {
     }
     clearErrors('address');
 
-    const payload = {
-      ...data,
-      address: trimmedAddress,
-      latitude: coords?.lat ?? null,
-      longitude: coords?.lng ?? null,
-      preferredDate: data.preferredDate || null,
-      additionalDetails: data.additionalDetails || null,
-    };
+    const fd = new FormData();
+    fd.append('contactPhone', data.contactPhone);
+    if (trimmedAddress) fd.append('address', trimmedAddress);
+    fd.append('numberOfSkins', String(data.numberOfSkins));
+    if (coords?.lat != null) fd.append('latitude', String(coords.lat));
+    if (coords?.lng != null) fd.append('longitude', String(coords.lng));
+    if (data.preferredDate) fd.append('preferredDate', data.preferredDate);
+    if (data.additionalDetails) fd.append('additionalDetails', data.additionalDetails);
+    if (housePhoto) fd.append('housePhoto', housePhoto);
 
     try {
-      await qurbaniSkinPickupService.createSkinPickup(payload);
+      await qurbaniSkinPickupService.createSkinPickup(fd);
       toast.success('Request submitted', {
         description: 'Our team will reach out to schedule the pickup.',
       });
       reset({ numberOfSkins: 1 });
       setCoords(null);
+      clearPhoto();
       loadPickups();
     } catch (err) {
       toast.error('Submission failed', { description: formatApiError(err) });
@@ -411,6 +456,53 @@ export default function SkinPickup() {
                       />
                     </div>
 
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Photo of House (Optional)
+                      </label>
+                      <p className="text-xs text-gray-500 mb-2">
+                        Helps our pickup team find your address quickly.
+                      </p>
+                      {housePhotoPreview ? (
+                        <div className="relative">
+                          <img
+                            src={housePhotoPreview}
+                            alt="House preview"
+                            className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={clearPhoto}
+                            className="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-md rounded-full p-1.5 text-gray-700"
+                            aria-label="Remove photo"
+                          >
+                            <XIcon className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label
+                          htmlFor="house-photo"
+                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                        >
+                          <Camera className="w-6 h-6 text-gray-400 mb-1" />
+                          <span className="text-sm text-gray-600">
+                            Tap to take or choose a photo
+                          </span>
+                          <span className="text-xs text-gray-400 mt-0.5">
+                            JPG / PNG, up to 5 MB
+                          </span>
+                          <input
+                            id="house-photo"
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            onChange={handlePhotoChange}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
+                    </div>
+
                     <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
                       <Button
                         type="button"
@@ -418,6 +510,7 @@ export default function SkinPickup() {
                         onClick={() => {
                           reset({ numberOfSkins: 1 });
                           setCoords(null);
+                          clearPhoto();
                         }}
                         disabled={isSubmitting}
                       >

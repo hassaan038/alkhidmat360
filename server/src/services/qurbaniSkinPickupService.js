@@ -16,6 +16,7 @@ function buildPickupData(userId, data) {
     numberOfSkins = 1,
     preferredDate,
     additionalDetails,
+    housePhotoUrl,
   } = data;
 
   return {
@@ -27,6 +28,7 @@ function buildPickupData(userId, data) {
     numberOfSkins,
     preferredDate: preferredDate ? new Date(preferredDate) : null,
     additionalDetails: additionalDetails || null,
+    housePhotoUrl: housePhotoUrl || null,
   };
 }
 

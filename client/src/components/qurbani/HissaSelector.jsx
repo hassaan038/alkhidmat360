@@ -1,30 +1,30 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, Banknote, CheckCircle2, AlertTriangle } from 'lucide-react';
 import Button from '../ui/Button';
+import Alert from '../ui/Alert';
 import * as qurbaniModuleService from '../../services/qurbaniModuleService';
-import PaymentPanel from './PaymentPanel';
+import * as systemConfigService from '../../services/systemConfigService';
 import { formatCurrency, formatApiError } from '../../lib/utils';
 
 /**
  * HissaSelector — modal with two steps:
- *   1. pick hissa count, submit booking
- *   2. show PaymentPanel for the just-created booking
+ *   1. pick hissa count + notes
+ *   2. show bank details + "I've Paid" or "Cancel"
  *
- * Props:
- *  - listing
- *  - open
- *  - onClose: () => void
- *  - onSubmitted: (booking) => void — called once a booking is created so the
- *    parent can refresh its list.
+ * No booking is created until the user clicks "I've Paid". Cancelling
+ * or closing the modal at any point discards the in-progress selection
+ * — no DB write, no slot reservation.
  */
 export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
   const [step, setStep] = useState(1);
   const [hissaCount, setHissaCount] = useState(1);
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [booking, setBooking] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const [bankDetails, setBankDetails] = useState('');
+  const [loadingBank, setLoadingBank] = useState(false);
 
   const pricePerHissa = parseFloat(listing?.pricePerHissa ?? 0);
   const available = listing?.hissasAvailable ?? 0;
@@ -37,11 +37,33 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
       setStep(1);
       setHissaCount(1);
       setNotes('');
-      setBooking(null);
       setErrorMsg('');
+      setBankDetails('');
       /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [open, listing?.id]);
+
+  // Fetch bank details once we hit step 2
+  useEffect(() => {
+    if (step !== 2) return;
+    let active = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoadingBank(true);
+    systemConfigService
+      .getBankDetails()
+      .then((res) => {
+        if (active) setBankDetails(res.data?.bankDetails || '');
+      })
+      .catch(() => {
+        if (active) setBankDetails('');
+      })
+      .finally(() => {
+        if (active) setLoadingBank(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [step]);
 
   if (!open || !listing) return null;
 
@@ -55,10 +77,9 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
     setHissaCount(clamped);
   };
 
-  const handleSubmit = async (e) => {
+  const handleContinue = (e) => {
     e.preventDefault();
     setErrorMsg('');
-
     if (hissaCount < 1) {
       setErrorMsg('Please select at least 1 hissa.');
       return;
@@ -67,30 +88,40 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
       setErrorMsg(`Only ${available} hissa(s) available.`);
       return;
     }
+    setStep(2);
+  };
 
-    const payload = {
-      listingId: listing.id,
-      hissaCount,
-      ...(notes.trim() ? { notes: notes.trim() } : {}),
-    };
-
+  // Only here do we actually persist the booking. Until this fires, the
+  // user has reserved nothing.
+  const handleMarkPaid = async () => {
+    setErrorMsg('');
     setSubmitting(true);
     try {
-      const res = await qurbaniModuleService.createBooking(payload);
+      const res = await qurbaniModuleService.createBooking({
+        listingId: listing.id,
+        hissaCount,
+        paymentMarked: true,
+        ...(notes.trim() ? { notes: notes.trim() } : {}),
+      });
       const created = res.data?.booking;
-      setBooking(created);
-      toast.success('Booking created', {
-        description: 'Please complete your payment to confirm.',
+      toast.success('Payment marked', {
+        description: 'Your hissas are reserved. You will be notified once admin confirms.',
       });
       onSubmitted?.(created);
-      setStep(2);
+      onClose();
     } catch (error) {
-      const msg = formatApiError(error) || 'Could not create booking.';
+      const msg = formatApiError(error) || 'Could not save your booking.';
       setErrorMsg(msg);
       toast.error('Booking failed', { description: msg });
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleCancel = () => {
+    // Closing or cancelling at any step discards the selection — nothing
+    // is in the database yet.
+    onClose();
   };
 
   return (
@@ -106,7 +137,7 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleCancel}
             className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"
             aria-label="Close"
           >
@@ -117,7 +148,7 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {step === 1 ? (
-            <form id="hissa-form" onSubmit={handleSubmit} className="space-y-5">
+            <form id="hissa-form" onSubmit={handleContinue} className="space-y-5">
               {/* Hissa count */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -159,12 +190,62 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
                 </span>
               </div>
 
-              {errorMsg && (
-                <p className="text-sm text-error">{errorMsg}</p>
-              )}
+              <p className="text-xs text-gray-500">
+                Your hissas are not reserved yet. They will be locked only after you
+                mark payment as done on the next step.
+              </p>
+
+              {errorMsg && <p className="text-sm text-error">{errorMsg}</p>}
             </form>
           ) : (
-            <PaymentPanel booking={booking} />
+            // STEP 2 — payment instructions, no DB write yet
+            <div className="space-y-4">
+              {/* Total */}
+              <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+                <p className="text-xs uppercase tracking-wide text-primary-700 font-semibold mb-1">
+                  Total Amount Due
+                </p>
+                <p className="text-3xl font-bold text-primary-900">
+                  {formatCurrency(total)}
+                </p>
+                <p className="text-xs text-primary-700 mt-1">
+                  {hissaCount} hissa{hissaCount > 1 ? 's' : ''} × {formatCurrency(pricePerHissa)}
+                </p>
+              </div>
+
+              {/* Bank details */}
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Banknote className="w-4 h-4 text-gray-500" />
+                  <h4 className="text-sm font-semibold text-gray-900">Bank Details</h4>
+                </div>
+                {loadingBank ? (
+                  <div className="h-24 bg-gray-100 rounded-lg animate-pulse" />
+                ) : bankDetails ? (
+                  <pre className="whitespace-pre-wrap font-sans text-sm bg-gray-50 border border-gray-200 rounded-lg p-4 text-gray-800 leading-relaxed">
+                    {bankDetails}
+                  </pre>
+                ) : (
+                  <Alert variant="warning">
+                    Bank details are not configured yet. Please contact support.
+                  </Alert>
+                )}
+              </div>
+
+              <Alert variant="warning">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <p className="text-xs">
+                    Your hissas are <strong>not yet reserved</strong>. Click{' '}
+                    <strong>I've Paid</strong> only after you have transferred the
+                    amount — that's when the slot is locked. Cancel or close this
+                    window if you change your mind.
+                  </p>
+                </div>
+              </Alert>
+
+              {errorMsg && <p className="text-sm text-error">{errorMsg}</p>}
+            </div>
           )}
         </div>
 
@@ -172,7 +253,7 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3">
           {step === 1 ? (
             <>
-              <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+              <Button type="button" variant="outline" onClick={handleCancel} disabled={submitting}>
                 Cancel
               </Button>
               <Button
@@ -181,20 +262,33 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
                 disabled={submitting || available === 0}
                 className="bg-primary-600 hover:bg-primary-700 text-white"
               >
-                {submitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Booking...
-                  </>
-                ) : (
-                  'Continue to Payment'
-                )}
+                Continue to Payment
               </Button>
             </>
           ) : (
-            <Button type="button" onClick={onClose} className="bg-primary-600 hover:bg-primary-700 text-white">
-              Done
-            </Button>
+            <>
+              <Button type="button" variant="outline" onClick={handleCancel} disabled={submitting}>
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleMarkPaid}
+                disabled={submitting}
+                className="bg-primary-600 hover:bg-primary-700 text-white"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Reserving…
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    I&apos;ve Paid
+                  </>
+                )}
+              </Button>
+            </>
           )}
         </div>
       </div>
