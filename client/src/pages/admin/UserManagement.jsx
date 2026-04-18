@@ -102,7 +102,7 @@ export default function UserManagement() {
                 {userStats.map((stat) => {
                   const Icon = stat.icon;
                   return (
-                    <Card key={stat.label} className="shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+                    <Card key={stat.label} className="shadow-md hover:shadow-lg transition-all duration-300">
                       <CardContent className="pt-6">
                         <div className="flex items-center justify-between mb-4">
                           <div className={`${stat.bg} p-3 rounded-lg`}>

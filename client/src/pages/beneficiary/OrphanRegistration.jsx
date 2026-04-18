@@ -117,7 +117,7 @@ export default function OrphanRegistration() {
                     <input
                       type="text"
                       {...register('orphanName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter orphan's full name"
                     />
                     {errors.orphanName && (
@@ -133,7 +133,7 @@ export default function OrphanRegistration() {
                       <input
                         type="number"
                         {...register('orphanAge')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="e.g., 10"
                       />
                       {errors.orphanAge && (
@@ -147,7 +147,7 @@ export default function OrphanRegistration() {
                       </label>
                       <select
                         {...register('orphanGender')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       >
                         <option value="MALE">Male</option>
                         <option value="FEMALE">Female</option>
@@ -165,7 +165,7 @@ export default function OrphanRegistration() {
                       </label>
                       <select
                         {...register('fatherStatus')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       >
                         <option value="DECEASED">Deceased</option>
                         <option value="UNKNOWN">Unknown</option>
@@ -182,7 +182,7 @@ export default function OrphanRegistration() {
                       </label>
                       <select
                         {...register('motherStatus')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       >
                         <option value="DECEASED">Deceased</option>
                         <option value="ALIVE">Alive</option>
@@ -210,7 +210,7 @@ export default function OrphanRegistration() {
                     <input
                       type="text"
                       {...register('educationLevel')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., Grade 5, Not enrolled"
                     />
                     {errors.educationLevel && (
@@ -225,7 +225,7 @@ export default function OrphanRegistration() {
                     <input
                       type="text"
                       {...register('schoolName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter school name"
                     />
                   </div>
@@ -258,7 +258,7 @@ export default function OrphanRegistration() {
                       <input
                         type="text"
                         {...register('guardianName')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="Enter your full name"
                       />
                       {errors.guardianName && (
@@ -273,7 +273,7 @@ export default function OrphanRegistration() {
                       <input
                         type="text"
                         {...register('guardianRelation')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="e.g., Uncle, Grandmother"
                       />
                       {errors.guardianRelation && (
@@ -290,7 +290,7 @@ export default function OrphanRegistration() {
                       <input
                         type="tel"
                         {...register('guardianPhone')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="03001234567"
                       />
                       {errors.guardianPhone && (
@@ -306,7 +306,7 @@ export default function OrphanRegistration() {
                         type="text"
                         {...register('guardianCNIC')}
                         maxLength={13}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="1234567890123"
                       />
                       {errors.guardianCNIC && (
@@ -322,7 +322,7 @@ export default function OrphanRegistration() {
                     <textarea
                       {...register('guardianAddress')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter complete address"
                     />
                     {errors.guardianAddress && (
@@ -345,7 +345,7 @@ export default function OrphanRegistration() {
                     <input
                       type="number"
                       {...register('monthlyIncome')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., 20000"
                     />
                     {errors.monthlyIncome && (
@@ -360,7 +360,7 @@ export default function OrphanRegistration() {
                     <input
                       type="number"
                       {...register('familyMembers')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., 6"
                     />
                     {errors.familyMembers && (
@@ -387,7 +387,7 @@ export default function OrphanRegistration() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:scale-105 hover:shadow-md transition-all duration-200"
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <>
@@ -406,7 +406,7 @@ export default function OrphanRegistration() {
                   variant="outline"
                   onClick={() => reset()}
                   disabled={isSubmitting}
-                  className="hover:scale-105 transition-all duration-200"
+                  className="transition-colors duration-200"
                 >
                   Reset
                 </Button>

@@ -152,7 +152,7 @@ export default function RationDonation() {
                   {packageTypes.map((pkg) => (
                     <label
                       key={pkg.id}
-                      className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md ${
+                      className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-md ${
                         selectedPackage === pkg.id
                           ? 'border-primary-500 bg-primary-50 shadow-glow-blue'
                           : 'border-gray-200 hover:border-primary-200'
@@ -206,7 +206,7 @@ export default function RationDonation() {
                     <input
                       type="text"
                       {...register('packageType')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., Ramadan Special Package"
                       autoFocus
                     />
@@ -229,7 +229,7 @@ export default function RationDonation() {
                   <input
                     type="number"
                     {...register('quantity')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter quantity"
                   />
                   {errors.quantity && (
@@ -244,7 +244,7 @@ export default function RationDonation() {
                   <input
                     type="number"
                     {...register('amount')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter amount"
                   />
                   {errors.amount && (
@@ -267,7 +267,7 @@ export default function RationDonation() {
                     <input
                       type="text"
                       {...register('donorName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your full name"
                     />
                     {errors.donorName && (
@@ -282,7 +282,7 @@ export default function RationDonation() {
                     <input
                       type="email"
                       {...register('donorEmail')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="your.email@example.com"
                     />
                     {errors.donorEmail && (
@@ -297,7 +297,7 @@ export default function RationDonation() {
                     <input
                       type="tel"
                       {...register('donorPhone')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="03001234567"
                     />
                     {errors.donorPhone && (
@@ -312,7 +312,7 @@ export default function RationDonation() {
                     <textarea
                       {...register('donorAddress')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your complete address"
                     />
                     {errors.donorAddress && (
@@ -327,7 +327,7 @@ export default function RationDonation() {
                     <input
                       type="date"
                       {...register('deliveryDate')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     />
                   </div>
 
@@ -338,7 +338,7 @@ export default function RationDonation() {
                     <textarea
                       {...register('notes')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Any special instructions or preferences"
                     />
                   </div>
@@ -350,7 +350,7 @@ export default function RationDonation() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:scale-105 hover:shadow-md transition-all duration-200"
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <>
@@ -373,7 +373,7 @@ export default function RationDonation() {
                     setCustomMode(false);
                   }}
                   disabled={isSubmitting}
-                  className="hover:scale-105 transition-all duration-200"
+                  className="transition-colors duration-200"
                 >
                   Reset
                 </Button>

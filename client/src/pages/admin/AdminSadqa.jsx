@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Heart } from 'lucide-react';
+import { Heart, Check, X } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import FadeIn from '../../components/animations/FadeIn';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -96,9 +96,9 @@ export default function AdminSadqa() {
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {s.paymentMarked ? (
-                              <span className="text-success-dark font-semibold">✓</span>
+                              <Check className="w-4 h-4 text-success-dark" aria-label="Paid" />
                             ) : (
-                              <span className="text-gray-400">✗</span>
+                              <X className="w-4 h-4 text-gray-400" aria-label="Unpaid" />
                             )}
                           </td>
                           <td className="px-4 py-3">

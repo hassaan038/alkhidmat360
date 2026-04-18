@@ -105,7 +105,8 @@ function PickupCard({ pickup }) {
                   rel="noopener noreferrer"
                   className="text-xs text-primary-600 hover:text-primary-700 underline mt-0.5 inline-block"
                 >
-                  📍 {lat.toFixed(5)}, {lng.toFixed(5)} — view on map
+                  <MapPin className="inline w-3 h-3 mr-0.5 -mt-0.5" />
+                  {lat.toFixed(5)}, {lng.toFixed(5)} — view on map
                 </a>
               )}
             </div>
@@ -412,8 +413,9 @@ export default function SkinPickup() {
                     {coords && (
                       <div className="border border-primary-200 bg-primary-50/50 rounded-lg overflow-hidden">
                         <div className="flex items-center justify-between px-3 py-2 text-xs">
-                          <span className="text-primary-900 font-medium">
-                            📍 Captured: {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
+                          <span className="text-primary-900 font-medium inline-flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5" />
+                            Captured: {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
                           </span>
                           <button
                             type="button"

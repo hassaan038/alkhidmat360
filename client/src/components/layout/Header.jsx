@@ -52,7 +52,8 @@ export default function Header({ onMenuClick }) {
             {/* Mobile menu button */}
             <button
               onClick={onMenuClick}
-              className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+              aria-label="Open navigation menu"
+              className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
             >
               <Menu className="w-6 h-6" />
             </button>
@@ -75,7 +76,9 @@ export default function Header({ onMenuClick }) {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+              aria-label="Open user menu"
+              aria-expanded={dropdownOpen}
+              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
             >
               <div className="hidden sm:block text-right">
                 <p className="text-sm font-medium text-gray-900">{user?.fullName}</p>
@@ -115,7 +118,7 @@ export default function Header({ onMenuClick }) {
                 <div className="py-2">
                   <button
                     onClick={handleLogout}
-                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3"
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 cursor-pointer transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     <span>Logout</span>

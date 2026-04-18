@@ -89,7 +89,7 @@ export default function VolunteersManagement() {
           <FadeIn direction="up" delay={0}>
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl shadow-xl flex items-center justify-center transform hover:scale-110 transition-transform duration-300">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl shadow-xl flex items-center justify-center transform transition-transform duration-300">
                   <HandHeart className="w-8 h-8 text-white" />
                 </div>
                 <div>
@@ -100,7 +100,7 @@ export default function VolunteersManagement() {
 
               {/* Statistics Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 shadow-md hover:shadow-lg transition-all duration-300">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -114,7 +114,7 @@ export default function VolunteersManagement() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-md hover:shadow-lg transition-all duration-300">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -128,7 +128,7 @@ export default function VolunteersManagement() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <Card className="bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -142,7 +142,7 @@ export default function VolunteersManagement() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-md hover:shadow-lg transition-all duration-300">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -172,7 +172,7 @@ export default function VolunteersManagement() {
                       placeholder="Search by name, email, or phone..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:scale-[1.01] transition-all outline-none"
+                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none"
                     />
                   </div>
 
@@ -182,7 +182,7 @@ export default function VolunteersManagement() {
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 focus:scale-[1.01] transition-all outline-none appearance-none bg-white"
+                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all outline-none appearance-none bg-white"
                     >
                       <option value="all">All Status</option>
                       <option value="active">Active</option>
@@ -247,7 +247,7 @@ export default function VolunteersManagement() {
                       {filteredVolunteers.map((volunteer, index) => (
                         <tr
                           key={volunteer.id}
-                          className="hover:bg-green-50 transition-all duration-200 hover:scale-[1.01]"
+                          className="hover:bg-green-50 transition-all duration-200"
                           style={{
                             animation: `fadeIn 0.3s ease-out ${index * 0.05}s both`
                           }}

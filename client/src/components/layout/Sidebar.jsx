@@ -328,7 +328,8 @@ export default function Sidebar({ isOpen, onClose }) {
         <div className="lg:hidden flex justify-end p-4">
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Close navigation menu"
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5 text-gray-600" />
           </button>
@@ -346,13 +347,20 @@ export default function Sidebar({ isOpen, onClose }) {
                   key={item.path}
                   to={item.path}
                   onClick={() => onClose()}
+                  aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'flex items-start gap-3 px-4 py-3 rounded-lg transition-all group',
+                    'relative flex items-start gap-3 px-4 py-2.5 rounded-lg transition-colors group cursor-pointer',
                     active
-                      ? 'bg-primary-50 text-primary-700 shadow-sm'
+                      ? 'bg-primary-50 text-primary-700 ring-1 ring-inset ring-primary-100'
                       : 'text-gray-700 hover:bg-gray-50'
                   )}
                 >
+                  {active && (
+                    <span
+                      aria-hidden
+                      className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-primary-600"
+                    />
+                  )}
                   <Icon
                     className={cn(
                       'w-5 h-5 mt-0.5 flex-shrink-0',

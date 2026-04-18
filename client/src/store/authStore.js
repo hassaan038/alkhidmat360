@@ -71,12 +71,9 @@ const useAuthStore = create((set) => ({
 
   // Check authentication status
   checkAuth: async () => {
-    console.log('🔍 checkAuth called');
     set({ loading: true });
     try {
-      console.log('📡 Calling getCurrentUser API...');
       const response = await authService.getCurrentUser();
-      console.log('✅ checkAuth success:', response);
       set({
         user: response.data.user,
         isAuthenticated: true,
@@ -84,7 +81,7 @@ const useAuthStore = create((set) => ({
         error: null,
       });
     } catch (error) {
-      console.error('❌ checkAuth failed:', error);
+      console.error('[auth] checkAuth failed:', error);
       set({
         user: null,
         isAuthenticated: false,

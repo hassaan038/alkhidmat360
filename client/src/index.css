@@ -13,35 +13,40 @@
   }
 
   h1 {
-    @apply text-4xl;
+    @apply text-3xl sm:text-4xl;
   }
 
   h2 {
-    @apply text-3xl;
+    @apply text-2xl sm:text-3xl;
   }
 
   h3 {
-    @apply text-2xl;
+    @apply text-xl sm:text-2xl;
   }
 
   h4 {
-    @apply text-xl;
+    @apply text-lg sm:text-xl;
+  }
+
+  /* Stable focus ring for any interactive element — overridden where needed */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-white;
   }
 }
 
 @layer components {
   /* Enhanced button */
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 hover:shadow-md hover:scale-105;
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-150 hover:shadow-md cursor-pointer;
   }
 
   /* Enhanced card */
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all duration-300;
+    @apply bg-white rounded-2xl shadow-card border border-gray-200 p-6 transition-all duration-200;
   }
 
   .card-hover {
-    @apply hover:shadow-medium hover:-translate-y-1;
+    @apply hover:shadow-card-hover hover:-translate-y-0.5;
   }
 
   .card-glow {
@@ -50,11 +55,11 @@
 
   /* Enhanced input */
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150;
   }
 
   .input-field-enhanced {
-    @apply input-field focus:scale-[1.01] focus:shadow-md;
+    @apply input-field focus:shadow-sm;
   }
 
   /* Glass morphism */
@@ -62,14 +67,14 @@
     @apply backdrop-blur-sm bg-white/95 border border-white/20;
   }
 
-  /* Animation utilities */
+  /* Hover lift utility (replaces scale-on-hover) */
   .animate-on-hover {
-    @apply transition-all duration-300 hover:scale-105 hover:shadow-lg;
+    @apply transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5;
   }
 
   /* Stats card enhancement */
   .stats-card {
-    @apply card hover:shadow-glow-blue hover:-translate-y-1 hover:border-blue-100 border-transparent;
+    @apply card hover:shadow-card-hover hover:-translate-y-0.5 hover:border-primary-100 transition-all duration-200;
   }
 
   /* Quick action card enhancement */

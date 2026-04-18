@@ -127,9 +127,9 @@ export default function QurbaniBookings() {
                               </td>
                               <td className="px-4 py-3 text-sm">
                                 {b.paymentMarked ? (
-                                  <span className="text-success-dark font-semibold">✓</span>
+                                  <Check className="w-4 h-4 text-success-dark" aria-label="Paid" />
                                 ) : (
-                                  <span className="text-gray-400">✗</span>
+                                  <X className="w-4 h-4 text-gray-400" aria-label="Unpaid" />
                                 )}
                               </td>
                               <td className="px-4 py-3 text-sm text-gray-700">

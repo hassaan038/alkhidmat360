@@ -111,7 +111,7 @@ export default function Login() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="mt-1.5 focus:scale-[1.01] transition-all duration-200"
+                    className="mt-1.5 transition-all duration-200"
                     disabled={loading}
                   />
                 </div>
@@ -129,7 +129,7 @@ export default function Login() {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    className="mt-1.5 focus:scale-[1.01] transition-all duration-200"
+                    className="mt-1.5 transition-all duration-200"
                     disabled={loading}
                   />
                 </div>
@@ -137,7 +137,7 @@ export default function Login() {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  className="w-full h-11 text-base hover:scale-105 hover:shadow-md transition-all duration-200"
+                  className="w-full h-11 text-base hover:shadow-md transition-all duration-200"
                   disabled={loading}
                 >
                   {loading ? (
@@ -164,7 +164,7 @@ export default function Login() {
               {/* Sign Up Link */}
               <div className="text-center">
                 <Link to="/signup">
-                  <Button variant="outline" className="w-full hover:scale-105 transition-all duration-200">
+                  <Button variant="outline" className="w-full transition-all duration-200">
                     Create New Account
                   </Button>
                 </Link>

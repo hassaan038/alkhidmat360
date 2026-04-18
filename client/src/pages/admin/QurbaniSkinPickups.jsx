@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Scissors, ChevronDown, ChevronUp } from 'lucide-react';
+import { Scissors, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import FadeIn from '../../components/animations/FadeIn';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -142,9 +142,10 @@ export default function QurbaniSkinPickups() {
                                     href={osmLink(lat, lng)}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-xs text-primary-600 hover:text-primary-700 underline mt-0.5 inline-block"
+                                    className="text-xs text-primary-600 hover:text-primary-700 underline mt-0.5 inline-flex items-center gap-1"
                                   >
-                                    📍 view on map
+                                    <MapPin className="w-3 h-3" />
+                                    view on map
                                   </a>
                                 )}
                               </td>

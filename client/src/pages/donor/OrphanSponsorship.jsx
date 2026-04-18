@@ -6,7 +6,7 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { createOrphanSponsorship } from '../../services/donationService';
-import { Baby, Loader2 } from 'lucide-react';
+import { Baby, Loader2, Heart } from 'lucide-react';
 import FadeIn from '../../components/animations/FadeIn';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 
@@ -170,7 +170,7 @@ export default function OrphanSponsorship() {
                   {sponsorshipTypes.map((type) => (
                     <label
                       key={type.id}
-                      className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md ${
+                      className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-md ${
                         selectedType === type.id
                           ? 'border-primary-500 bg-primary-50 shadow-glow-blue'
                           : 'border-gray-200 hover:border-primary-200'
@@ -224,7 +224,7 @@ export default function OrphanSponsorship() {
                     <input
                       type="text"
                       {...register('sponsorshipType')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., Specialized Educational Support"
                       autoFocus
                     />
@@ -247,7 +247,7 @@ export default function OrphanSponsorship() {
                   <input
                     type="number"
                     {...register('monthlyAmount')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter amount"
                   />
                   {errors.monthlyAmount && (
@@ -264,7 +264,7 @@ export default function OrphanSponsorship() {
                     {...register('duration', {
                       onChange: handleDurationChange,
                     })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="e.g., 12"
                   />
                   {errors.duration && (
@@ -279,7 +279,7 @@ export default function OrphanSponsorship() {
                   <input
                     type="number"
                     {...register('totalAmount')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200 bg-gray-50"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-gray-50"
                     placeholder="Auto-calculated"
                     readOnly
                   />
@@ -303,7 +303,7 @@ export default function OrphanSponsorship() {
                     <input
                       type="text"
                       {...register('sponsorName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your full name"
                     />
                     {errors.sponsorName && (
@@ -319,7 +319,7 @@ export default function OrphanSponsorship() {
                       <input
                         type="tel"
                         {...register('sponsorPhone')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="03001234567"
                       />
                       {errors.sponsorPhone && (
@@ -334,7 +334,7 @@ export default function OrphanSponsorship() {
                       <input
                         type="email"
                         {...register('sponsorEmail')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="your@email.com"
                       />
                       {errors.sponsorEmail && (
@@ -350,7 +350,7 @@ export default function OrphanSponsorship() {
                     <textarea
                       {...register('sponsorAddress')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your complete address"
                     />
                     {errors.sponsorAddress && (
@@ -369,7 +369,7 @@ export default function OrphanSponsorship() {
                         </label>
                         <select
                           {...register('orphanAge')}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         >
                           <option value="">Any Age</option>
                           <option value="0-5">0-5 years</option>
@@ -385,7 +385,7 @@ export default function OrphanSponsorship() {
                         </label>
                         <select
                           {...register('orphanGender')}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         >
                           <option value="">Any Gender</option>
                           <option value="male">Male</option>
@@ -400,7 +400,7 @@ export default function OrphanSponsorship() {
                         <input
                           type="date"
                           {...register('startDate')}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         />
                       </div>
                     </div>
@@ -413,7 +413,7 @@ export default function OrphanSponsorship() {
                     <textarea
                       {...register('notes')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Any special message or requirements"
                     />
                   </div>
@@ -425,7 +425,7 @@ export default function OrphanSponsorship() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:scale-105 hover:shadow-md transition-all duration-200"
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <>
@@ -448,7 +448,7 @@ export default function OrphanSponsorship() {
                     setCustomMode(false);
                   }}
                   disabled={isSubmitting}
-                  className="hover:scale-105 transition-all duration-200"
+                  className="transition-colors duration-200"
                 >
                   Reset
                 </Button>
@@ -464,7 +464,7 @@ export default function OrphanSponsorship() {
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-lg">💙</span>
+                <Heart className="w-4 h-4 text-primary-600 fill-primary-600" />
               </div>
               <div>
                 <h4 className="font-semibold text-primary-900 mb-1">What Your Sponsorship Includes</h4>

@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Ca
 import Button from '../../components/ui/Button';
 import { createSkinCollection } from '../../services/donationService';
 import { toast } from 'sonner';
-import { Scissors, Loader2 } from 'lucide-react';
+import { Scissors, Loader2, Bot, Beef, Mountain } from 'lucide-react';
 import FadeIn from '../../components/animations/FadeIn';
 
 // Validation schema matching backend.
@@ -34,10 +34,12 @@ const skinCollectionSchema = z.object({
   notes: z.string().optional(),
 });
 
+// Lucide doesn't have animal-specific icons for goat/cow/camel — we use
+// semantically neutral icons and rely on the label to communicate the type.
 const skinTypes = [
-  { id: 'goat', name: 'Goat Skin', emoji: '🐑' },
-  { id: 'cow', name: 'Cow Skin', emoji: '🐄' },
-  { id: 'camel', name: 'Camel Skin', emoji: '🐫' },
+  { id: 'goat', name: 'Goat Skin', icon: Bot },
+  { id: 'cow', name: 'Cow Skin', icon: Beef },
+  { id: 'camel', name: 'Camel Skin', icon: Mountain },
 ];
 
 export default function SkinCollection() {
@@ -123,28 +125,36 @@ export default function SkinCollection() {
                   Animal Type <span className="text-error">*</span>
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {skinTypes.map((skin) => (
-                    <label
-                      key={skin.id}
-                      className={`relative flex flex-col items-center justify-center p-5 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md ${
-                        selectedSkin === skin.id
-                          ? 'border-primary-500 bg-primary-50 shadow-glow-blue'
-                          : 'border-gray-200 hover:border-primary-200'
-                      }`}
-                      onClick={() => handleSkinSelect(skin)}
-                    >
-                      <input
-                        type="radio"
-                        value={skin.name}
-                        {...register('animalType')}
-                        className="sr-only"
-                      />
-                      <div className="text-center">
-                        <p className="text-2xl mb-2">{skin.emoji}</p>
+                  {skinTypes.map((skin) => {
+                    const SkinIcon = skin.icon;
+                    const selected = selectedSkin === skin.id;
+                    return (
+                      <label
+                        key={skin.id}
+                        className={`relative flex flex-col items-center justify-center p-5 border rounded-xl cursor-pointer transition-colors duration-200 ${
+                          selected
+                            ? 'border-primary-500 bg-primary-50 ring-1 ring-inset ring-primary-200 shadow-glow-blue'
+                            : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'
+                        }`}
+                        onClick={() => handleSkinSelect(skin)}
+                      >
+                        <input
+                          type="radio"
+                          value={skin.name}
+                          {...register('animalType')}
+                          className="sr-only"
+                        />
+                        <div
+                          className={`flex h-10 w-10 items-center justify-center rounded-lg mb-2 transition-colors ${
+                            selected ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'
+                          }`}
+                        >
+                          <SkinIcon className="h-5 w-5" />
+                        </div>
                         <p className="font-medium text-gray-900">{skin.name}</p>
-                      </div>
-                    </label>
-                  ))}
+                      </label>
+                    );
+                  })}
                 </div>
                 {!customMode && (
                   <button
@@ -175,7 +185,7 @@ export default function SkinCollection() {
                     <input
                       type="text"
                       {...register('animalType')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., Mixed Animal Skins"
                       autoFocus
                     />
@@ -195,7 +205,7 @@ export default function SkinCollection() {
                   type="number"
                   min={1}
                   {...register('numberOfSkins')}
-                  className="w-full sm:w-48 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                  className="w-full sm:w-48 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter number of skins"
                 />
                 {errors.numberOfSkins && (
@@ -217,7 +227,7 @@ export default function SkinCollection() {
                     <input
                       type="text"
                       {...register('donorName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your full name"
                     />
                     {errors.donorName && (
@@ -232,7 +242,7 @@ export default function SkinCollection() {
                     <input
                       type="tel"
                       {...register('donorPhone')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="03001234567"
                     />
                     {errors.donorPhone && (
@@ -247,7 +257,7 @@ export default function SkinCollection() {
                     <textarea
                       {...register('collectionAddress')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter complete pickup address with landmarks"
                     />
                     {errors.collectionAddress && (
@@ -262,7 +272,7 @@ export default function SkinCollection() {
                     <input
                       type="date"
                       {...register('preferredDate')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     />
                     {errors.preferredDate && (
                       <p className="mt-1 text-sm text-error">{errors.preferredDate.message}</p>
@@ -279,7 +289,7 @@ export default function SkinCollection() {
                     <textarea
                       {...register('notes')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Special instructions for pickup team"
                     />
                   </div>
@@ -291,7 +301,7 @@ export default function SkinCollection() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:scale-105 hover:shadow-md transition-all duration-200"
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <>
@@ -314,7 +324,7 @@ export default function SkinCollection() {
                     setCustomMode(false);
                   }}
                   disabled={isSubmitting}
-                  className="hover:scale-105 transition-all duration-200"
+                  className="transition-colors duration-200"
                 >
                   Reset
                 </Button>

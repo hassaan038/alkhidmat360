@@ -1,19 +1,34 @@
 import { cn } from "../../lib/utils";
+import { Loader2 } from "lucide-react";
 
 const buttonVariants = {
-  default: "bg-primary-600 text-white hover:bg-primary-700",
-  destructive: "bg-error text-white hover:bg-error-dark",
-  outline: "border-2 border-primary-600 text-primary-600 hover:bg-primary-50",
-  secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300",
-  ghost: "hover:bg-gray-100 text-gray-700",
-  link: "text-primary-600 underline-offset-4 hover:underline",
+  default:
+    "bg-primary-600 text-white hover:bg-primary-700 shadow-sm hover:shadow",
+  destructive:
+    "bg-error text-white hover:bg-error-dark shadow-sm hover:shadow",
+  outline:
+    "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400",
+  primaryOutline:
+    "border border-primary-300 bg-primary-50/60 text-primary-700 hover:bg-primary-100 hover:border-primary-400",
+  secondary:
+    "bg-gray-100 text-gray-900 hover:bg-gray-200",
+  ghost:
+    "hover:bg-gray-100 text-gray-700",
+  link:
+    "text-primary-600 underline-offset-4 hover:underline",
+  success:
+    "bg-success text-white hover:bg-success-dark shadow-sm hover:shadow",
+  soft:
+    "bg-primary-50 text-primary-700 hover:bg-primary-100 ring-1 ring-inset ring-primary-100",
 };
 
 const buttonSizes = {
   default: "h-10 px-4 py-2",
-  sm: "h-9 px-3",
-  lg: "h-11 px-8",
+  sm: "h-9 px-3 text-xs",
+  lg: "h-11 px-8 text-base",
+  xl: "h-12 px-10 text-base",
   icon: "h-10 w-10",
+  iconSm: "h-9 w-9",
 };
 
 export default function Button({
@@ -22,20 +37,35 @@ export default function Button({
   size = "default",
   children,
   disabled,
+  loading = false,
+  leftIcon: LeftIcon,
+  rightIcon: RightIcon,
+  type = "button",
   ...props
 }) {
+  const isDisabled = disabled || loading;
   return (
     <button
+      type={type}
       className={cn(
-        "inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        buttonVariants[variant],
-        buttonSizes[size],
+        "inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors duration-150",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2",
+        "disabled:pointer-events-none disabled:opacity-50",
+        !isDisabled && "cursor-pointer",
+        buttonVariants[variant] || buttonVariants.default,
+        buttonSizes[size] || buttonSizes.default,
         className
       )}
-      disabled={disabled}
+      disabled={isDisabled}
       {...props}
     >
+      {loading ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        LeftIcon && <LeftIcon className="h-4 w-4" />
+      )}
       {children}
+      {!loading && RightIcon && <RightIcon className="h-4 w-4" />}
     </button>
   );
 }

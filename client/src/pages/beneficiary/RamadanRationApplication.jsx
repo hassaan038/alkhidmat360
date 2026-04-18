@@ -109,7 +109,7 @@ export default function RamadanRationApplication() {
                     <input
                       type="number"
                       {...register('familyMembers')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., 5"
                     />
                     {errors.familyMembers && (
@@ -124,7 +124,7 @@ export default function RamadanRationApplication() {
                     <input
                       type="number"
                       {...register('monthlyIncome')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., 15000"
                     />
                     {errors.monthlyIncome && (
@@ -154,7 +154,7 @@ export default function RamadanRationApplication() {
                     <textarea
                       {...register('disabilityDetails')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Please describe the condition and special needs"
                     />
                   </div>
@@ -174,7 +174,7 @@ export default function RamadanRationApplication() {
                     <input
                       type="text"
                       {...register('applicantName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your full name"
                     />
                     {errors.applicantName && (
@@ -190,7 +190,7 @@ export default function RamadanRationApplication() {
                       <input
                         type="tel"
                         {...register('applicantPhone')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="03001234567"
                       />
                       {errors.applicantPhone && (
@@ -206,7 +206,7 @@ export default function RamadanRationApplication() {
                         type="text"
                         {...register('applicantCNIC')}
                         maxLength={13}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="1234567890123"
                       />
                       {errors.applicantCNIC && (
@@ -222,7 +222,7 @@ export default function RamadanRationApplication() {
                     <textarea
                       {...register('applicantAddress')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your complete address with area and landmarks"
                     />
                     {errors.applicantAddress && (
@@ -245,7 +245,7 @@ export default function RamadanRationApplication() {
                     <textarea
                       {...register('reasonForApplication')}
                       rows={4}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Please explain why you need the ration package and your current circumstances"
                     />
                     {errors.reasonForApplication && (
@@ -275,7 +275,7 @@ export default function RamadanRationApplication() {
                     <textarea
                       {...register('additionalNotes')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Any additional information you'd like to share"
                     />
                   </div>
@@ -287,7 +287,7 @@ export default function RamadanRationApplication() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:scale-105 hover:shadow-md transition-all duration-200"
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <>
@@ -306,7 +306,7 @@ export default function RamadanRationApplication() {
                   variant="outline"
                   onClick={() => reset()}
                   disabled={isSubmitting}
-                  className="hover:scale-105 transition-all duration-200"
+                  className="transition-colors duration-200"
                 >
                   Reset
                 </Button>

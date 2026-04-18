@@ -315,7 +315,7 @@ export default function AdminDashboard() {
                     <Card className="hover:shadow-medium hover:-translate-y-2 transition-all duration-300 hover:border-primary-200 cursor-pointer h-full group">
                       <CardContent className="pt-6">
                         <div
-                          className={`${action.bg} p-4 rounded-xl inline-flex mb-4 group-hover:scale-110 transition-transform duration-300 ring-2 ring-white/50`}
+                          className={`${action.bg} p-4 rounded-xl inline-flex mb-4 transition-transform duration-300 ring-2 ring-white/50`}
                         >
                           <Icon className={`w-7 h-7 ${action.color}`} />
                         </div>

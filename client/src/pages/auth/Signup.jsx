@@ -169,7 +169,7 @@ export default function Signup() {
                       onClick={() => handleUserTypeSelect(type.value)}
                       className={`
                         relative p-5 rounded-xl border-2 transition-all duration-300 text-left
-                        hover:scale-105 hover:shadow-lg
+                        hover:shadow-lg
                         ${
                           isSelected
                             ? `${type.color} border-2 shadow-glow-blue`
@@ -226,7 +226,7 @@ export default function Signup() {
                   value={formData.fullName}
                   onChange={handleChange}
                   required
-                  className="mt-1.5 focus:scale-[1.01] transition-all duration-200"
+                  className="mt-1.5 transition-all duration-200"
                   disabled={loading}
                 />
               </div>
@@ -243,7 +243,7 @@ export default function Signup() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="mt-1.5 focus:scale-[1.01] transition-all duration-200"
+                  className="mt-1.5 transition-all duration-200"
                   disabled={loading}
                 />
               </div>
@@ -260,7 +260,7 @@ export default function Signup() {
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   required
-                  className="mt-1.5 focus:scale-[1.01] transition-all duration-200"
+                  className="mt-1.5 transition-all duration-200"
                   disabled={loading}
                 />
               </div>
@@ -274,7 +274,7 @@ export default function Signup() {
                   placeholder="12345-1234567-1"
                   value={formData.cnic}
                   onChange={handleChange}
-                  className="mt-1.5 focus:scale-[1.01] transition-all duration-200"
+                  className="mt-1.5 transition-all duration-200"
                   disabled={loading}
                 />
               </div>
@@ -292,7 +292,7 @@ export default function Signup() {
                   onChange={handleChange}
                   required
                   minLength={6}
-                  className="mt-1.5 focus:scale-[1.01] transition-all duration-200"
+                  className="mt-1.5 transition-all duration-200"
                   disabled={loading}
                 />
               </div>
@@ -310,7 +310,7 @@ export default function Signup() {
                   onChange={handleChange}
                   required
                   minLength={6}
-                  className="mt-1.5 focus:scale-[1.01] transition-all duration-200"
+                  className="mt-1.5 transition-all duration-200"
                   disabled={loading}
                 />
               </div>
@@ -319,7 +319,7 @@ export default function Signup() {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full h-11 text-base hover:scale-105 hover:shadow-md transition-all duration-200"
+              className="w-full h-11 text-base hover:shadow-md transition-all duration-200"
               disabled={loading}
             >
               {loading ? (
@@ -346,7 +346,7 @@ export default function Signup() {
           {/* Sign In Link */}
           <div className="text-center">
             <Link to="/login">
-              <Button variant="outline" className="w-full hover:scale-105 transition-all duration-200">
+              <Button variant="outline" className="w-full transition-all duration-200">
                 Sign In Instead
               </Button>
             </Link>

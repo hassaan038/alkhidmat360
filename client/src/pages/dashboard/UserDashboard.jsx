@@ -9,7 +9,14 @@ import {
   XCircle,
   ArrowRight,
   Sparkles,
+  Package,
+  Baby,
+  DollarSign,
+  Apple,
+  HandHeart,
+  BarChart3,
 } from 'lucide-react';
+import IconTile from '../../components/ui/IconTile';
 import { Link } from 'react-router-dom';
 import * as userService from '../../services/userService';
 import CharacterLaptop from '../../components/illustrations/CharacterLaptop';
@@ -80,19 +87,22 @@ export default function UserDashboard() {
             title: 'Qurbani Donation',
             description: 'Donate animals for Qurbani',
             path: '/dashboard/user/qurbani',
-            icon: '🐑',
+            icon: Heart,
+            tone: 'qurbani',
           },
           {
             title: 'Ration Donation',
             description: 'Donate ration packages',
             path: '/dashboard/user/ration',
-            icon: '📦',
+            icon: Package,
+            tone: 'ration',
           },
           {
             title: 'Orphan Sponsorship',
             description: 'Sponsor an orphan child',
             path: '/dashboard/user/orphan-sponsorship',
-            icon: '👶',
+            icon: Baby,
+            tone: 'orphan',
           },
         ];
       case 'BENEFICIARY':
@@ -101,19 +111,22 @@ export default function UserDashboard() {
             title: 'Loan Application',
             description: 'Apply for interest-free loan',
             path: '/dashboard/user/loan',
-            icon: '💰',
+            icon: DollarSign,
+            tone: 'loan',
           },
           {
             title: 'Ramadan Ration',
             description: 'Apply for Ramadan ration',
             path: '/dashboard/user/ramadan-ration',
-            icon: '🍎',
+            icon: Apple,
+            tone: 'ration',
           },
           {
             title: 'Orphan Registration',
             description: 'Register as orphan guardian',
             path: '/dashboard/user/orphan',
-            icon: '👨‍👩‍👧',
+            icon: Baby,
+            tone: 'orphan',
           },
         ];
       case 'VOLUNTEER':
@@ -122,13 +135,15 @@ export default function UserDashboard() {
             title: 'Browse Tasks',
             description: 'Find volunteering opportunities',
             path: '/dashboard/user/volunteer',
-            icon: '🤝',
+            icon: HandHeart,
+            tone: 'volunteer',
           },
           {
             title: 'My Activities',
             description: 'Track your contributions',
             path: '/dashboard/user/activities',
-            icon: '📊',
+            icon: BarChart3,
+            tone: 'primary',
           },
         ];
       default:
@@ -205,15 +220,15 @@ export default function UserDashboard() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {quickActions.map((action) => (
-              <Link key={action.path} to={action.path}>
-                <Card className="hover:shadow-medium hover:-translate-y-2 transition-all duration-300 hover:border-primary-200 cursor-pointer h-full group">
+              <Link key={action.path} to={action.path} className="block">
+                <Card className="hover:shadow-card-hover hover:-translate-y-1 transition-all duration-200 hover:border-primary-200 cursor-pointer h-full group">
                   <CardContent className="pt-6">
-                    <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">{action.icon}</div>
+                    <IconTile icon={action.icon} tone={action.tone} size="lg" className="mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       {action.title}
                     </h3>
                     <p className="text-sm text-gray-600 mb-4">{action.description}</p>
-                    <div className="flex items-center text-primary-600 text-sm font-medium group-hover:gap-3 transition-all duration-300">
+                    <div className="flex items-center gap-1 text-primary-600 text-sm font-medium transition-all duration-200 group-hover:gap-2">
                       <span>Get started</span>
                       <ArrowRight className="w-4 h-4" />
                     </div>

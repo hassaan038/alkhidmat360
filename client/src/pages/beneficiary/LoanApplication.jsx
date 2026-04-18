@@ -7,7 +7,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Ca
 import Button from '../../components/ui/Button';
 import { createLoanApplication } from '../../services/applicationService';
 import { toast } from 'sonner';
-import { DollarSign, Loader2 } from 'lucide-react';
+import { DollarSign, Loader2, Briefcase, GraduationCap, Stethoscope, Home, Heart, FileText } from 'lucide-react';
 import FadeIn from '../../components/animations/FadeIn';
 
 // Validation schema matching backend
@@ -37,12 +37,12 @@ const loanApplicationSchema = z.object({
 });
 
 const loanTypes = [
-  { value: 'BUSINESS', label: 'Business Loan', icon: '💼' },
-  { value: 'EDUCATION', label: 'Education Loan', icon: '🎓' },
-  { value: 'MEDICAL', label: 'Medical Loan', icon: '🏥' },
-  { value: 'HOUSING', label: 'Housing Loan', icon: '🏠' },
-  { value: 'MARRIAGE', label: 'Marriage Loan', icon: '💒' },
-  { value: 'OTHER', label: 'Other', icon: '📄' },
+  { value: 'BUSINESS', label: 'Business Loan', icon: Briefcase },
+  { value: 'EDUCATION', label: 'Education Loan', icon: GraduationCap },
+  { value: 'MEDICAL', label: 'Medical Loan', icon: Stethoscope },
+  { value: 'HOUSING', label: 'Housing Loan', icon: Home },
+  { value: 'MARRIAGE', label: 'Marriage Loan', icon: Heart },
+  { value: 'OTHER', label: 'Other', icon: FileText },
 ];
 
 export default function LoanApplication() {
@@ -117,25 +117,35 @@ export default function LoanApplication() {
                   Loan Type <span className="text-error">*</span>
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {loanTypes.map((type) => (
-                    <label
-                      key={type.value}
-                      className={`relative flex flex-col items-center justify-center p-5 border-2 rounded-xl cursor-pointer hover:scale-105 hover:shadow-md transition-all duration-300 ${
-                        selectedLoanType === type.value
-                          ? 'border-primary-500 bg-primary-50 shadow-glow-blue'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        value={type.value}
-                        {...register('loanType')}
-                        className="sr-only"
-                      />
-                      <span className="text-2xl mb-2">{type.icon}</span>
-                      <span className="text-sm font-medium text-center">{type.label}</span>
-                    </label>
-                  ))}
+                  {loanTypes.map((type) => {
+                    const TypeIcon = type.icon;
+                    const selected = selectedLoanType === type.value;
+                    return (
+                      <label
+                        key={type.value}
+                        className={`relative flex flex-col items-center justify-center p-5 border rounded-xl cursor-pointer transition-colors duration-200 ${
+                          selected
+                            ? 'border-primary-500 bg-primary-50 ring-1 ring-inset ring-primary-200 shadow-glow-blue'
+                            : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          value={type.value}
+                          {...register('loanType')}
+                          className="sr-only"
+                        />
+                        <div
+                          className={`flex h-10 w-10 items-center justify-center rounded-lg mb-2 transition-colors ${
+                            selected ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'
+                          }`}
+                        >
+                          <TypeIcon className="h-5 w-5" />
+                        </div>
+                        <span className="text-sm font-medium text-center">{type.label}</span>
+                      </label>
+                    );
+                  })}
                 </div>
                 {errors.loanType && (
                   <p className="mt-1 text-sm text-error">{errors.loanType.message}</p>
@@ -155,7 +165,7 @@ export default function LoanApplication() {
                     <input
                       type="number"
                       {...register('requestedAmount')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                       placeholder="e.g., 50000"
                     />
                     {errors.requestedAmount && (
@@ -170,7 +180,7 @@ export default function LoanApplication() {
                     <input
                       type="number"
                       {...register('monthlyIncome')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                       placeholder="e.g., 30000"
                     />
                     {errors.monthlyIncome && (
@@ -185,7 +195,7 @@ export default function LoanApplication() {
                     <input
                       type="number"
                       {...register('familyMembers')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                       placeholder="e.g., 5"
                     />
                     {errors.familyMembers && (
@@ -199,7 +209,7 @@ export default function LoanApplication() {
                     </label>
                     <select
                       {...register('employmentStatus')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                     >
                       <option value="">Select status</option>
                       <option value="Employed">Employed</option>
@@ -244,7 +254,7 @@ export default function LoanApplication() {
                     <input
                       type="text"
                       {...register('applicantName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                       placeholder="Enter your full name"
                     />
                     {errors.applicantName && (
@@ -260,7 +270,7 @@ export default function LoanApplication() {
                       <input
                         type="tel"
                         {...register('applicantPhone')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                         placeholder="03001234567"
                       />
                       {errors.applicantPhone && (
@@ -276,7 +286,7 @@ export default function LoanApplication() {
                         type="text"
                         {...register('applicantCNIC')}
                         maxLength={13}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                         placeholder="1234567890123"
                       />
                       {errors.applicantCNIC && (
@@ -292,7 +302,7 @@ export default function LoanApplication() {
                     <textarea
                       {...register('applicantAddress')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                       placeholder="Enter your complete address"
                     />
                     {errors.applicantAddress && (
@@ -318,7 +328,7 @@ export default function LoanApplication() {
                     <input
                       type="text"
                       {...register('guarantorName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                       placeholder="Enter guarantor's full name"
                     />
                   </div>
@@ -331,7 +341,7 @@ export default function LoanApplication() {
                       <input
                         type="tel"
                         {...register('guarantorPhone')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                         placeholder="03001234567"
                       />
                     </div>
@@ -344,7 +354,7 @@ export default function LoanApplication() {
                         type="text"
                         {...register('guarantorCNIC')}
                         maxLength={13}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                         placeholder="1234567890123"
                       />
                     </div>
@@ -357,7 +367,7 @@ export default function LoanApplication() {
                     <textarea
                       {...register('guarantorAddress')}
                       rows={2}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                       placeholder="Enter guarantor's complete address"
                     />
                   </div>
@@ -369,7 +379,7 @@ export default function LoanApplication() {
                     <textarea
                       {...register('additionalNotes')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
                       placeholder="Any additional information you'd like to share"
                     />
                   </div>
@@ -381,7 +391,7 @@ export default function LoanApplication() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:scale-105 hover:shadow-md transition-all duration-200"
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <>
@@ -400,7 +410,7 @@ export default function LoanApplication() {
                   variant="outline"
                   onClick={() => reset()}
                   disabled={isSubmitting}
-                  className="hover:scale-105 transition-all duration-200"
+                  className="transition-colors duration-200"
                 >
                   Reset
                 </Button>

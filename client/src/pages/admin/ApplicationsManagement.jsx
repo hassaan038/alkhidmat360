@@ -128,7 +128,7 @@ export default function ApplicationsManagement() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all duration-200 hover:scale-105 ${
+                  className={`px-4 py-3 font-medium text-sm whitespace-nowrap border-b-2 transition-all duration-200 ${
                     activeTab === tab.id
                       ? 'border-yellow-600 text-yellow-600'
                       : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'

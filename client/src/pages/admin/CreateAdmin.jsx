@@ -75,7 +75,7 @@ export default function CreateAdmin() {
           {/* Header Section */}
           <FadeIn direction="up" delay={0}>
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl shadow-xl mb-6 transform hover:scale-110 transition-transform duration-300">
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl shadow-xl mb-6 transform transition-transform duration-300">
                 <UserPlus className="w-10 h-10 text-white" />
               </div>
               <h1 className="text-4xl font-bold text-gray-900 mb-3 flex items-center justify-center gap-2">
@@ -124,7 +124,7 @@ export default function CreateAdmin() {
                   <input
                     type="text"
                     {...register('fullName')}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 focus:scale-[1.01] transition-all outline-none"
+                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 transition-all outline-none"
                     placeholder="John Doe"
                   />
                 </div>
@@ -148,7 +148,7 @@ export default function CreateAdmin() {
                   <input
                     type="email"
                     {...register('email')}
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 focus:scale-[1.01] transition-all outline-none"
+                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 transition-all outline-none"
                     placeholder="admin@alkhidmat360.com"
                   />
                 </div>
@@ -174,7 +174,7 @@ export default function CreateAdmin() {
                     <input
                       type="tel"
                       {...register('phoneNumber')}
-                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 focus:scale-[1.01] transition-all outline-none"
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 transition-all outline-none"
                       placeholder="03001234567"
                     />
                   </div>
@@ -198,7 +198,7 @@ export default function CreateAdmin() {
                     <input
                       type="text"
                       {...register('cnic')}
-                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 focus:scale-[1.01] transition-all outline-none"
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 transition-all outline-none"
                       placeholder="1234567890123"
                       maxLength={13}
                     />
@@ -226,7 +226,7 @@ export default function CreateAdmin() {
                     <input
                       type="password"
                       {...register('password')}
-                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 focus:scale-[1.01] transition-all outline-none"
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 transition-all outline-none"
                       placeholder="••••••••"
                     />
                   </div>
@@ -250,7 +250,7 @@ export default function CreateAdmin() {
                     <input
                       type="password"
                       {...register('confirmPassword')}
-                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 focus:scale-[1.01] transition-all outline-none"
+                      className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-600 focus:border-gray-600 transition-all outline-none"
                       placeholder="••••••••"
                     />
                   </div>
@@ -285,7 +285,7 @@ export default function CreateAdmin() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 hover:scale-[1.02] transition-all duration-200"
+                  className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <div className="flex items-center justify-center gap-2">
@@ -304,7 +304,7 @@ export default function CreateAdmin() {
                   variant="outline"
                   onClick={() => reset()}
                   disabled={isSubmitting}
-                  className="px-8 py-3 border-2 border-gray-300 hover:border-gray-400 hover:scale-105 rounded-xl font-semibold transition-all duration-200"
+                  className="px-8 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-200"
                 >
                   Reset
                 </Button>

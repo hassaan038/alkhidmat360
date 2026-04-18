@@ -147,7 +147,7 @@ export default function VolunteerTaskRegistration() {
                     <input
                       type="text"
                       {...register('volunteerName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your full name"
                     />
                     {errors.volunteerName && (
@@ -163,7 +163,7 @@ export default function VolunteerTaskRegistration() {
                       <input
                         type="tel"
                         {...register('volunteerPhone')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="03001234567"
                       />
                       {errors.volunteerPhone && (
@@ -178,7 +178,7 @@ export default function VolunteerTaskRegistration() {
                       <input
                         type="email"
                         {...register('volunteerEmail')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                         placeholder="your.email@example.com"
                       />
                       {errors.volunteerEmail && (
@@ -194,7 +194,7 @@ export default function VolunteerTaskRegistration() {
                     <textarea
                       {...register('volunteerAddress')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your complete address"
                     />
                     {errors.volunteerAddress && (
@@ -209,7 +209,7 @@ export default function VolunteerTaskRegistration() {
                     <input
                       type="tel"
                       {...register('emergencyContact')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="03001234567"
                     />
                     {errors.emergencyContact && (
@@ -231,7 +231,7 @@ export default function VolunteerTaskRegistration() {
                     </label>
                     <select
                       {...register('taskCategory')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     >
                       <option value="">Select a category</option>
                       {TASK_CATEGORIES.map((category) => (
@@ -253,7 +253,7 @@ export default function VolunteerTaskRegistration() {
                       {DAYS_OF_WEEK.map((day) => (
                         <label
                           key={day.value}
-                          className={`flex items-center justify-center gap-2 p-3 border rounded-lg cursor-pointer transition-all duration-200 transform hover:scale-105 ${
+                          className={`flex items-center justify-center gap-2 p-3 border rounded-lg cursor-pointer transition-all duration-200 transform ${
                             selectedDays.includes(day.value)
                               ? 'bg-primary-50 border-primary-500 text-primary-700 shadow-md'
                               : 'bg-white border-gray-300 hover:bg-gray-50 hover:shadow-sm'
@@ -281,7 +281,7 @@ export default function VolunteerTaskRegistration() {
                     <input
                       type="text"
                       {...register('preferredLocation')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="e.g., Karachi, Lahore, Islamabad"
                     />
                   </div>
@@ -301,7 +301,7 @@ export default function VolunteerTaskRegistration() {
                     <textarea
                       {...register('skills')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="List any relevant skills (e.g., first aid, public speaking, event management)"
                     />
                   </div>
@@ -313,7 +313,7 @@ export default function VolunteerTaskRegistration() {
                     <textarea
                       {...register('experience')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Describe any previous volunteer work or community service experience"
                     />
                   </div>
@@ -325,7 +325,7 @@ export default function VolunteerTaskRegistration() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:scale-105 hover:shadow-md transition-all duration-200"
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <>
@@ -347,7 +347,7 @@ export default function VolunteerTaskRegistration() {
                     setSelectedDays([]);
                   }}
                   disabled={isSubmitting}
-                  className="hover:scale-105 transition-all duration-200"
+                  className="transition-colors duration-200"
                 >
                   Reset
                 </Button>

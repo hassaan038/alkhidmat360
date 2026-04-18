@@ -6,7 +6,7 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { createQurbaniDonation } from '../../services/donationService';
-import { Heart, Loader2 } from 'lucide-react';
+import { Heart, Loader2, Bot, Mountain } from 'lucide-react';
 import FadeIn from '../../components/animations/FadeIn';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 
@@ -124,10 +124,10 @@ export default function QurbaniDonation() {
                   {['GOAT', 'CAMEL'].map((type) => (
                     <label
                       key={type}
-                      className={`relative flex items-center justify-center p-5 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md ${
+                      className={`relative flex items-center justify-center p-5 border rounded-xl cursor-pointer transition-colors duration-200 ${
                         watch('animalType') === type
-                          ? 'border-primary-500 bg-primary-50 shadow-glow-blue'
-                          : 'border-gray-200 hover:border-primary-200'
+                          ? 'border-primary-500 bg-primary-50 ring-1 ring-inset ring-primary-200 shadow-glow-blue'
+                          : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'
                       }`}
                     >
                       <input
@@ -137,10 +137,14 @@ export default function QurbaniDonation() {
                         className="sr-only"
                       />
                       <div className="text-center">
-                        <p className="text-3xl mb-2">
-                          {type === 'GOAT' && '🐑'}
-                          {type === 'CAMEL' && '🐫'}
-                        </p>
+                        <div
+                          className={`mx-auto flex h-10 w-10 items-center justify-center rounded-lg mb-2 transition-colors ${
+                            watch('animalType') === type ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'
+                          }`}
+                        >
+                          {type === 'GOAT' && <Bot className="h-5 w-5" />}
+                          {type === 'CAMEL' && <Mountain className="h-5 w-5" />}
+                        </div>
                         <p className="font-semibold text-gray-900">{type}</p>
                       </div>
                     </label>
@@ -160,7 +164,7 @@ export default function QurbaniDonation() {
                   <input
                     type="number"
                     {...register('quantity')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter quantity"
                   />
                   {errors.quantity && (
@@ -175,7 +179,7 @@ export default function QurbaniDonation() {
                   <input
                     type="number"
                     {...register('totalAmount')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     placeholder="Enter amount"
                   />
                   <p className="mt-1 text-xs text-gray-500">
@@ -201,7 +205,7 @@ export default function QurbaniDonation() {
                     <input
                       type="text"
                       {...register('donorName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your full name"
                     />
                     {errors.donorName && (
@@ -216,7 +220,7 @@ export default function QurbaniDonation() {
                     <input
                       type="tel"
                       {...register('donorPhone')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="03001234567"
                     />
                     {errors.donorPhone && (
@@ -231,7 +235,7 @@ export default function QurbaniDonation() {
                     <textarea
                       {...register('donorAddress')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Enter your complete address"
                     />
                     {errors.donorAddress && (
@@ -246,7 +250,7 @@ export default function QurbaniDonation() {
                     <input
                       type="date"
                       {...register('deliveryDate')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                     />
                   </div>
 
@@ -257,7 +261,7 @@ export default function QurbaniDonation() {
                     <textarea
                       {...register('notes')}
                       rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
                       placeholder="Any special instructions or preferences"
                     />
                   </div>
@@ -269,7 +273,7 @@ export default function QurbaniDonation() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:scale-105 hover:shadow-md transition-all duration-200"
+                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <>
@@ -288,7 +292,7 @@ export default function QurbaniDonation() {
                   variant="outline"
                   onClick={() => reset()}
                   disabled={isSubmitting}
-                  className="hover:scale-105 transition-all duration-200"
+                  className="transition-colors duration-200"
                 >
                   Reset
                 </Button>
