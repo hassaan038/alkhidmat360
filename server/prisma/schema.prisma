@@ -1,0 +1,291 @@
+// Prisma Schema for Alkhidmat 360
+// Database: MySQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USERS & AUTHENTICATION
+// ============================================
+
+enum UserType {
+  DONOR
+  BENEFICIARY
+  VOLUNTEER
+  ADMIN
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  password      String   // hashed with bcrypt
+  fullName      String
+  phoneNumber   String
+  cnic          String?  @unique
+  userType      UserType
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  qurbaniDonations      QurbaniDonation[]
+  rationDonations       RationDonation[]
+  skinCollections       SkinCollection[]
+  orphanSponsorships    OrphanSponsorship[]
+  loanApplications      LoanApplication[]
+  ramadanRations        RamadanRationApplication[]
+  orphanRegistrations   OrphanRegistration[]
+  volunteerTasks        VolunteerTask[]
+
+  @@index([email])
+  @@index([userType])
+}
+
+// ============================================
+// DONOR FORMS
+// ============================================
+
+enum QurbaniAnimalType {
+  GOAT
+  COW
+  CAMEL
+}
+
+model QurbaniDonation {
+  id            Int                 @id @default(autoincrement())
+  userId        Int
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  animalType    QurbaniAnimalType
+  quantity      Int
+  totalAmount   Decimal             @db.Decimal(10, 2)
+  donorName     String
+  donorPhone    String
+  donorAddress  String              @db.Text
+  deliveryDate  DateTime?
+  notes         String?             @db.Text
+
+  status        String              @default("pending") // pending, confirmed, completed, rejected
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model RationDonation {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  donorName     String
+  donorPhone    String
+  donorEmail    String
+  amount        Decimal  @db.Decimal(10, 2)
+  rationItems   String?  @db.Text // JSON string of items if specific
+  notes         String?  @db.Text
+
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model SkinCollection {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  donorName         String
+  donorPhone        String
+  collectionAddress String   @db.Text
+  numberOfSkins     Int
+  animalType        String   // goat, cow, camel, etc.
+  preferredDate     DateTime
+  notes             String?  @db.Text
+
+  status            String   @default("pending")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrphanSponsorship {
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sponsorName      String
+  sponsorPhone     String
+  sponsorEmail     String
+  monthlyAmount    Decimal  @db.Decimal(10, 2)
+  duration         Int      // months
+  orphanAge        String?  // preference: "child", "teen", "any"
+  orphanGender     String?  // preference: "male", "female", "any"
+  startDate        DateTime?
+  notes            String?  @db.Text
+
+  status           String   @default("pending")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ============================================
+// BENEFICIARY FORMS
+// ============================================
+
+enum LoanType {
+  INTEREST_FREE
+  BUSINESS
+  EDUCATION
+  MEDICAL
+  HOUSING
+}
+
+model LoanApplication {
+  id                    Int      @id @default(autoincrement())
+  userId                Int
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  loanType              LoanType
+  requestedAmount       Decimal  @db.Decimal(10, 2)
+  monthlyIncome         Decimal  @db.Decimal(10, 2)
+  familyMembers         Int
+  employmentStatus      String
+  purposeDescription    String   @db.Text
+  applicantName         String
+  applicantPhone        String
+  applicantCNIC         String
+  applicantAddress      String   @db.Text
+  guarantorName         String?
+  guarantorPhone        String?
+  guarantorCNIC         String?
+  guarantorAddress      String?  @db.Text
+  additionalNotes       String?  @db.Text
+
+  status                String   @default("pending") // pending, under_review, approved, rejected
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model RamadanRationApplication {
+  id                    Int      @id @default(autoincrement())
+  userId                Int
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  familyMembers         Int
+  monthlyIncome         Decimal  @db.Decimal(10, 2)
+  hasDisabledMembers    Boolean
+  disabilityDetails     String?  @db.Text
+  applicantName         String
+  applicantPhone        String
+  applicantCNIC         String
+  applicantAddress      String   @db.Text
+  reasonForApplication  String   @db.Text
+  previouslyReceived    Boolean
+  additionalNotes       String?  @db.Text
+
+  status                String   @default("pending")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrphanRegistration {
+  id                  Int      @id @default(autoincrement())
+  userId              Int
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orphanName          String
+  orphanAge           Int
+  orphanGender        String
+  guardianRelation    String
+  guardianName        String
+  guardianPhone       String
+  guardianCNIC        String
+  guardianAddress     String   @db.Text
+  monthlyIncome       Decimal  @db.Decimal(10, 2)
+  familyMembers       Int
+  educationLevel      String
+  schoolName          String?
+  healthCondition     String?  @db.Text
+  fatherStatus        String
+  motherStatus        String
+  additionalNotes     String?  @db.Text
+
+  status              String   @default("pending")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// ============================================
+// VOLUNTEER FORMS
+// ============================================
+
+enum TaskCategory {
+  DISTRIBUTION
+  FUNDRAISING
+  AWARENESS
+  ADMINISTRATIVE
+  FIELD_WORK
+  EVENT_SUPPORT
+}
+
+model VolunteerTask {
+  id                  Int          @id @default(autoincrement())
+  userId              Int
+  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  volunteerName       String
+  volunteerPhone      String
+  volunteerEmail      String
+  volunteerAddress    String       @db.Text
+  taskCategory        TaskCategory
+  availability        String       // JSON: ["monday", "saturday"]
+  skills              String?      @db.Text
+  experience          String?      @db.Text
+  preferredLocation   String?
+  emergencyContact    String
+
+  status              String       @default("pending")
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([taskCategory])
+}
+
+// ============================================
+// SESSIONS (for express-session)
+// ============================================
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String   @db.Text
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
