@@ -25,6 +25,7 @@ function systemPrefersDark() {
 }
 
 function apply(theme) {
+  if (typeof document === 'undefined') return;
   const el = document.documentElement;
   if (theme === 'dark') el.classList.add('dark');
   else el.classList.remove('dark');
@@ -33,6 +34,12 @@ function apply(theme) {
 // Compute initial theme: stored override wins, else follow OS.
 const initialStored = readStored();
 const initialResolved = initialStored || (systemPrefersDark() ? 'dark' : 'light');
+
+// Force DOM to agree with the resolved theme at module init. The inline
+// script in index.html already handles the same thing before React
+// hydrates to avoid a flash, but applying again here keeps the two
+// sources of truth in sync if anything else ever removes the class.
+apply(initialResolved);
 
 const useThemeStore = create((set, get) => ({
   // `override` is what the user explicitly chose ('light' | 'dark' | null = follow OS)
