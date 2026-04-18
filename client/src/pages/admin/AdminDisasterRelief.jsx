@@ -61,7 +61,7 @@ export default function AdminDisasterRelief() {
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full">
-                <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
+                <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                   <tr>
                     <Th>#</Th><Th>Donor</Th><Th>Campaign</Th><Th>Amount</Th>
                     <Th>Paid?</Th><Th>Screenshot</Th><Th>Status</Th>
@@ -70,33 +70,33 @@ export default function AdminDisasterRelief() {
                 <tbody className="divide-y divide-gray-100">
                   {items.map((d) => (
                     <tr key={d.id} className="transition-colors hover:bg-disaster-50/40 align-top">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-600">#{d.id}</td>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400">#{d.id}</td>
                       <td className="px-4 py-3 text-sm">
-                        <div className="font-medium text-gray-900">{d.donorName}</div>
-                        <div className="text-xs text-gray-500">{d.donorPhone}</div>
-                        {d.donorEmail && <div className="text-xs text-gray-500">{d.donorEmail}</div>}
+                        <div className="font-medium text-gray-900 dark:text-gray-50">{d.donorName}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{d.donorPhone}</div>
+                        {d.donorEmail && <div className="text-xs text-gray-500 dark:text-gray-400">{d.donorEmail}</div>}
                       </td>
                       <td className="px-4 py-3 text-sm">
-                        <div className="font-medium text-gray-900">{d.campaignLabel}</div>
-                        <div className="text-xs text-gray-500">{d.campaignKey}</div>
+                        <div className="font-medium text-gray-900 dark:text-gray-50">{d.campaignLabel}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{d.campaignKey}</div>
                       </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-gray-900 tabular-nums">
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-50 tabular-nums">
                         {formatCurrency(d.amount)}
                       </td>
                       <td className="px-4 py-3 text-sm">
                         {d.paymentMarked ? (
                           <Check className="w-4 h-4 text-success-dark" aria-label="Paid" />
                         ) : (
-                          <X className="w-4 h-4 text-gray-400" aria-label="Unpaid" />
+                          <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label="Unpaid" />
                         )}
                       </td>
                       <td className="px-4 py-3">
                         {d.paymentScreenshotUrl ? (
-                          <a href={imageUrl(d.paymentScreenshotUrl)} target="_blank" rel="noopener noreferrer" className="inline-block overflow-hidden rounded border border-gray-200 transition hover:border-primary-300">
+                          <a href={imageUrl(d.paymentScreenshotUrl)} target="_blank" rel="noopener noreferrer" className="inline-block overflow-hidden rounded border border-gray-200 dark:border-gray-800 transition hover:border-primary-300">
                             <img src={imageUrl(d.paymentScreenshotUrl)} alt="Payment" className="w-12 h-12 object-cover" />
                           </a>
                         ) : (
-                          <span className="text-xs text-gray-400">—</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -116,7 +116,7 @@ export default function AdminDisasterRelief() {
 
 function Th({ children }) {
   return (
-    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
       {children}
     </th>
   );

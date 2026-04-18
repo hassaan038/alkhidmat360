@@ -81,10 +81,10 @@ export default function QurbaniModuleSettings() {
         />
 
         <FormSection title="Booking status" icon={Power} description="When inactive, users will not see the Qurbani Booking links in their sidebar.">
-          <div className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50/60">
+          <div className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/60">
             <div>
-              <p className="text-sm font-semibold text-gray-900">Booking active</p>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">Booking active</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 {loadingFlag ? 'Loading…' : enabled ? 'Users can book hissas right now.' : 'The module is hidden from end users.'}
               </p>
             </div>
@@ -101,7 +101,7 @@ export default function QurbaniModuleSettings() {
             >
               <span
                 className={cn(
-                  'inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform',
+                  'inline-block h-5 w-5 transform rounded-full bg-white dark:bg-gray-900 shadow transition-transform',
                   enabled ? 'translate-x-6' : 'translate-x-1'
                 )}
               />
@@ -111,7 +111,7 @@ export default function QurbaniModuleSettings() {
 
         <FormSection title="Bank details" icon={Banknote} description="Shown to users on the payment screen after they create a booking.">
           {loadingBank ? (
-            <div className="h-32 bg-gray-100 rounded-lg animate-pulse" />
+            <div className="h-32 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
           ) : (
             <>
               <FormField label="Bank account instructions" htmlFor="bd">

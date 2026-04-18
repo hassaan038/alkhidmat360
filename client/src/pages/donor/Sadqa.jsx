@@ -37,9 +37,9 @@ function SadqaCard({ sadqa }) {
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div className="min-w-0">
-            <p className="text-xs text-gray-500">Donation #{sadqa.id}</p>
-            <p className="text-2xl font-bold text-gray-900 tabular-nums">{formatCurrency(sadqa.amount)}</p>
-            {sadqa.purpose && <p className="text-xs text-gray-500 mt-0.5 truncate">{sadqa.purpose}</p>}
+            <p className="text-xs text-gray-500 dark:text-gray-400">Donation #{sadqa.id}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-50 tabular-nums">{formatCurrency(sadqa.amount)}</p>
+            {sadqa.purpose && <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{sadqa.purpose}</p>}
           </div>
           <div className="flex items-center gap-1.5 flex-wrap">
             {sadqa.paymentMarked && (
@@ -49,8 +49,8 @@ function SadqaCard({ sadqa }) {
           </div>
         </div>
         {sadqa.createdAt && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Calendar className="w-3.5 h-3.5 text-gray-400" />
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <Calendar className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
             <span>{formatDate(sadqa.createdAt)}</span>
           </div>
         )}
@@ -132,7 +132,7 @@ export default function Sadqa() {
                     'px-3 py-1 rounded-full text-xs font-medium ring-1 ring-inset transition-colors cursor-pointer',
                     Number(watchAmount) === amt
                       ? 'bg-sadqa-600 text-white ring-sadqa-600'
-                      : 'bg-white text-gray-700 ring-gray-200 hover:ring-sadqa-300 hover:text-sadqa-700'
+                      : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 ring-gray-200 hover:ring-sadqa-300 hover:text-sadqa-700'
                   )}
                 >
                   {formatCurrency(amt)}
@@ -155,7 +155,7 @@ export default function Sadqa() {
                     'px-3 py-1 rounded-full text-xs font-medium ring-1 ring-inset transition-colors cursor-pointer',
                     watchPurpose === p
                       ? 'bg-sadqa-600 text-white ring-sadqa-600'
-                      : 'bg-white text-gray-700 ring-gray-200 hover:ring-sadqa-300 hover:text-sadqa-700'
+                      : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 ring-gray-200 hover:ring-sadqa-300 hover:text-sadqa-700'
                   )}
                 >
                   {p}
@@ -182,7 +182,7 @@ export default function Sadqa() {
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-gray-500">Nothing is recorded until you mark the payment as done.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Nothing is recorded until you mark the payment as done.</p>
             <div className="flex gap-2">
               <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset({ amount: '' })} disabled={isSubmitting}>
                 Reset

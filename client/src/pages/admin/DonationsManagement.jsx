@@ -90,7 +90,7 @@ export default function DonationsManagement() {
           description="Review and manage all donation submissions by type."
         />
 
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200 dark:border-gray-800">
           <nav className="flex gap-1 overflow-x-auto -mb-px">
             {tabs.map((tab) => (
               <button
@@ -99,8 +99,8 @@ export default function DonationsManagement() {
                 className={cn(
                   'relative px-4 py-2.5 text-sm font-medium whitespace-nowrap rounded-t-lg border-b-2 transition-colors cursor-pointer',
                   activeTab === tab.id
-                    ? 'border-sadqa-600 text-sadqa-700'
-                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'border-sadqa-600 text-sadqa-700 dark:text-sadqa-200'
+                    : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:bg-gray-50'
                 )}
               >
                 {tab.label}

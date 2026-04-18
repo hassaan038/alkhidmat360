@@ -79,43 +79,43 @@ function ApplicationCard({ application }) {
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div>
-            <p className="text-xs text-gray-500">Application #{application.id}</p>
-            <p className="text-lg font-semibold text-gray-900">{application.applicantName}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Application #{application.id}</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">{application.applicantName}</p>
           </div>
           <StatusBadge status={application.status} size="sm" />
         </div>
 
-        <div className="space-y-1.5 text-sm text-gray-700">
+        <div className="space-y-1.5 text-sm text-gray-700 dark:text-gray-300">
           <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-gray-400" />
+            <Phone className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             <span>{application.applicantPhone}</span>
           </div>
           <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-gray-400" />
+            <CreditCard className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             <span>{application.applicantCNIC}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-gray-400" />
+            <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             <span>{application.familyMembers} members · monthly income {formatCurrency(application.monthlyIncome)}</span>
           </div>
           {application.amountRequested && (
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               Requested: {formatCurrency(application.amountRequested)}
             </div>
           )}
           {application.createdAt && (
-            <div className="flex items-center gap-2 text-xs text-gray-500 pt-1">
-              <Calendar className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 pt-1">
+              <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               <span>{formatDate(application.createdAt)}</span>
             </div>
           )}
           {cnicDoc && (
-            <div className="pt-2 border-t border-gray-100 mt-2">
+            <div className="pt-2 border-t border-gray-100 dark:border-gray-800 mt-2">
               <a href={cnicDoc} target="_blank" rel="noopener noreferrer">
                 <img
                   src={cnicDoc}
                   alt="CNIC document"
-                  className="w-full h-32 object-cover rounded-md border border-gray-200 hover:opacity-90 transition"
+                  className="w-full h-32 object-cover rounded-md border border-gray-200 dark:border-gray-800 hover:opacity-90 transition"
                 />
               </a>
             </div>
@@ -212,7 +212,7 @@ export default function ZakatApplication() {
   };
 
   const inputClass =
-    'w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent';
+    'w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent';
 
   return (
     <DashboardLayout>
@@ -233,7 +233,7 @@ export default function ZakatApplication() {
                 {/* Identity */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Full Name <span className="text-error">*</span>
                     </label>
                     <input {...register('applicantName')} className={inputClass} />
@@ -242,7 +242,7 @@ export default function ZakatApplication() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Phone Number <span className="text-error">*</span>
                     </label>
                     <input
@@ -256,7 +256,7 @@ export default function ZakatApplication() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       CNIC (13 digits, no dashes) <span className="text-error">*</span>
                     </label>
                     <input
@@ -269,7 +269,7 @@ export default function ZakatApplication() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Family Members <span className="text-error">*</span>
                     </label>
                     <input
@@ -285,7 +285,7 @@ export default function ZakatApplication() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Address <span className="text-error">*</span>
                   </label>
                   <textarea
@@ -302,7 +302,7 @@ export default function ZakatApplication() {
                 {/* Financial situation */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Monthly Income (PKR) <span className="text-error">*</span>
                     </label>
                     <input
@@ -316,7 +316,7 @@ export default function ZakatApplication() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Employment Status <span className="text-error">*</span>
                     </label>
                     <select {...register('employmentStatus')} className={inputClass}>
@@ -328,7 +328,7 @@ export default function ZakatApplication() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Housing Status <span className="text-error">*</span>
                     </label>
                     <select {...register('housingStatus')} className={inputClass}>
@@ -340,7 +340,7 @@ export default function ZakatApplication() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Amount Requested (Optional, PKR)
                     </label>
                     <input
@@ -355,11 +355,11 @@ export default function ZakatApplication() {
 
                 {/* Disability */}
                 <div>
-                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                     <input
                       type="checkbox"
                       {...register('hasDisabledMembers')}
-                      className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      className="rounded border-gray-300 dark:border-gray-700 text-primary-600 focus:ring-primary-500"
                     />
                     Anyone in the household has a disability or chronic illness
                   </label>
@@ -375,7 +375,7 @@ export default function ZakatApplication() {
 
                 {/* Reason */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Reason for Application <span className="text-error">*</span>
                   </label>
                   <textarea
@@ -392,7 +392,7 @@ export default function ZakatApplication() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Additional Notes (Optional)
                   </label>
                   <textarea
@@ -405,10 +405,10 @@ export default function ZakatApplication() {
 
                 {/* CNIC photo */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     CNIC Photo (Optional)
                   </label>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                     Attach a clear photo of your CNIC to help us verify your application faster.
                   </p>
                   {docPreview ? (
@@ -416,12 +416,12 @@ export default function ZakatApplication() {
                       <img
                         src={docPreview}
                         alt="CNIC preview"
-                        className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                        className="w-full h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-800"
                       />
                       <button
                         type="button"
                         onClick={clearDoc}
-                        className="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-md rounded-full p-1.5 text-gray-700"
+                        className="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-md rounded-full p-1.5 text-gray-700 dark:text-gray-300"
                         aria-label="Remove photo"
                       >
                         <XIcon className="w-4 h-4" />
@@ -430,11 +430,11 @@ export default function ZakatApplication() {
                   ) : (
                     <label
                       htmlFor="cnic-doc"
-                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 transition"
                     >
-                      <Camera className="w-6 h-6 text-gray-400 mb-1" />
-                      <span className="text-sm text-gray-600">Tap to attach CNIC photo</span>
-                      <span className="text-xs text-gray-400 mt-0.5">JPG / PNG, up to 5 MB</span>
+                      <Camera className="w-6 h-6 text-gray-400 dark:text-gray-500 mb-1" />
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Tap to attach CNIC photo</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">JPG / PNG, up to 5 MB</span>
                       <input
                         id="cnic-doc"
                         type="file"
@@ -447,7 +447,7 @@ export default function ZakatApplication() {
                   )}
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
+                <div className="flex justify-end gap-2 pt-2 border-t border-gray-200 dark:border-gray-800">
                   <Button
                     type="button"
                     variant="outline"

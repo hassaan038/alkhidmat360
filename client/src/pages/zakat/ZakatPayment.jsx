@@ -48,11 +48,11 @@ function PastPaymentCard({ payment }) {
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div>
-            <p className="text-xs text-gray-500">Payment #{payment.id}</p>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-xs text-gray-500 dark:text-gray-400">Payment #{payment.id}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
               {formatCurrency(payment.zakatAmount)}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               On wealth of {formatCurrency(payment.totalWealth)} ·{' '}
               {payment.nisabBasis === 'gold' ? 'Gold nisab' : 'Silver nisab'}
             </p>
@@ -63,8 +63,8 @@ function PastPaymentCard({ payment }) {
           </div>
         </div>
         {payment.createdAt && (
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <Calendar className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+            <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             <span>{formatDate(payment.createdAt)}</span>
           </div>
         )}
@@ -146,13 +146,13 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-2xl shadow-large w-full max-w-lg max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Complete Zakat Payment</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-large w-full max-w-lg max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Complete Zakat Payment</h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"
+            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 dark:text-gray-400"
             aria-label="Close"
           >
             <XIcon className="w-5 h-5" />
@@ -174,13 +174,13 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
 
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Banknote className="w-4 h-4 text-gray-500" />
-              <h4 className="text-sm font-semibold text-gray-900">Bank Details</h4>
+              <Banknote className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-50">Bank Details</h4>
             </div>
             {loadingBank ? (
-              <div className="h-24 bg-gray-100 rounded-lg animate-pulse" />
+              <div className="h-24 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
             ) : bankDetails ? (
-              <pre className="whitespace-pre-wrap font-sans text-sm bg-gray-50 border border-gray-200 rounded-lg p-4 text-gray-800 leading-relaxed">
+              <pre className="whitespace-pre-wrap font-sans text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 text-gray-800 dark:text-gray-100 leading-relaxed">
                 {bankDetails}
               </pre>
             ) : (
@@ -211,7 +211,7 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
           {errorMsg && <p className="text-sm text-error">{errorMsg}</p>}
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-end gap-3">
           <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
             Cancel
           </Button>
@@ -352,7 +352,7 @@ export default function ZakatPayment() {
     : null;
 
   const inputClass =
-    'w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent';
+    'w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent';
 
   return (
     <DashboardLayout>
@@ -367,8 +367,8 @@ export default function ZakatPayment() {
         {/* Reference rates */}
           <Card className="shadow-card bg-gray-50/40">
             <CardContent className="pt-5">
-              <div className="flex items-start gap-2 mb-3 text-xs text-gray-600">
-                <Info className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+              <div className="flex items-start gap-2 mb-3 text-xs text-gray-600 dark:text-gray-400">
+                <Info className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
                 <p>
                   Reference rates default to recent Pakistan market prices and are used to value
                   any gold/silver you enter and to compute the nisab threshold. Override either
@@ -377,7 +377,7 @@ export default function ZakatPayment() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Gold rate (PKR/gram)
                   </label>
                   <input
@@ -388,7 +388,7 @@ export default function ZakatPayment() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Silver rate (PKR/gram)
                   </label>
                   <input
@@ -410,7 +410,7 @@ export default function ZakatPayment() {
             <CardContent className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Cash & Savings (PKR)
                   </label>
                   <input
@@ -423,7 +423,7 @@ export default function ZakatPayment() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Investments (PKR)
                   </label>
                   <input
@@ -436,7 +436,7 @@ export default function ZakatPayment() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Gold (grams)
                   </label>
                   <input
@@ -449,13 +449,13 @@ export default function ZakatPayment() {
                     className={inputClass}
                   />
                   {goldValue > 0 && (
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       ≈ {formatCurrency(goldValue)}
                     </p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Silver (grams)
                   </label>
                   <input
@@ -468,13 +468,13 @@ export default function ZakatPayment() {
                     className={inputClass}
                   />
                   {silverValue > 0 && (
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       ≈ {formatCurrency(silverValue)}
                     </p>
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Business Assets (PKR)
                   </label>
                   <input
@@ -487,7 +487,7 @@ export default function ZakatPayment() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Other Zakatable Assets (PKR)
                   </label>
                   <input
@@ -502,7 +502,7 @@ export default function ZakatPayment() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Liabilities / Debts due within 12 months (PKR)
                 </label>
                 <input
@@ -517,7 +517,7 @@ export default function ZakatPayment() {
 
               {/* Nisab basis */}
               <div>
-                <p className="block text-sm font-medium text-gray-700 mb-2">
+                <p className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Nisab Basis
                 </p>
                 <div className="grid grid-cols-2 gap-3">
@@ -544,21 +544,21 @@ export default function ZakatPayment() {
                         className={cn(
                           'text-left p-4 border rounded-xl transition-colors duration-200 cursor-pointer',
                           active
-                            ? 'border-zakat-500 bg-zakat-50 ring-1 ring-inset ring-zakat-200'
-                            : 'border-gray-200 hover:border-zakat-300 hover:bg-gray-50'
+                            ? 'border-zakat-500 bg-zakat-50 dark:bg-zakat-500/10 ring-1 ring-inset ring-zakat-200 dark:ring-zakat-700/40'
+                            : 'border-gray-200 dark:border-gray-800 hover:border-zakat-300 hover:bg-gray-50'
                         )}
                       >
-                        <p className={cn('text-sm font-semibold', active ? 'text-zakat-700' : 'text-gray-900')}>
+                        <p className={cn('text-sm font-semibold', active ? 'text-zakat-700 dark:text-zakat-200' : 'text-gray-900 dark:text-gray-50')}>
                           {b.label}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                           {b.grams}g · threshold ≈ {formatCurrency(threshold)}
                         </p>
                       </button>
                     );
                   })}
                 </div>
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                   Many scholars recommend the silver basis since it sets a lower threshold,
                   meaning more donors qualify and more zakat reaches those in need.
                 </p>
@@ -567,7 +567,7 @@ export default function ZakatPayment() {
               {/* Optional fields */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Contact Phone (Optional)
                   </label>
                   <input
@@ -579,7 +579,7 @@ export default function ZakatPayment() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Notes (Optional)
                   </label>
                   <input
@@ -597,26 +597,26 @@ export default function ZakatPayment() {
                 className={cn(
                   'rounded-xl p-5 border',
                   isAboveNisab
-                    ? 'bg-zakat-50 border-zakat-200'
-                    : 'bg-gray-50 border-gray-200'
+                    ? 'bg-zakat-50 dark:bg-zakat-500/10 border-zakat-200 dark:border-zakat-700/40'
+                    : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800'
                 )}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-xs text-gray-600 uppercase tracking-wider font-semibold">Total wealth</p>
-                    <p className="text-lg font-semibold text-gray-900 tabular-nums">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-semibold">Total wealth</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-50 tabular-nums">
                       {formatCurrency(totalWealth)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 uppercase tracking-wider font-semibold">Nisab threshold</p>
-                    <p className="text-lg font-semibold text-gray-900 tabular-nums">
+                    <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-semibold">Nisab threshold</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-gray-50 tabular-nums">
                       {formatCurrency(nisabThreshold)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 uppercase tracking-wider font-semibold">Zakat due</p>
-                    <p className={cn('text-2xl font-bold tabular-nums', isAboveNisab ? 'text-zakat-700' : 'text-gray-500')}>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-semibold">Zakat due</p>
+                    <p className={cn('text-2xl font-bold tabular-nums', isAboveNisab ? 'text-zakat-700 dark:text-zakat-200' : 'text-gray-500 dark:text-gray-400')}>
                       {formatCurrency(zakatAmount)}
                     </p>
                   </div>
@@ -637,7 +637,7 @@ export default function ZakatPayment() {
                 </div>
               </div>
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Nothing is recorded until you mark the payment as done on the next step. Cancel
                 or close the popup to discard.
               </p>

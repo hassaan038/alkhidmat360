@@ -95,22 +95,22 @@ export default function QurbaniDonation() {
                       className={cn(
                         'relative flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-colors duration-200',
                         selected
-                          ? 'border-qurbani-500 bg-qurbani-50 ring-1 ring-inset ring-qurbani-200'
-                          : 'border-gray-200 hover:border-qurbani-300 hover:bg-gray-50'
+                          ? 'border-qurbani-500 bg-qurbani-50 dark:bg-qurbani-500/10 ring-1 ring-inset ring-qurbani-200 dark:ring-qurbani-700/40'
+                          : 'border-gray-200 dark:border-gray-800 hover:border-qurbani-300 hover:bg-gray-50'
                       )}
                     >
                       <input type="radio" value={a.value} {...register('animalType')} className="sr-only" />
                       <span
                         className={cn(
                           'flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl transition-colors',
-                          selected ? 'bg-qurbani-100 text-qurbani-700' : 'bg-gray-100 text-gray-500'
+                          selected ? 'bg-qurbani-100 dark:bg-qurbani-500/15 text-qurbani-700 dark:text-qurbani-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         )}
                       >
                         <AIcon className="h-5 w-5" />
                       </span>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">{a.label}</p>
-                        <p className="text-xs text-gray-500">{a.hint}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">{a.label}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{a.hint}</p>
                       </div>
                     </label>
                   );
@@ -165,13 +165,13 @@ export default function QurbaniDonation() {
         </form>
 
         {/* Info panel */}
-        <div className="rounded-2xl border border-qurbani-100 bg-qurbani-50/60 p-5">
+        <div className="rounded-2xl border border-qurbani-100 dark:border-qurbani-700/40 bg-qurbani-50/60 dark:bg-qurbani-500/10 p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-qurbani-100 text-qurbani-700">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-qurbani-100 dark:bg-qurbani-500/15 text-qurbani-700 dark:text-qurbani-200">
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-qurbani-700">Important information</h4>
+              <h4 className="text-sm font-semibold text-qurbani-700 dark:text-qurbani-200">Important information</h4>
               <ul className="mt-2 space-y-1 text-xs text-qurbani-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

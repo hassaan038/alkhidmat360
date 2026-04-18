@@ -5,7 +5,7 @@ export default function Label({ className, children, htmlFor, required, ...props
     <label
       htmlFor={htmlFor}
       className={cn(
-        "text-sm font-medium leading-none text-gray-700",
+        "text-sm font-medium leading-none text-gray-700 dark:text-gray-300",
         "peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
         className
       )}

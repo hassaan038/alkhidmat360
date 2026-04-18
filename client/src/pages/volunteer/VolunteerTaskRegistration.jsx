@@ -136,7 +136,7 @@ export default function VolunteerTaskRegistration() {
                         'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ring-1 ring-inset transition-colors cursor-pointer',
                         on
                           ? 'bg-volunteer-600 text-white ring-volunteer-600'
-                          : 'bg-white text-gray-700 ring-gray-200 hover:ring-volunteer-300 hover:text-volunteer-700'
+                          : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 ring-gray-200 hover:ring-volunteer-300 hover:text-volunteer-700'
                       )}
                     >
                       <Calendar className="h-3 w-3" />
@@ -173,13 +173,13 @@ export default function VolunteerTaskRegistration() {
           </div>
         </form>
 
-        <div className="rounded-2xl border border-volunteer-100 bg-volunteer-50/60 p-5">
+        <div className="rounded-2xl border border-volunteer-100 dark:border-volunteer-700/40 bg-volunteer-50/60 dark:bg-volunteer-500/10 p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-volunteer-100 text-volunteer-700">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-volunteer-100 dark:bg-volunteer-500/15 text-volunteer-700 dark:text-volunteer-200">
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-volunteer-700">Volunteer information</h4>
+              <h4 className="text-sm font-semibold text-volunteer-700 dark:text-volunteer-200">Volunteer information</h4>
               <ul className="mt-2 space-y-1 text-xs text-volunteer-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

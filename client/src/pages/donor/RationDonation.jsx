@@ -120,15 +120,15 @@ export default function RationDonation() {
                   className={cn(
                     'relative flex cursor-pointer items-center justify-between gap-4 rounded-xl border p-4 transition-colors duration-200',
                     selectedPackage === pkg.id
-                      ? 'border-ration-500 bg-ration-50 ring-1 ring-inset ring-ration-200'
-                      : 'border-gray-200 hover:border-ration-300 hover:bg-gray-50'
+                      ? 'border-ration-500 bg-ration-50 dark:bg-ration-500/10 ring-1 ring-inset ring-ration-200 dark:ring-ration-700/40'
+                      : 'border-gray-200 dark:border-gray-800 hover:border-ration-300 hover:bg-gray-50'
                   )}
                   onClick={() => handlePackageSelect(pkg)}
                 >
                   <input type="radio" value={pkg.name} {...register('packageType')} className="sr-only" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900">{pkg.name}</p>
-                    <p className="mt-0.5 text-xs text-gray-500">{pkg.items}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">{pkg.name}</p>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{pkg.items}</p>
                   </div>
                   <p className="flex-shrink-0 text-base font-bold text-ration-600 tabular-nums">
                     PKR {pkg.price.toLocaleString()}
@@ -148,17 +148,17 @@ export default function RationDonation() {
             ) : (
               <div className="mt-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Custom package type</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Custom package type</label>
                   <button
                     type="button"
                     onClick={() => { setCustomMode(false); setValue('packageType', '', { shouldValidate: false }); }}
-                    className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
+                    className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 cursor-pointer"
                   >
                     Use a preset instead
                   </button>
                 </div>
                 <Input {...register('packageType')} placeholder="e.g., Ramadan Special Package" autoFocus />
-                <p className="text-xs text-gray-500">You'll set the amount in the next field.</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">You'll set the amount in the next field.</p>
               </div>
             )}
             {errors.packageType && <p className="mt-2 text-xs text-error-dark">{errors.packageType.message}</p>}
@@ -206,13 +206,13 @@ export default function RationDonation() {
           </div>
         </form>
 
-        <div className="rounded-2xl border border-ration-100 bg-ration-50/60 p-5">
+        <div className="rounded-2xl border border-ration-100 dark:border-ration-700/40 bg-ration-50/60 dark:bg-ration-500/10 p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-ration-100 text-ration-700">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-ration-100 dark:bg-ration-500/15 text-ration-700 dark:text-ration-200">
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-ration-700">Distribution information</h4>
+              <h4 className="text-sm font-semibold text-ration-700 dark:text-ration-200">Distribution information</h4>
               <ul className="mt-2 space-y-1 text-xs text-ration-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

@@ -31,13 +31,13 @@ const statusBadgeClass = (status) => {
     case 'ACTIVE':
       return 'bg-success-light text-success-dark border-success';
     case 'DRAFT':
-      return 'bg-gray-100 text-gray-700 border-gray-300';
+      return 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700';
     case 'FULL':
       return 'bg-info-light text-info-dark border-info';
     case 'CLOSED':
       return 'bg-warning-light text-warning-dark border-warning';
     default:
-      return 'bg-gray-100 text-gray-700 border-gray-300';
+      return 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700';
   }
 };
 
@@ -101,32 +101,32 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Weight (kg) <span className="text-error">*</span>
           </label>
           <input
             type="number"
             step="0.1"
             {...register('weightKg')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           {errors.weightKg && <p className="mt-1 text-xs text-error">{errors.weightKg.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Estimated Bull Price (PKR) <span className="text-error">*</span>
           </label>
           <input
             type="number"
             {...register('bullPrice')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="e.g. 210000"
           />
           {errors.bullPrice && (
             <p className="mt-1 text-xs text-error">{errors.bullPrice.message}</p>
           )}
           {derivedPerHissa > 0 && (
-            <p className="mt-1 text-xs text-gray-600">
+            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">
               ≈ {formatCurrency(derivedPerHissa)} per hissa ({HISSAS_PER_BULL} hissas)
             </p>
           )}
@@ -136,25 +136,25 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Pickup Date <span className="text-error">*</span>
           </label>
           <input
             type="date"
             {...register('pickupDate')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           {errors.pickupDate && (
             <p className="mt-1 text-xs text-error">{errors.pickupDate.message}</p>
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Pickup Location <span className="text-error">*</span>
           </label>
           <input
             {...register('pickupLocation')}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           {errors.pickupLocation && (
             <p className="mt-1 text-xs text-error">{errors.pickupLocation.message}</p>
@@ -163,27 +163,27 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
         <textarea
           rows={3}
           {...register('description')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          Photo {mode === 'edit' && <span className="text-xs text-gray-500">(leave empty to keep current)</span>}
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Photo {mode === 'edit' && <span className="text-xs text-gray-500 dark:text-gray-400">(leave empty to keep current)</span>}
         </label>
         <input
           type="file"
           accept="image/*"
           onChange={(e) => setPhoto(e.target.files?.[0] || null)}
-          className="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+          className="block w-full text-sm text-gray-700 dark:text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
         />
       </div>
 
-      <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
+      <div className="flex justify-end gap-2 pt-2 border-t border-gray-200 dark:border-gray-800">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
           Cancel
         </Button>
@@ -304,19 +304,19 @@ export default function QurbaniListings() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-gray-50 border-b border-gray-200">
+                    <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price / Hissa</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Booked</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pickup</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Photo</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Weight</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price / Hissa</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Booked</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pickup</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200">
                       {listings.map((listing) => {
                         const img = imageUrl(listing.photoUrl);
                         const total = listing.totalHissas || 7;
@@ -324,25 +324,25 @@ export default function QurbaniListings() {
                         return (
                           <tr key={listing.id} className="hover:bg-gray-50">
                             <td className="px-4 py-3">
-                              <div className="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center">
+                              <div className="w-14 h-14 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden flex items-center justify-center">
                                 {img ? (
                                   <img src={img} alt={listing.name} className="w-full h-full object-cover" />
                                 ) : (
-                                  <ImageIcon className="w-5 h-5 text-gray-400" />
+                                  <ImageIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                 )}
                               </div>
                             </td>
-                            <td className="px-4 py-3 text-sm font-medium text-gray-900">{listing.name}</td>
-                            <td className="px-4 py-3 text-sm text-gray-700">
+                            <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-50">{listing.name}</td>
+                            <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                               {listing.weightKg ? `${listing.weightKg} kg` : '—'}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-700">
+                            <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                               {formatCurrency(listing.pricePerHissa)}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-700">
+                            <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                               {booked} / {total}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-700">
+                            <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                               {listing.pickupDate ? formatDate(listing.pickupDate) : '—'}
                             </td>
                             <td className="px-4 py-3">
@@ -368,7 +368,7 @@ export default function QurbaniListings() {
                                   size="sm"
                                   variant="outline"
                                   onClick={() => openEdit(listing)}
-                                  className="border-gray-300 text-gray-700"
+                                  className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
                                 >
                                   <Edit2 className="w-3 h-3 mr-1" /> Edit
                                 </Button>
@@ -395,15 +395,15 @@ export default function QurbaniListings() {
       {/* Create / Edit Modal */}
       {modalMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-2xl shadow-large w-full max-w-xl max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-large w-full max-w-xl max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
                 {modalMode === 'create' ? 'Create Listing' : 'Edit Listing'}
               </h2>
               <button
                 type="button"
                 onClick={closeModal}
-                className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"
+                className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 dark:text-gray-400"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />

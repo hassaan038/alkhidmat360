@@ -18,13 +18,13 @@ export default function SectionHeading({
     <div className={cn('flex items-start justify-between gap-4 mb-4', className)}>
       <div className="flex items-start gap-3 min-w-0">
         {Icon && (
-          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-300">
             <Icon className="h-4 w-4" />
           </div>
         )}
         <div className="min-w-0">
-          <h2 className={cn(s.title, 'text-gray-900')}>{title}</h2>
-          {description && <p className={cn(s.desc, 'text-gray-500 mt-0.5')}>{description}</p>}
+          <h2 className={cn(s.title, 'text-gray-900 dark:text-gray-50')}>{title}</h2>
+          {description && <p className={cn(s.desc, 'text-gray-500 dark:text-gray-400 mt-0.5')}>{description}</p>}
         </div>
       </div>
       {action && <div className="flex-shrink-0">{action}</div>}

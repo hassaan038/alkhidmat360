@@ -134,16 +134,16 @@ const menuSections = {
 
 // Tone → Tailwind class mapping for active state left-bar + hover tint.
 const toneAccent = {
-  primary: { bar: 'bg-primary-600', soft: 'bg-primary-50 text-primary-700', icon: 'text-primary-600' },
-  qurbani: { bar: 'bg-qurbani-600', soft: 'bg-qurbani-50 text-qurbani-700', icon: 'text-qurbani-600' },
-  zakat: { bar: 'bg-zakat-600', soft: 'bg-zakat-50 text-zakat-700', icon: 'text-zakat-600' },
-  sadqa: { bar: 'bg-sadqa-600', soft: 'bg-sadqa-50 text-sadqa-700', icon: 'text-sadqa-600' },
-  disaster: { bar: 'bg-disaster-600', soft: 'bg-disaster-50 text-disaster-700', icon: 'text-disaster-600' },
-  ration: { bar: 'bg-ration-600', soft: 'bg-ration-50 text-ration-700', icon: 'text-ration-600' },
-  orphan: { bar: 'bg-orphan-600', soft: 'bg-orphan-50 text-orphan-700', icon: 'text-orphan-600' },
-  loan: { bar: 'bg-loan-600', soft: 'bg-loan-50 text-loan-700', icon: 'text-loan-600' },
-  volunteer: { bar: 'bg-volunteer-600', soft: 'bg-volunteer-50 text-volunteer-700', icon: 'text-volunteer-600' },
-  neutral: { bar: 'bg-gray-600', soft: 'bg-gray-100 text-gray-900', icon: 'text-gray-600' },
+  primary: { bar: 'bg-primary-600', soft: 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-200', icon: 'text-primary-600 dark:text-primary-300' },
+  qurbani: { bar: 'bg-qurbani-600', soft: 'bg-qurbani-50 text-qurbani-700 dark:bg-qurbani-500/15 dark:text-qurbani-200', icon: 'text-qurbani-600 dark:text-qurbani-300' },
+  zakat: { bar: 'bg-zakat-600', soft: 'bg-zakat-50 text-zakat-700 dark:bg-zakat-500/15 dark:text-zakat-200', icon: 'text-zakat-600 dark:text-zakat-300' },
+  sadqa: { bar: 'bg-sadqa-600', soft: 'bg-sadqa-50 text-sadqa-700 dark:bg-sadqa-500/15 dark:text-sadqa-200', icon: 'text-sadqa-600 dark:text-sadqa-300' },
+  disaster: { bar: 'bg-disaster-600', soft: 'bg-disaster-50 text-disaster-700 dark:bg-disaster-500/15 dark:text-disaster-200', icon: 'text-disaster-600 dark:text-disaster-300' },
+  ration: { bar: 'bg-ration-600', soft: 'bg-ration-50 text-ration-700 dark:bg-ration-500/15 dark:text-ration-200', icon: 'text-ration-600 dark:text-ration-300' },
+  orphan: { bar: 'bg-orphan-600', soft: 'bg-orphan-50 text-orphan-700 dark:bg-orphan-500/15 dark:text-orphan-200', icon: 'text-orphan-600 dark:text-orphan-300' },
+  loan: { bar: 'bg-loan-600', soft: 'bg-loan-50 text-loan-700 dark:bg-loan-500/15 dark:text-loan-200', icon: 'text-loan-600 dark:text-loan-300' },
+  volunteer: { bar: 'bg-volunteer-600', soft: 'bg-volunteer-50 text-volunteer-700 dark:bg-volunteer-500/15 dark:text-volunteer-200', icon: 'text-volunteer-600 dark:text-volunteer-300' },
+  neutral: { bar: 'bg-gray-600', soft: 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100', icon: 'text-gray-600 dark:text-gray-300' },
 };
 
 export default function Sidebar({ isOpen, onClose }) {
@@ -193,7 +193,8 @@ export default function Sidebar({ isOpen, onClose }) {
 
       <aside
         className={cn(
-          'fixed lg:sticky top-0 left-0 h-screen bg-white border-r border-gray-200 z-50',
+          'fixed lg:sticky top-0 left-0 h-screen z-50 border-r',
+          'bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-800',
           'w-72 flex flex-col',
           'transition-transform duration-300',
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
@@ -203,9 +204,9 @@ export default function Sidebar({ isOpen, onClose }) {
           <button
             onClick={onClose}
             aria-label="Close navigation menu"
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5 text-gray-600" />
+            <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
         </div>
 
@@ -213,7 +214,7 @@ export default function Sidebar({ isOpen, onClose }) {
           {sections.map((section, idx) => (
             <div key={idx} className={cn(idx > 0 && 'mt-5')}>
               {section.heading && (
-                <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">
+                <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
                   {section.heading}
                 </p>
               )}
@@ -232,7 +233,7 @@ export default function Sidebar({ isOpen, onClose }) {
                         'relative flex items-center gap-3 pl-3 pr-3 py-2 rounded-lg transition-colors cursor-pointer text-sm',
                         active
                           ? cn(accent.soft, 'font-semibold')
-                          : 'text-gray-700 hover:bg-gray-50'
+                          : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
                       )}
                     >
                       {active && (
@@ -244,7 +245,7 @@ export default function Sidebar({ isOpen, onClose }) {
                       <Icon
                         className={cn(
                           'w-4 h-4 flex-shrink-0',
-                          active ? accent.icon : 'text-gray-400 group-hover:text-gray-600'
+                          active ? accent.icon : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600'
                         )}
                       />
                       <span className="truncate">{item.label}</span>
@@ -257,15 +258,15 @@ export default function Sidebar({ isOpen, onClose }) {
 
         </div>
 
-        <div className="border-t border-gray-200 p-3">
-          <div className="rounded-xl bg-gradient-to-br from-primary-50 to-primary-100 p-4 ring-1 ring-primary-100">
+        <div className="border-t border-gray-200 dark:border-gray-800 p-3">
+          <div className="rounded-xl bg-gradient-to-br from-primary-50 to-primary-100 p-4 ring-1 ring-primary-100 dark:from-primary-900/30 dark:to-primary-800/20 dark:ring-primary-800/50">
             <div className="flex items-start gap-3">
-              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white text-primary-600 shadow-sm">
+              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white text-primary-600 shadow-sm dark:bg-gray-900 dark:text-primary-300">
                 <HelpCircle className="w-4 h-4" />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-primary-900">Need help?</p>
-                <p className="text-xs text-primary-700/80 leading-relaxed">
+                <p className="text-sm font-semibold text-primary-900 dark:text-primary-100">Need help?</p>
+                <p className="text-xs text-primary-700/80 dark:text-primary-300/80 leading-relaxed">
                   Contact our support team for assistance.
                 </p>
               </div>

@@ -80,7 +80,7 @@ export default function AdminZakatApplications() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full">
-                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
+                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
                         <Th>#</Th><Th>Applicant</Th><Th>CNIC</Th>
                         <Th>Family</Th><Th>Income</Th><Th>Status</Th><Th></Th>
@@ -92,19 +92,19 @@ export default function AdminZakatApplications() {
                         return (
                           <>
                             <tr key={a.id} className="transition-colors hover:bg-zakat-50/40 align-top">
-                              <td className="px-4 py-3 text-sm font-medium text-gray-900">#{a.id}</td>
+                              <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-50">#{a.id}</td>
                               <td className="px-4 py-3 text-sm">
-                                <div className="font-medium text-gray-900">{a.applicantName}</div>
-                                <div className="text-xs text-gray-500">{a.applicantPhone}</div>
-                                <div className="text-xs text-gray-500">{a.user?.email}</div>
+                                <div className="font-medium text-gray-900 dark:text-gray-50">{a.applicantName}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">{a.applicantPhone}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">{a.user?.email}</div>
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-700">
+                              <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                                 {a.applicantCNIC}
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-900">{a.familyMembers}</td>
-                              <td className="px-4 py-3 text-sm text-gray-700">
+                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-50">{a.familyMembers}</td>
+                              <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                                 {formatCurrency(a.monthlyIncome)}
-                                <div className="text-xs text-gray-500 capitalize">
+                                <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                                   {a.employmentStatus.replace('-', ' ')}
                                 </div>
                               </td>
@@ -126,7 +126,7 @@ export default function AdminZakatApplications() {
                                 <button
                                   type="button"
                                   onClick={() => toggleExpand(a.id)}
-                                  className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
+                                  className="rounded-md p-1 text-gray-400 dark:text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
                                   aria-label={expanded === a.id ? 'Collapse row' : 'Expand row'}
                                 >
                                   {expanded === a.id ? (
@@ -139,40 +139,40 @@ export default function AdminZakatApplications() {
                             </tr>
                             {expanded === a.id && (
                               <tr key={`${a.id}-details`}>
-                                <td colSpan={7} className="px-4 py-4 bg-gray-50">
+                                <td colSpan={7} className="px-4 py-4 bg-gray-50 dark:bg-gray-900">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                    <div className="space-y-1 text-gray-800">
+                                    <div className="space-y-1 text-gray-800 dark:text-gray-100">
                                       <div>
-                                        <span className="text-gray-500">Address:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">Address:</span>{' '}
                                         {a.applicantAddress}
                                       </div>
                                       <div>
-                                        <span className="text-gray-500">Housing:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">Housing:</span>{' '}
                                         <span className="capitalize">{a.housingStatus}</span>
                                       </div>
                                       <div>
-                                        <span className="text-gray-500">Disability:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">Disability:</span>{' '}
                                         {a.hasDisabledMembers
                                           ? `Yes — ${a.disabilityDetails || 'no detail provided'}`
                                           : 'No'}
                                       </div>
                                       <div>
-                                        <span className="text-gray-500">Amount requested:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">Amount requested:</span>{' '}
                                         {a.amountRequested
                                           ? formatCurrency(a.amountRequested)
                                           : '—'}
                                       </div>
-                                      <div className="pt-2 border-t border-gray-200">
-                                        <div className="text-gray-500 mb-0.5">Reason:</div>
-                                        <p className="text-gray-800">{a.reasonForApplication}</p>
+                                      <div className="pt-2 border-t border-gray-200 dark:border-gray-800">
+                                        <div className="text-gray-500 dark:text-gray-400 mb-0.5">Reason:</div>
+                                        <p className="text-gray-800 dark:text-gray-100">{a.reasonForApplication}</p>
                                       </div>
                                       {a.additionalNotes && (
                                         <div>
-                                          <span className="text-gray-500">Notes:</span>{' '}
+                                          <span className="text-gray-500 dark:text-gray-400">Notes:</span>{' '}
                                           {a.additionalNotes}
                                         </div>
                                       )}
-                                      <div className="text-xs text-gray-500 pt-1">
+                                      <div className="text-xs text-gray-500 dark:text-gray-400 pt-1">
                                         Submitted{' '}
                                         {a.createdAt
                                           ? new Date(a.createdAt).toLocaleString()
@@ -181,12 +181,12 @@ export default function AdminZakatApplications() {
                                     </div>
                                     {cnicDoc && (
                                       <div>
-                                        <p className="text-xs text-gray-500 mb-1">CNIC document</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">CNIC document</p>
                                         <a href={cnicDoc} target="_blank" rel="noopener noreferrer">
                                           <img
                                             src={cnicDoc}
                                             alt="CNIC"
-                                            className="w-full max-w-sm h-48 object-cover rounded-lg border border-gray-200 hover:opacity-90 transition"
+                                            className="w-full max-w-sm h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-800 hover:opacity-90 transition"
                                           />
                                         </a>
                                       </div>
@@ -210,7 +210,7 @@ export default function AdminZakatApplications() {
 
 function Th({ children }) {
   return (
-    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
       {children}
     </th>
   );

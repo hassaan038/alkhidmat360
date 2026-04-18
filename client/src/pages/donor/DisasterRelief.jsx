@@ -51,9 +51,9 @@ function DonationCard({ donation }) {
           <div className="flex items-start gap-3 min-w-0">
             <IconTile icon={Icon} tone="disaster" size="md" />
             <div className="min-w-0">
-              <p className="text-xs text-gray-500">Donation #{donation.id}</p>
-              <p className="text-2xl font-bold text-gray-900 tabular-nums">{formatCurrency(donation.amount)}</p>
-              <p className="text-xs text-gray-500 mt-0.5 truncate">{donation.campaignLabel}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Donation #{donation.id}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-gray-50 tabular-nums">{formatCurrency(donation.amount)}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{donation.campaignLabel}</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -62,8 +62,8 @@ function DonationCard({ donation }) {
           </div>
         </div>
         {donation.createdAt && (
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <Calendar className="w-3.5 h-3.5 text-gray-400" />
+          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <Calendar className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
             <span>{formatDate(donation.createdAt)}</span>
           </div>
         )}
@@ -142,19 +142,19 @@ export default function DisasterRelief() {
                     className={cn(
                       'text-left p-4 rounded-xl border transition-colors duration-200 cursor-pointer',
                       active
-                        ? 'border-disaster-500 bg-disaster-50 ring-1 ring-inset ring-disaster-200'
-                        : 'border-gray-200 hover:border-disaster-300 hover:bg-gray-50'
+                        ? 'border-disaster-500 bg-disaster-50 dark:bg-disaster-500/10 ring-1 ring-inset ring-disaster-200 dark:ring-disaster-700/40'
+                        : 'border-gray-200 dark:border-gray-800 hover:border-disaster-300 hover:bg-gray-50'
                     )}
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <span className={cn('flex h-8 w-8 items-center justify-center rounded-lg', active ? 'bg-disaster-100 text-disaster-700' : 'bg-gray-100 text-gray-500')}>
+                      <span className={cn('flex h-8 w-8 items-center justify-center rounded-lg', active ? 'bg-disaster-100 dark:bg-disaster-500/15 text-disaster-700 dark:text-disaster-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400')}>
                         <CIcon className="w-4 h-4" />
                       </span>
-                      <p className={cn('text-sm font-semibold', active ? 'text-disaster-700' : 'text-gray-900')}>
+                      <p className={cn('text-sm font-semibold', active ? 'text-disaster-700 dark:text-disaster-200' : 'text-gray-900 dark:text-gray-50')}>
                         {c.label}
                       </p>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">{c.description}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{c.description}</p>
                   </button>
                 );
               })}
@@ -175,7 +175,7 @@ export default function DisasterRelief() {
                     'px-3 py-1 rounded-full text-xs font-medium ring-1 ring-inset transition-colors cursor-pointer',
                     Number(watchAmount) === amt
                       ? 'bg-disaster-600 text-white ring-disaster-600'
-                      : 'bg-white text-gray-700 ring-gray-200 hover:ring-disaster-300 hover:text-disaster-700'
+                      : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 ring-gray-200 hover:ring-disaster-300 hover:text-disaster-700'
                   )}
                 >
                   {formatCurrency(amt)}

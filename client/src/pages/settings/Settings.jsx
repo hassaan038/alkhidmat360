@@ -93,15 +93,15 @@ function ProfileSection({ profile, onUpdated }) {
           </FormField>
         </FormGrid>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100 text-sm text-gray-600">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-800 text-sm text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-2">
-            <span className="text-gray-500">Account type:</span>
+            <span className="text-gray-500 dark:text-gray-400">Account type:</span>
             <Badge variant="primary" size="sm">{profile.userType}</Badge>
           </div>
           {profile.createdAt && (
             <div>
-              <span className="text-gray-500">Member since:</span>{' '}
-              <span className="font-medium text-gray-900">{formatDate(profile.createdAt)}</span>
+              <span className="text-gray-500 dark:text-gray-400">Member since:</span>{' '}
+              <span className="font-medium text-gray-900 dark:text-gray-50">{formatDate(profile.createdAt)}</span>
             </div>
           )}
         </div>
@@ -287,7 +287,7 @@ export default function Settings() {
         ) : (
           <>
             {/* Tabs */}
-            <div className="border-b border-gray-200">
+            <div className="border-b border-gray-200 dark:border-gray-800">
               <nav className="flex gap-1 overflow-x-auto -mb-px">
                 {TABS.map((t) => {
                   const Icon = t.icon;
@@ -303,7 +303,7 @@ export default function Settings() {
                           ? isDanger
                             ? 'border-error text-error-dark'
                             : 'border-primary-600 text-primary-700'
-                          : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 hover:bg-gray-50'
                       )}
                     >
                       <Icon className="h-4 w-4" />

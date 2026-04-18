@@ -121,18 +121,18 @@ export default function OrphanSponsorship() {
                   className={cn(
                     'relative flex cursor-pointer items-center justify-between gap-4 rounded-xl border p-4 transition-colors duration-200',
                     selectedType === type.id
-                      ? 'border-orphan-500 bg-orphan-50 ring-1 ring-inset ring-orphan-200'
-                      : 'border-gray-200 hover:border-orphan-300 hover:bg-gray-50'
+                      ? 'border-orphan-500 bg-orphan-50 dark:bg-orphan-500/10 ring-1 ring-inset ring-orphan-200 dark:ring-orphan-700/40'
+                      : 'border-gray-200 dark:border-gray-800 hover:border-orphan-300 hover:bg-gray-50'
                   )}
                   onClick={() => handleTypeSelect(type)}
                 >
                   <input type="radio" value={type.name} {...register('sponsorshipType')} className="sr-only" />
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900">{type.name}</p>
-                    <p className="mt-0.5 text-xs text-gray-500">{type.description}</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">{type.name}</p>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{type.description}</p>
                   </div>
                   <p className="flex-shrink-0 text-base font-bold text-orphan-600 tabular-nums">
-                    PKR {type.monthlyAmount.toLocaleString()}<span className="text-xs font-medium text-gray-500">/mo</span>
+                    PKR {type.monthlyAmount.toLocaleString()}<span className="text-xs font-medium text-gray-500 dark:text-gray-400">/mo</span>
                   </p>
                 </label>
               ))}
@@ -149,17 +149,17 @@ export default function OrphanSponsorship() {
             ) : (
               <div className="mt-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Custom sponsorship type</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Custom sponsorship type</label>
                   <button
                     type="button"
                     onClick={() => { setCustomMode(false); setValue('sponsorshipType', '', { shouldValidate: false }); }}
-                    className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
+                    className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 cursor-pointer"
                   >
                     Use a preset instead
                   </button>
                 </div>
                 <Input {...register('sponsorshipType')} placeholder="e.g., Specialized Educational Support" autoFocus />
-                <p className="text-xs text-gray-500">Set the monthly amount manually in the next field.</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Set the monthly amount manually in the next field.</p>
               </div>
             )}
             {errors.sponsorshipType && <p className="mt-2 text-xs text-error-dark">{errors.sponsorshipType.message}</p>}
@@ -172,7 +172,7 @@ export default function OrphanSponsorship() {
                 <Input id="du" type="number" min={1} {...register('duration', { onChange: handleDurationChange })} />
               </FormField>
               <FormField label="Total (PKR)" required htmlFor="ta" error={errors.totalAmount?.message} hint="Auto-calculated">
-                <Input id="ta" type="number" readOnly {...register('totalAmount')} className="bg-gray-50" />
+                <Input id="ta" type="number" readOnly {...register('totalAmount')} className="bg-gray-50 dark:bg-gray-900" />
               </FormField>
             </FormGrid>
           </FormSection>
@@ -231,13 +231,13 @@ export default function OrphanSponsorship() {
           </div>
         </form>
 
-        <div className="rounded-2xl border border-orphan-100 bg-orphan-50/60 p-5">
+        <div className="rounded-2xl border border-orphan-100 dark:border-orphan-700/40 bg-orphan-50/60 dark:bg-orphan-500/10 p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orphan-100 text-orphan-700">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orphan-100 dark:bg-orphan-500/15 text-orphan-700 dark:text-orphan-200">
               <Heart className="h-4 w-4 fill-orphan-600" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-orphan-700">What your sponsorship includes</h4>
+              <h4 className="text-sm font-semibold text-orphan-700 dark:text-orphan-200">What your sponsorship includes</h4>
               <ul className="mt-2 space-y-1 text-xs text-orphan-700/90">
                 {benefits.map((b) => (
                   <li key={b} className="flex gap-2">
