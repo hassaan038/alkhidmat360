@@ -1,0 +1,160 @@
+import { PrismaClient } from '@prisma/client';
+import { ApiError } from '../utils/ApiResponse.js';
+
+const prisma = new PrismaClient();
+
+// ============================================
+// QURBANI DONATION
+// ============================================
+
+export async function createQurbaniDonation(userId, donationData) {
+  const { deliveryDate, ...rest } = donationData;
+
+  const donation = await prisma.qurbaniDonation.create({
+    data: {
+      userId,
+      ...rest,
+      deliveryDate: deliveryDate ? new Date(deliveryDate) : null,
+    },
+  });
+
+  return donation;
+}
+
+export async function getUserQurbaniDonations(userId) {
+  const donations = await prisma.qurbaniDonation.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return donations;
+}
+
+// ============================================
+// RATION DONATION
+// ============================================
+
+export async function createRationDonation(userId, donationData) {
+  const donation = await prisma.rationDonation.create({
+    data: {
+      userId,
+      ...donationData,
+    },
+  });
+
+  return donation;
+}
+
+export async function getUserRationDonations(userId) {
+  const donations = await prisma.rationDonation.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return donations;
+}
+
+// ============================================
+// SKIN COLLECTION
+// ============================================
+
+export async function createSkinCollection(userId, collectionData) {
+  const { preferredDate, ...rest } = collectionData;
+
+  const collection = await prisma.skinCollection.create({
+    data: {
+      userId,
+      ...rest,
+      preferredDate: new Date(preferredDate),
+    },
+  });
+
+  return collection;
+}
+
+export async function getUserSkinCollections(userId) {
+  const collections = await prisma.skinCollection.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return collections;
+}
+
+// ============================================
+// ORPHAN SPONSORSHIP
+// ============================================
+
+export async function createOrphanSponsorship(userId, sponsorshipData) {
+  const { startDate, ...rest } = sponsorshipData;
+
+  const sponsorship = await prisma.orphanSponsorship.create({
+    data: {
+      userId,
+      ...rest,
+      startDate: startDate ? new Date(startDate) : null,
+    },
+  });
+
+  return sponsorship;
+}
+
+export async function getUserOrphanSponsorships(userId) {
+  const sponsorships = await prisma.orphanSponsorship.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return sponsorships;
+}
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+export async function getDonationById(type, id, userId) {
+  let donation;
+
+  switch (type) {
+    case 'qurbani':
+      donation = await prisma.qurbaniDonation.findFirst({
+        where: { id: parseInt(id), userId },
+      });
+      break;
+    case 'ration':
+      donation = await prisma.rationDonation.findFirst({
+        where: { id: parseInt(id), userId },
+      });
+      break;
+    case 'skin':
+      donation = await prisma.skinCollection.findFirst({
+        where: { id: parseInt(id), userId },
+      });
+      break;
+    case 'orphan':
+      donation = await prisma.orphanSponsorship.findFirst({
+        where: { id: parseInt(id), userId },
+      });
+      break;
+    default:
+      throw new ApiError(400, 'Invalid donation type');
+  }
+
+  if (!donation) {
+    throw new ApiError(404, 'Donation not found');
+  }
+
+  return donation;
+}
+
+export default {
+  createQurbaniDonation,
+  getUserQurbaniDonations,
+  createRationDonation,
+  getUserRationDonations,
+  createSkinCollection,
+  getUserSkinCollections,
+  createOrphanSponsorship,
+  getUserOrphanSponsorships,
+  getDonationById,
+};
