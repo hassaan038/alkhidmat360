@@ -7,12 +7,29 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import logo from '../../assets/logo.jpg';
+import ThemeToggle from '../ui/ThemeToggle';
 
 const roleMeta = {
-  ADMIN: { label: 'Admin', icon: ShieldCheck, chip: 'bg-primary-600 text-white', avatar: 'bg-primary-700 text-white' },
-  DONOR: { label: 'Donor', icon: Heart, chip: 'bg-primary-50 text-primary-700 ring-1 ring-primary-200', avatar: 'bg-primary-100 text-primary-700' },
-  BENEFICIARY: { label: 'Beneficiary', icon: HandHeart, chip: 'bg-success-light text-success-dark ring-1 ring-success/30', avatar: 'bg-success-light text-success-dark' },
-  VOLUNTEER: { label: 'Volunteer', icon: HandCoins, chip: 'bg-warning-light text-warning-dark ring-1 ring-warning/30', avatar: 'bg-warning-light text-warning-dark' },
+  ADMIN: {
+    label: 'Admin', icon: ShieldCheck,
+    chip: 'bg-primary-600 text-white',
+    avatar: 'bg-primary-700 text-white',
+  },
+  DONOR: {
+    label: 'Donor', icon: Heart,
+    chip: 'bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-900/30 dark:text-primary-200 dark:ring-primary-800',
+    avatar: 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200',
+  },
+  BENEFICIARY: {
+    label: 'Beneficiary', icon: HandHeart,
+    chip: 'bg-success-light text-success-dark ring-1 ring-success/30 dark:bg-success/20 dark:text-success-light dark:ring-success/30',
+    avatar: 'bg-success-light text-success-dark dark:bg-success/20 dark:text-success-light',
+  },
+  VOLUNTEER: {
+    label: 'Volunteer', icon: HandCoins,
+    chip: 'bg-warning-light text-warning-dark ring-1 ring-warning/30 dark:bg-warning/20 dark:text-warning-light dark:ring-warning/30',
+    avatar: 'bg-warning-light text-warning-dark dark:bg-warning/20 dark:text-warning-light',
+  },
 };
 
 function initials(name) {
@@ -90,7 +107,7 @@ export default function Header({ onMenuClick }) {
   const RoleIcon = role.icon;
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-gray-200">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-200 dark:border-gray-800">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Left: menu + logo */}
@@ -98,7 +115,7 @@ export default function Header({ onMenuClick }) {
             <button
               onClick={onMenuClick}
               aria-label="Open navigation menu"
-              className="lg:hidden p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+              className="lg:hidden p-2 -ml-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -107,11 +124,11 @@ export default function Header({ onMenuClick }) {
               <img
                 src={logo}
                 alt=""
-                className="h-9 w-9 flex-shrink-0 rounded-lg object-cover ring-1 ring-gray-200 shadow-sm"
+                className="h-9 w-9 flex-shrink-0 rounded-lg object-cover ring-1 ring-gray-200 dark:ring-gray-700 shadow-sm"
               />
               <div className="hidden sm:block min-w-0">
-                <h1 className="text-[15px] font-bold text-gray-900 leading-none">Alkhidmat 360</h1>
-                <p className="text-[11px] text-gray-500 mt-1">Social Welfare Platform</p>
+                <h1 className="text-[15px] font-bold text-gray-900 dark:text-gray-50 leading-none">Alkhidmat 360</h1>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Social Welfare Platform</p>
               </div>
             </Link>
           </div>
@@ -126,7 +143,7 @@ export default function Header({ onMenuClick }) {
               Search
             </label>
             <div className="relative w-full group">
-              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 transition-colors group-focus-within:text-primary-600" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 transition-colors group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400" />
               <input
                 id="header-search"
                 ref={searchInputRef}
@@ -134,11 +151,11 @@ export default function Header({ onMenuClick }) {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 type="search"
                 placeholder="Search donations, applications, users…"
-                className="w-full h-9 pl-9 pr-20 rounded-full border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder:text-gray-400 transition-colors focus:outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-500/20"
+                className="w-full h-9 pl-9 pr-20 rounded-full border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20 border-gray-200 bg-gray-50 text-gray-800 placeholder:text-gray-400 focus:border-primary-500 focus:bg-white dark:border-gray-800 dark:bg-gray-800/60 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-primary-500 dark:focus:bg-gray-900"
               />
               <kbd
                 aria-hidden
-                className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px] font-mono text-gray-500 shadow-sm"
+                className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-mono shadow-sm border-gray-200 bg-white text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
               >
                 {isMac ? '⌘K' : 'Ctrl K'}
               </kbd>
@@ -151,10 +168,12 @@ export default function Header({ onMenuClick }) {
             <button
               onClick={() => searchInputRef.current?.focus()}
               aria-label="Search"
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+              className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             >
               <Search className="w-5 h-5" />
             </button>
+
+            <ThemeToggle />
 
             {user && (
               <span
@@ -173,7 +192,7 @@ export default function Header({ onMenuClick }) {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 aria-label="Open user menu"
                 aria-expanded={dropdownOpen}
-                className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                className="flex items-center gap-2.5 pl-1.5 pr-2 py-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
               >
                 <span
                   className={cn(
@@ -183,17 +202,17 @@ export default function Header({ onMenuClick }) {
                 >
                   {user?.fullName ? initials(user.fullName) : <User className="h-4 w-4" />}
                 </span>
-                <span className="hidden md:inline-block max-w-[140px] truncate text-sm font-medium text-gray-800">
+                <span className="hidden md:inline-block max-w-[140px] truncate text-sm font-medium text-gray-800 dark:text-gray-200">
                   {user?.fullName}
                 </span>
                 <ChevronDown
-                  className={cn('hidden md:block w-4 h-4 text-gray-400 transition-transform', dropdownOpen && 'rotate-180')}
+                  className={cn('hidden md:block w-4 h-4 text-gray-400 dark:text-gray-500 transition-transform', dropdownOpen && 'rotate-180')}
                 />
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-large border border-gray-200 overflow-hidden animate-fade-in">
-                  <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/60">
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 rounded-xl shadow-large border border-gray-200 dark:border-gray-800 overflow-hidden animate-fade-in">
+                  <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/60 dark:bg-gray-800/40">
                     <div className="flex items-center gap-3">
                       <span
                         className={cn(
@@ -204,8 +223,8 @@ export default function Header({ onMenuClick }) {
                         {user?.fullName ? initials(user.fullName) : <User className="h-5 w-5" />}
                       </span>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{user?.fullName}</p>
-                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-50 truncate">{user?.fullName}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
                       </div>
                     </div>
                     <span className={cn('inline-flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full text-[11px] font-medium', role.chip)}>
@@ -218,16 +237,16 @@ export default function Header({ onMenuClick }) {
                     <Link
                       to="/dashboard/settings"
                       onClick={() => setDropdownOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                     >
-                      <SettingsIcon className="h-4 w-4 text-gray-400" />
+                      <SettingsIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                       <span>Settings</span>
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                     >
-                      <LogOut className="h-4 w-4 text-gray-400" />
+                      <LogOut className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                       <span>Sign out</span>
                     </button>
                   </div>

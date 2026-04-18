@@ -76,7 +76,7 @@ export default function AdminZakatPayments() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full">
-                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
+                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
                         <Th>#</Th><Th>Donor</Th><Th>Wealth</Th><Th>Nisab</Th>
                         <Th>Zakat</Th><Th>Paid?</Th><Th>Screenshot</Th><Th>Status</Th><Th>Actions</Th>
@@ -85,28 +85,28 @@ export default function AdminZakatPayments() {
                     <tbody className="divide-y divide-gray-100">
                       {items.map((p) => (
                         <tr key={p.id} className="transition-colors hover:bg-zakat-50/40 align-top">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900">#{p.id}</td>
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-50">#{p.id}</td>
                           <td className="px-4 py-3 text-sm">
-                            <div className="font-medium text-gray-900">{p.user?.fullName || '—'}</div>
-                            <div className="text-xs text-gray-500">{p.user?.email}</div>
+                            <div className="font-medium text-gray-900 dark:text-gray-50">{p.user?.fullName || '—'}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{p.user?.email}</div>
                             {p.contactPhone && (
-                              <div className="text-xs text-gray-500">{p.contactPhone}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">{p.contactPhone}</div>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-700">
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                             {formatCurrency(p.totalWealth)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-700 capitalize">
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 capitalize">
                             {p.nisabBasis} · {formatCurrency(p.nisabThreshold)}
                           </td>
-                          <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                          <td className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-50">
                             {formatCurrency(p.zakatAmount)}
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {p.paymentMarked ? (
                               <Check className="w-4 h-4 text-success-dark" aria-label="Paid" />
                             ) : (
-                              <X className="w-4 h-4 text-gray-400" aria-label="Unpaid" />
+                              <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label="Unpaid" />
                             )}
                           </td>
                           <td className="px-4 py-3">
@@ -119,11 +119,11 @@ export default function AdminZakatPayments() {
                                 <img
                                   src={imageUrl(p.paymentScreenshotUrl)}
                                   alt="Payment"
-                                  className="w-12 h-12 object-cover rounded border border-gray-200 hover:opacity-80 transition"
+                                  className="w-12 h-12 object-cover rounded border border-gray-200 dark:border-gray-800 hover:opacity-80 transition"
                                 />
                               </a>
                             ) : (
-                              <span className="text-xs text-gray-400">—</span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
                             )}
                           </td>
                           <td className="px-4 py-3">
@@ -155,7 +155,7 @@ export default function AdminZakatPayments() {
 
 function Th({ children }) {
   return (
-    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
       {children}
     </th>
   );

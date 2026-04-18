@@ -163,13 +163,13 @@ export default function OrphanRegistration() {
           </div>
         </form>
 
-        <div className="rounded-2xl border border-orphan-100 bg-orphan-50/60 p-5">
+        <div className="rounded-2xl border border-orphan-100 dark:border-orphan-700/40 bg-orphan-50/60 dark:bg-orphan-500/10 p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orphan-100 text-orphan-700">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orphan-100 dark:bg-orphan-500/15 text-orphan-700 dark:text-orphan-200">
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-orphan-700">Registration process</h4>
+              <h4 className="text-sm font-semibold text-orphan-700 dark:text-orphan-200">Registration process</h4>
               <ul className="mt-2 space-y-1 text-xs text-orphan-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

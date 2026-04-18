@@ -60,17 +60,17 @@ function PickupCard({ pickup }) {
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div>
-            <p className="text-sm text-gray-500">Request #{pickup.id}</p>
-            <p className="text-lg font-semibold text-gray-900">
+            <p className="text-sm text-gray-500 dark:text-gray-400">Request #{pickup.id}</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">
               {pickup.numberOfSkins} skin{pickup.numberOfSkins > 1 ? 's' : ''}
             </p>
           </div>
           <StatusBadge status={pickup.status} size="sm" />
         </div>
 
-        <div className="space-y-2 text-sm text-gray-700">
+        <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
           <div className="flex items-start gap-2">
-            <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+            <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
             <div className="flex-1">
               <p>{pickup.address}</p>
               {hasCoords && (
@@ -88,30 +88,30 @@ function PickupCard({ pickup }) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-gray-400" />
+            <Phone className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             <span>{pickup.contactPhone}</span>
           </div>
 
           {pickup.preferredDate && (
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-gray-400" />
+              <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               <span>Preferred: {formatDate(pickup.preferredDate)}</span>
             </div>
           )}
 
           {pickup.additionalDetails && (
-            <p className="text-xs text-gray-500 pt-2 border-t border-gray-100">
+            <p className="text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
               {pickup.additionalDetails}
             </p>
           )}
 
           {photo && (
-            <div className="pt-2 border-t border-gray-100">
+            <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
               <a href={photo} target="_blank" rel="noopener noreferrer">
                 <img
                   src={photo}
                   alt="House"
-                  className="w-full h-32 object-cover rounded-md border border-gray-200 hover:opacity-90 transition"
+                  className="w-full h-32 object-cover rounded-md border border-gray-200 dark:border-gray-800 hover:opacity-90 transition"
                 />
               </a>
             </div>
@@ -294,14 +294,14 @@ export default function SkinPickup() {
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Contact Phone <span className="text-error">*</span>
                         </label>
                         <input
                           type="tel"
                           {...register('contactPhone')}
                           placeholder="03001234567"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         />
                         {errors.contactPhone && (
                           <p className="mt-1 text-xs text-error">
@@ -310,7 +310,7 @@ export default function SkinPickup() {
                         )}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Number of Skins <span className="text-error">*</span>
                         </label>
                         <input
@@ -318,7 +318,7 @@ export default function SkinPickup() {
                           min={1}
                           max={50}
                           {...register('numberOfSkins')}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                         />
                         {errors.numberOfSkins && (
                           <p className="mt-1 text-xs text-error">
@@ -330,10 +330,10 @@ export default function SkinPickup() {
 
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <label className="block text-sm font-medium text-gray-700">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                           Pickup Address{' '}
                           {coords ? (
-                            <span className="text-xs text-gray-500 font-normal">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">
                               (optional — location captured)
                             </span>
                           ) : (
@@ -369,7 +369,7 @@ export default function SkinPickup() {
                             ? 'You can leave this blank or add a landmark / flat number'
                             : 'House #, street, area, city'
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                       {errors.address && (
                         <p className="mt-1 text-xs text-error">{errors.address.message}</p>
@@ -402,33 +402,33 @@ export default function SkinPickup() {
                     )}
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Preferred Pickup Date (Optional)
                       </label>
                       <input
                         type="date"
                         {...register('preferredDate')}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Landmark / Additional Details (Optional)
                       </label>
                       <textarea
                         rows={2}
                         {...register('additionalDetails')}
                         placeholder="e.g. Near central mosque, ground-floor flat, ring the bell twice"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Photo of House (Optional)
                       </label>
-                      <p className="text-xs text-gray-500 mb-2">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                         Helps our pickup team find your address quickly.
                       </p>
                       {housePhotoPreview ? (
@@ -436,12 +436,12 @@ export default function SkinPickup() {
                           <img
                             src={housePhotoPreview}
                             alt="House preview"
-                            className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                            className="w-full h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-800"
                           />
                           <button
                             type="button"
                             onClick={clearPhoto}
-                            className="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-md rounded-full p-1.5 text-gray-700"
+                            className="absolute top-2 right-2 bg-white/90 hover:bg-white shadow-md rounded-full p-1.5 text-gray-700 dark:text-gray-300"
                             aria-label="Remove photo"
                           >
                             <XIcon className="w-4 h-4" />
@@ -450,13 +450,13 @@ export default function SkinPickup() {
                       ) : (
                         <label
                           htmlFor="house-photo"
-                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                          className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 transition"
                         >
-                          <Camera className="w-6 h-6 text-gray-400 mb-1" />
-                          <span className="text-sm text-gray-600">
+                          <Camera className="w-6 h-6 text-gray-400 dark:text-gray-500 mb-1" />
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
                             Tap to take or choose a photo
                           </span>
-                          <span className="text-xs text-gray-400 mt-0.5">
+                          <span className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                             JPG / PNG, up to 5 MB
                           </span>
                           <input
@@ -471,7 +471,7 @@ export default function SkinPickup() {
                       )}
                     </div>
 
-                    <div className="flex justify-end gap-2 pt-2 border-t border-gray-200">
+                    <div className="flex justify-end gap-2 pt-2 border-t border-gray-200 dark:border-gray-800">
                       <Button
                         type="button"
                         variant="outline"

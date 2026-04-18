@@ -92,9 +92,9 @@ export default function DataTable({
   const hasToolbar = searchable || (statusFilter && statusFilter.length > 0);
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white shadow-card overflow-hidden">
+    <div className="rounded-2xl border bg-white shadow-card overflow-hidden border-gray-200 dark:bg-gray-900 dark:border-gray-800">
       {hasToolbar && (
-        <div className="flex flex-col gap-3 border-b border-gray-100 bg-gray-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b p-4 sm:flex-row sm:items-center sm:justify-between border-gray-100 bg-gray-50/60 dark:border-gray-800 dark:bg-gray-800/40">
           {searchable && (
             <div className="w-full sm:max-w-xs">
               <Input
@@ -127,7 +127,7 @@ export default function DataTable({
 
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
+          <thead className="sticky top-0 z-10 backdrop-blur border-b bg-gray-50/90 border-gray-200 dark:bg-gray-800/90 dark:border-gray-800">
             <tr>
               <Th className="w-20">ID</Th>
               {columns.map((column) => (
@@ -138,7 +138,7 @@ export default function DataTable({
               <Th className="w-10" />
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
+          <tbody className="divide-y divide-gray-100 bg-white dark:bg-gray-900 dark:divide-gray-800">
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} cols={columns.length + (onStatusUpdate ? 4 : 3)} />)
             ) : filtered.length === 0 ? (
@@ -154,12 +154,12 @@ export default function DataTable({
             ) : (
               filtered.map((row) => (
                 <>
-                  <tr key={row.id} className="group transition-colors hover:bg-primary-50/40">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-600 tabular-nums">
+                  <tr key={row.id} className="group transition-colors hover:bg-primary-50/40 dark:hover:bg-primary-900/20">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 tabular-nums">
                       #{row.id}
                     </td>
                     {columns.map((column) => (
-                      <td key={column.key} className="px-4 py-3 text-sm text-gray-800">
+                      <td key={column.key} className="px-4 py-3 text-sm text-gray-800 dark:text-gray-200">
                         {column.render ? column.render(row) : row[column.key]}
                       </td>
                     ))}
@@ -234,7 +234,7 @@ export default function DataTable({
                       <button
                         onClick={() => toggleRow(row.id)}
                         aria-label={expandedRow === row.id ? 'Collapse row' : 'Expand row'}
-                        className="rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 cursor-pointer"
+                        className="rounded-md p-1 text-gray-400 dark:text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-200 cursor-pointer"
                       >
                         {expandedRow === row.id ? (
                           <ChevronUp className="h-5 w-5" />
@@ -245,7 +245,7 @@ export default function DataTable({
                     </td>
                   </tr>
                   {expandedRow === row.id && (
-                    <tr key={`${row.id}-exp`} className="bg-gray-50/60">
+                    <tr key={`${row.id}-exp`} className="bg-gray-50/60 dark:bg-gray-800/40">
                       <td colSpan={columns.length + (onStatusUpdate ? 4 : 3)} className="px-6 py-5">
                         <ExpandedDetails row={row} />
                       </td>
@@ -265,7 +265,7 @@ function Th({ children, className }) {
   return (
     <th
       className={cn(
-        'px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap',
+        'px-4 py-3 text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap',
         className
       )}
     >
@@ -282,7 +282,7 @@ function FilterChip({ active, onClick, children }) {
         'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all cursor-pointer',
         active
           ? 'bg-primary-600 text-white shadow-sm'
-          : 'bg-white text-gray-600 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900'
+          : 'bg-white text-gray-600 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900 dark:bg-gray-900 dark:text-gray-300 dark:ring-gray-700 dark:hover:bg-gray-800 dark:hover:text-gray-100'
       )}
     >
       {children}
@@ -295,7 +295,7 @@ function SkeletonRow({ cols }) {
     <tr>
       {Array.from({ length: cols }).map((_, i) => (
         <td key={i} className="px-4 py-4">
-          <div className="h-3 w-3/4 animate-pulse rounded bg-gray-200" />
+          <div className="h-3 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
         </td>
       ))}
     </tr>
@@ -350,7 +350,7 @@ function ExpandedDetails({ row }) {
           return (
             <div key={key}>
               <DetailLabel>{humanize(key)}</DetailLabel>
-              <p className="mt-0.5 text-gray-900 break-words">
+              <p className="mt-0.5 text-gray-900 dark:text-gray-100 break-words">
                 {typeof value === 'boolean'
                   ? value
                     ? 'Yes'
@@ -364,21 +364,21 @@ function ExpandedDetails({ row }) {
           <>
             <div>
               <DetailLabel>User Name</DetailLabel>
-              <p className="mt-0.5 text-gray-900">{row.user.fullName}</p>
+              <p className="mt-0.5 text-gray-900 dark:text-gray-100">{row.user.fullName}</p>
             </div>
             <div>
               <DetailLabel>User Email</DetailLabel>
-              <p className="mt-0.5 text-gray-900">{row.user.email}</p>
+              <p className="mt-0.5 text-gray-900 dark:text-gray-100">{row.user.email}</p>
             </div>
             <div>
               <DetailLabel>User Phone</DetailLabel>
-              <p className="mt-0.5 text-gray-900">{row.user.phoneNumber}</p>
+              <p className="mt-0.5 text-gray-900 dark:text-gray-100">{row.user.phoneNumber}</p>
             </div>
           </>
         )}
         <div>
           <DetailLabel>Created At</DetailLabel>
-          <p className="mt-0.5 text-gray-900">
+          <p className="mt-0.5 text-gray-900 dark:text-gray-100">
             {row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}
           </p>
         </div>
@@ -389,7 +389,7 @@ function ExpandedDetails({ row }) {
 
 function DetailLabel({ children }) {
   return (
-    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+    <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
       {children}
     </span>
   );

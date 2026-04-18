@@ -95,7 +95,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-white">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-white dark:bg-gray-900">
       <aside className="relative hidden lg:flex lg:w-[38%] xl:w-[34%] flex-col justify-between overflow-hidden bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 text-white px-10 py-10">
         <div className="absolute inset-0 opacity-40 bg-gradient-mesh pointer-events-none" aria-hidden />
         <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl" aria-hidden />
@@ -153,15 +153,15 @@ export default function Signup() {
         <div className="mx-auto w-full max-w-2xl animate-fade-in-up">
           <div className="lg:hidden mb-8 flex items-center justify-center gap-3">
             <img src={logo} alt="Alkhidmat 360" className="h-10 w-10 rounded-xl object-cover shadow-md" />
-            <span className="text-xl font-bold text-gray-900">Alkhidmat 360</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-gray-50">Alkhidmat 360</span>
           </div>
 
           <div className="mb-8">
             <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary-50 text-primary-600 ring-8 ring-primary-50/50 mb-4">
               <UserPlus className="h-5 w-5" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Create your account</h1>
-            <p className="mt-1 text-sm text-gray-500">Takes less than a minute — pick a role and fill in your details.</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Create your account</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Takes less than a minute — pick a role and fill in your details.</p>
           </div>
 
           {(error || validationError) && (
@@ -187,16 +187,16 @@ export default function Signup() {
                       disabled={loading}
                       className={cn(
                         'relative text-left p-4 rounded-xl border transition-colors duration-200 cursor-pointer',
-                        selected ? t.active : 'border-gray-200 bg-white hover:border-primary-300 hover:bg-gray-50'
+                        selected ? t.active : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary-300 hover:bg-gray-50'
                       )}
                     >
                       <div className="flex items-start gap-3">
-                        <span className={cn('flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0', selected ? t.chip : 'bg-gray-100 text-gray-500')}>
+                        <span className={cn('flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0', selected ? t.chip : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400')}>
                           <Icon className="h-5 w-5" />
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-gray-900">{type.label}</p>
-                          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{type.description}</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">{type.label}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{type.description}</p>
                         </div>
                       </div>
                       {selected && (
@@ -225,7 +225,7 @@ export default function Signup() {
                 <Input id="phoneNumber" name="phoneNumber" type="tel" leftIcon={Phone} placeholder="+92-300-1234567" value={formData.phoneNumber} onChange={handleChange} required disabled={loading} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="cnic">CNIC <span className="text-gray-400 font-normal">(optional)</span></Label>
+                <Label htmlFor="cnic">CNIC <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span></Label>
                 <Input id="cnic" name="cnic" type="text" leftIcon={CreditCard} placeholder="12345-1234567-1" value={formData.cnic} onChange={handleChange} disabled={loading} />
               </div>
               <div className="space-y-1.5">
@@ -236,7 +236,7 @@ export default function Signup() {
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -253,7 +253,7 @@ export default function Signup() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
+          <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
             Already have an account?{' '}
             <Link to="/login" className="font-medium text-primary-600 hover:text-primary-700 hover:underline cursor-pointer">
               Sign in

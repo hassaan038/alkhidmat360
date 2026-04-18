@@ -5,20 +5,23 @@ export default function EmptyState({
   icon,
   title = 'Nothing here yet',
   description = '',
-  action = null, // { label, onClick } or { label, href }
+  action = null,
   tone = 'neutral',
   className,
 }) {
   const Icon = icon || Inbox;
+
   const tones = {
-    neutral: 'bg-gray-100 text-gray-400',
-    primary: 'bg-primary-50 text-primary-500',
-    qurbani: 'bg-qurbani-50 text-qurbani-500',
-    zakat: 'bg-zakat-50 text-zakat-500',
-    sadqa: 'bg-sadqa-50 text-sadqa-500',
-    disaster: 'bg-disaster-50 text-disaster-500',
-    success: 'bg-success-light text-success',
-    warning: 'bg-warning-light text-warning',
+    neutral: 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500',
+    primary: 'bg-primary-50 text-primary-500 dark:bg-primary-900/30 dark:text-primary-300',
+    qurbani: 'bg-qurbani-50 text-qurbani-500 dark:bg-qurbani-500/15 dark:text-qurbani-300',
+    zakat: 'bg-zakat-50 text-zakat-500 dark:bg-zakat-500/15 dark:text-zakat-300',
+    sadqa: 'bg-sadqa-50 text-sadqa-500 dark:bg-sadqa-500/15 dark:text-sadqa-300',
+    disaster: 'bg-disaster-50 text-disaster-500 dark:bg-disaster-500/15 dark:text-disaster-300',
+    volunteer: 'bg-volunteer-50 text-volunteer-500 dark:bg-volunteer-500/15 dark:text-volunteer-300',
+    loan: 'bg-loan-50 text-loan-500 dark:bg-loan-500/15 dark:text-loan-300',
+    success: 'bg-success-light text-success dark:bg-success/20 dark:text-success-light',
+    warning: 'bg-warning-light text-warning dark:bg-warning/20 dark:text-warning-light',
   };
   const toneClass = tones[tone] || tones.neutral;
 
@@ -35,12 +38,12 @@ export default function EmptyState({
           toneClass
         )}
       >
-        <span className="absolute inset-0 rounded-2xl ring-8 ring-white/40" aria-hidden />
+        <span className="absolute inset-0 rounded-2xl ring-8 ring-white/40 dark:ring-gray-900/40" aria-hidden />
         <Icon className="relative h-9 w-9" />
       </div>
-      <h3 className="mt-5 text-base font-semibold text-gray-900">{title}</h3>
+      <h3 className="mt-5 text-base font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
       {description && (
-        <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-gray-500">{description}</p>
+        <p className="mt-1.5 max-w-sm text-sm leading-relaxed text-gray-500 dark:text-gray-400">{description}</p>
       )}
       {action && (
         <div className="mt-5">

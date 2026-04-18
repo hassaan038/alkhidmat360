@@ -37,7 +37,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-white">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-white dark:bg-gray-900">
       {/* Branded side panel — hidden on mobile */}
       <aside className="relative hidden lg:flex lg:w-[44%] xl:w-[40%] flex-col justify-between overflow-hidden bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 text-white px-12 py-10">
         <div className="absolute inset-0 opacity-40 bg-gradient-mesh pointer-events-none" aria-hidden />
@@ -100,15 +100,15 @@ export default function Login() {
         <div className="w-full max-w-md animate-fade-in-up">
           <div className="lg:hidden mb-8 flex items-center justify-center gap-3">
             <img src={logo} alt="Alkhidmat 360" className="h-10 w-10 rounded-xl object-cover shadow-md" />
-            <span className="text-xl font-bold text-gray-900">Alkhidmat 360</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-gray-50">Alkhidmat 360</span>
           </div>
 
           <div className="mb-8">
             <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary-50 text-primary-600 ring-8 ring-primary-50/50 mb-4">
               <LogIn className="h-5 w-5" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Welcome back</h1>
-            <p className="mt-1 text-sm text-gray-500">Sign in to your account to continue</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Welcome back</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Sign in to your account to continue</p>
           </div>
 
           {error && (
@@ -137,7 +137,7 @@ export default function Login() {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" required>Password</Label>
-                <span className="text-xs text-gray-400">Use a strong, unique password</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">Use a strong, unique password</span>
               </div>
               <div className="relative">
                 <Input
@@ -157,7 +157,7 @@ export default function Login() {
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -171,10 +171,10 @@ export default function Login() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-gray-200 dark:border-gray-800" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white px-3 text-gray-400">New to Alkhidmat 360?</span>
+              <span className="bg-white dark:bg-gray-900 px-3 text-gray-400 dark:text-gray-500">New to Alkhidmat 360?</span>
             </div>
           </div>
 
@@ -184,11 +184,11 @@ export default function Login() {
             </Button>
           </Link>
 
-          <details className="mt-6 rounded-xl border border-gray-200 bg-gray-50 text-xs">
-            <summary className="cursor-pointer px-4 py-2.5 font-medium text-gray-700 select-none hover:text-gray-900">
+          <details className="mt-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-xs">
+            <summary className="cursor-pointer px-4 py-2.5 font-medium text-gray-700 dark:text-gray-300 select-none hover:text-gray-900">
               Test credentials
             </summary>
-            <div className="border-t border-gray-200 px-4 py-3 space-y-1 text-gray-600 font-mono text-[11px]">
+            <div className="border-t border-gray-200 dark:border-gray-800 px-4 py-3 space-y-1 text-gray-600 dark:text-gray-400 font-mono text-[11px]">
               <p>admin@alkhidmat360.com / admin123</p>
               <p>donor@test.com / donor123</p>
               <p>beneficiary@test.com / beneficiary123</p>

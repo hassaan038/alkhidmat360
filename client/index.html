@@ -4,7 +4,21 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>alkhidmat360</title>
+    <title>Alkhidmat 360</title>
+    <script>
+      // Apply the stored theme preference before React hydrates to avoid
+      // a flash of the wrong theme on reload.
+      (function () {
+        try {
+          var stored = localStorage.getItem('alkhidmat-theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = stored || (prefersDark ? 'dark' : 'light');
+          if (theme === 'dark') document.documentElement.classList.add('dark');
+        } catch (e) {
+          // localStorage disabled — fall back to light.
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

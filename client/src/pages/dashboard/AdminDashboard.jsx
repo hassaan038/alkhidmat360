@@ -153,11 +153,11 @@ export default function AdminDashboard() {
         {/* Charts */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
               <IconTile icon={BarChart2} tone="primary" size="sm" />
               <div>
-                <h2 className="text-base font-semibold text-gray-900">Donations overview</h2>
-                <p className="text-xs text-gray-500">Submissions by donation type</p>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">Donations overview</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Submissions by donation type</p>
               </div>
             </div>
             <CardContent className="pt-5">
@@ -176,11 +176,11 @@ export default function AdminDashboard() {
           </Card>
 
           <Card>
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
               <IconTile icon={ListChecks} tone="loan" size="sm" />
               <div>
-                <h2 className="text-base font-semibold text-gray-900">Applications overview</h2>
-                <p className="text-xs text-gray-500">Breakdown by request type</p>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">Applications overview</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Breakdown by request type</p>
               </div>
             </div>
             <CardContent className="pt-5">
@@ -213,8 +213,8 @@ export default function AdminDashboard() {
                   <Card className="group h-full cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover hover:border-primary-200">
                     <CardContent className="pt-5 pb-5">
                       <IconTile icon={action.icon} tone={action.tone} size="lg" className="mb-4" />
-                      <h3 className="text-base font-semibold text-gray-900">{action.title}</h3>
-                      <p className="mt-1 text-sm text-gray-500">{action.description}</p>
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-gray-50">{action.title}</h3>
+                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{action.description}</p>
                       <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary-600 transition-all group-hover:gap-2">
                         <span>Open</span>
                         <ArrowRight className="w-4 h-4" />
@@ -228,12 +228,12 @@ export default function AdminDashboard() {
 
           <div>
             <Card className="h-full overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <IconTile icon={Clock} tone="warning" size="sm" />
                   <div>
-                    <h2 className="text-base font-semibold text-gray-900">Pending reviews</h2>
-                    <p className="text-xs text-gray-500">Require your action</p>
+                    <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">Pending reviews</h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Require your action</p>
                   </div>
                 </div>
                 <span className="text-xs font-semibold tabular-nums text-warning-dark">
@@ -249,8 +249,8 @@ export default function AdminDashboard() {
                 ) : pendingItems.length === 0 ? (
                   <div className="flex flex-col items-center justify-center text-center py-8">
                     <IconTile icon={ShieldCheck} tone="success" size="lg" className="mb-3" />
-                    <p className="text-sm font-medium text-gray-900">All clear!</p>
-                    <p className="text-xs text-gray-500 mt-1 max-w-[240px]">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-50">All clear!</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-[240px]">
                       No items awaiting review. New submissions will show up here.
                     </p>
                   </div>
@@ -264,10 +264,10 @@ export default function AdminDashboard() {
                         >
                           <IconTile icon={item.icon} tone={item.tone} size="md" />
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium text-gray-900 truncate">{item.label}</p>
-                            <p className="text-xs text-gray-500">{item.sub}</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-50 truncate">{item.label}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{item.sub}</p>
                           </div>
-                          <ArrowRight className="h-4 w-4 text-gray-400 transition-transform group-hover:translate-x-0.5" />
+                          <ArrowRight className="h-4 w-4 text-gray-400 dark:text-gray-500 transition-transform group-hover:translate-x-0.5" />
                         </Link>
                       </li>
                     ))}

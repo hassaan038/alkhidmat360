@@ -85,7 +85,7 @@ export default function AdminFitrana() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full">
-                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
+                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
                         <Th>#</Th><Th>User</Th><Th>People</Th><Th>Basis</Th>
                         <Th>Per Person</Th><Th>Total</Th><Th>Paid?</Th>
@@ -95,31 +95,31 @@ export default function AdminFitrana() {
                     <tbody className="divide-y divide-gray-100">
                       {items.map((f) => (
                         <tr key={f.id} className="transition-colors hover:bg-zakat-50/40">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900">#{f.id}</td>
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-50">#{f.id}</td>
                           <td className="px-4 py-3 text-sm">
-                            <div className="font-medium text-gray-900">
+                            <div className="font-medium text-gray-900 dark:text-gray-50">
                               {f.user?.fullName || '—'}
                             </div>
-                            <div className="text-xs text-gray-500">{f.user?.email}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{f.user?.email}</div>
                             {f.contactPhone && (
-                              <div className="text-xs text-gray-500">{f.contactPhone}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">{f.contactPhone}</div>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{f.numberOfPeople}</td>
-                          <td className="px-4 py-3 text-sm text-gray-700">
+                          <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-50">{f.numberOfPeople}</td>
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                             {BASIS_LABEL[f.calculationBasis] || f.calculationBasis}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-700">
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                             {formatCurrency(f.amountPerPerson)}
                           </td>
-                          <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                          <td className="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-50">
                             {formatCurrency(f.totalAmount)}
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {f.paymentMarked ? (
                               <Check className="w-4 h-4 text-success-dark" aria-label="Paid" />
                             ) : (
-                              <X className="w-4 h-4 text-gray-400" aria-label="Unpaid" />
+                              <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label="Unpaid" />
                             )}
                           </td>
                           <td className="px-4 py-3">
@@ -133,11 +133,11 @@ export default function AdminFitrana() {
                                 <img
                                   src={imageUrl(f.paymentScreenshotUrl)}
                                   alt="Payment"
-                                  className="w-12 h-12 object-cover rounded border border-gray-200 hover:opacity-80 transition"
+                                  className="w-12 h-12 object-cover rounded border border-gray-200 dark:border-gray-800 hover:opacity-80 transition"
                                 />
                               </a>
                             ) : (
-                              <span className="text-xs text-gray-400">—</span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
                             )}
                           </td>
                           <td className="px-4 py-3">
@@ -169,7 +169,7 @@ export default function AdminFitrana() {
 
 function Th({ children }) {
   return (
-    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
       {children}
     </th>
   );

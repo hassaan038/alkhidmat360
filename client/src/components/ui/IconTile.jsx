@@ -1,20 +1,20 @@
 import { cn } from '../../lib/utils';
 
 const tones = {
-  primary: 'bg-primary-50 text-primary-600',
-  qurbani: 'bg-qurbani-50 text-qurbani-600',
-  zakat: 'bg-zakat-50 text-zakat-600',
-  sadqa: 'bg-sadqa-50 text-sadqa-600',
-  disaster: 'bg-disaster-50 text-disaster-600',
-  ration: 'bg-ration-50 text-ration-600',
-  orphan: 'bg-orphan-50 text-orphan-600',
-  loan: 'bg-loan-50 text-loan-600',
-  volunteer: 'bg-volunteer-50 text-volunteer-600',
-  success: 'bg-success-light text-success-dark',
-  warning: 'bg-warning-light text-warning-dark',
-  error: 'bg-error-light text-error-dark',
-  info: 'bg-info-light text-info-dark',
-  neutral: 'bg-gray-100 text-gray-700',
+  primary: 'bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-300',
+  qurbani: 'bg-qurbani-50 text-qurbani-600 dark:bg-qurbani-500/15 dark:text-qurbani-300',
+  zakat: 'bg-zakat-50 text-zakat-600 dark:bg-zakat-500/15 dark:text-zakat-300',
+  sadqa: 'bg-sadqa-50 text-sadqa-600 dark:bg-sadqa-500/15 dark:text-sadqa-300',
+  disaster: 'bg-disaster-50 text-disaster-600 dark:bg-disaster-500/15 dark:text-disaster-300',
+  ration: 'bg-ration-50 text-ration-600 dark:bg-ration-500/15 dark:text-ration-300',
+  orphan: 'bg-orphan-50 text-orphan-600 dark:bg-orphan-500/15 dark:text-orphan-300',
+  loan: 'bg-loan-50 text-loan-600 dark:bg-loan-500/15 dark:text-loan-300',
+  volunteer: 'bg-volunteer-50 text-volunteer-600 dark:bg-volunteer-500/15 dark:text-volunteer-300',
+  success: 'bg-success-light text-success-dark dark:bg-success/20 dark:text-success-light',
+  warning: 'bg-warning-light text-warning-dark dark:bg-warning/20 dark:text-warning-light',
+  error: 'bg-error-light text-error-dark dark:bg-error/20 dark:text-error-light',
+  info: 'bg-info-light text-info-dark dark:bg-info/20 dark:text-info-light',
+  neutral: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
 };
 
 const sizes = {

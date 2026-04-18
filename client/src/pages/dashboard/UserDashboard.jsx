@@ -162,7 +162,7 @@ export default function UserDashboard() {
                   <Card className="group h-full cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
                     <CardContent className="flex items-center gap-3 py-4">
                       <IconTile icon={s.icon} tone={s.tone} size="md" />
-                      <span className="text-sm font-medium text-gray-800 group-hover:text-gray-900 truncate">
+                      <span className="text-sm font-medium text-gray-800 dark:text-gray-100 group-hover:text-gray-900 truncate">
                         {s.title}
                       </span>
                     </CardContent>
@@ -186,8 +186,8 @@ export default function UserDashboard() {
                 <Card className="group h-full cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover hover:border-primary-200">
                   <CardContent className="pt-5 pb-5">
                     <IconTile icon={action.icon} tone={action.tone} size="lg" className="mb-4" />
-                    <h3 className="text-base font-semibold text-gray-900">{action.title}</h3>
-                    <p className="mt-1 text-sm text-gray-500">{action.description}</p>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-50">{action.title}</h3>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{action.description}</p>
                     <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary-600 transition-all group-hover:gap-2">
                       <span>Get started</span>
                       <ArrowRight className="w-4 h-4" />
@@ -202,12 +202,12 @@ export default function UserDashboard() {
         {/* Recent activity */}
         <section>
           <Card className="overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <IconTile icon={Activity} tone="primary" size="sm" />
                 <div>
-                  <h2 className="text-base font-semibold text-gray-900">Recent activity</h2>
-                  <p className="text-xs text-gray-500">Your latest submissions and updates</p>
+                  <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">Recent activity</h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Your latest submissions and updates</p>
                 </div>
               </div>
             </div>
@@ -250,14 +250,14 @@ function ActivityRow({ activity }) {
         size="md"
       />
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 truncate">
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-50 truncate">
           {activity.title || typeLabel}
         </p>
         {activity.description && (
-          <p className="text-xs text-gray-500 truncate">{activity.description}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{activity.description}</p>
         )}
         {activity.createdAt && (
-          <p className="text-[11px] text-gray-400 mt-0.5">
+          <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5">
             {new Date(activity.createdAt).toLocaleString()}
           </p>
         )}

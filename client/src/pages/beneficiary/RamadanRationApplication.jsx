@@ -80,9 +80,9 @@ export default function RamadanRationApplication() {
                     id="dm"
                     type="checkbox"
                     {...register('hasDisabledMembers')}
-                    className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-2 focus:ring-primary-500"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-primary-600 focus:ring-2 focus:ring-primary-500"
                   />
-                  <span className="text-sm text-gray-700">My family has disabled or special needs members</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">My family has disabled or special needs members</span>
                 </label>
               </FormField>
               {hasDisabledMembers && (
@@ -119,9 +119,9 @@ export default function RamadanRationApplication() {
                 <input
                   type="checkbox"
                   {...register('previouslyReceived')}
-                  className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-2 focus:ring-primary-500"
+                  className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-primary-600 focus:ring-2 focus:ring-primary-500"
                 />
-                <span className="text-sm text-gray-700">I have previously received ration from Alkhidmat</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">I have previously received ration from Alkhidmat</span>
               </label>
             </div>
             <FormField label="Additional notes" htmlFor="add" className="mt-4">
@@ -139,13 +139,13 @@ export default function RamadanRationApplication() {
           </div>
         </form>
 
-        <div className="rounded-2xl border border-ration-100 bg-ration-50/60 p-5">
+        <div className="rounded-2xl border border-ration-100 dark:border-ration-700/40 bg-ration-50/60 dark:bg-ration-500/10 p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-ration-100 text-ration-700">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-ration-100 dark:bg-ration-500/15 text-ration-700 dark:text-ration-200">
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-ration-700">Distribution information</h4>
+              <h4 className="text-sm font-semibold text-ration-700 dark:text-ration-200">Distribution information</h4>
               <ul className="mt-2 space-y-1 text-xs text-ration-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

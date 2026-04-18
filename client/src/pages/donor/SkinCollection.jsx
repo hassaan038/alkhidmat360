@@ -100,8 +100,8 @@ export default function SkinCollection() {
                       className={cn(
                         'relative flex cursor-pointer flex-col items-center justify-center rounded-xl border p-4 transition-colors duration-200',
                         selected
-                          ? 'border-qurbani-500 bg-qurbani-50 ring-1 ring-inset ring-qurbani-200'
-                          : 'border-gray-200 hover:border-qurbani-300 hover:bg-gray-50'
+                          ? 'border-qurbani-500 bg-qurbani-50 dark:bg-qurbani-500/10 ring-1 ring-inset ring-qurbani-200 dark:ring-qurbani-700/40'
+                          : 'border-gray-200 dark:border-gray-800 hover:border-qurbani-300 hover:bg-gray-50'
                       )}
                       onClick={() => handleSkinSelect(skin)}
                     >
@@ -109,12 +109,12 @@ export default function SkinCollection() {
                       <span
                         className={cn(
                           'flex h-11 w-11 items-center justify-center rounded-xl mb-2 transition-colors',
-                          selected ? 'bg-qurbani-100 text-qurbani-700' : 'bg-gray-100 text-gray-500'
+                          selected ? 'bg-qurbani-100 dark:bg-qurbani-500/15 text-qurbani-700 dark:text-qurbani-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                         )}
                       >
                         <SkinIcon className="h-5 w-5" />
                       </span>
-                      <p className="text-sm font-medium text-gray-900">{skin.name}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-50">{skin.name}</p>
                     </label>
                   );
                 })}
@@ -132,11 +132,11 @@ export default function SkinCollection() {
             ) : (
               <div className="mt-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Custom animal type</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Custom animal type</label>
                   <button
                     type="button"
                     onClick={() => { setCustomMode(false); setValue('animalType', '', { shouldValidate: false }); }}
-                    className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
+                    className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 cursor-pointer"
                   >
                     Use a preset instead
                   </button>
@@ -182,13 +182,13 @@ export default function SkinCollection() {
           </div>
         </form>
 
-        <div className="rounded-2xl border border-qurbani-100 bg-qurbani-50/60 p-5">
+        <div className="rounded-2xl border border-qurbani-100 dark:border-qurbani-700/40 bg-qurbani-50/60 dark:bg-qurbani-500/10 p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-qurbani-100 text-qurbani-700">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-qurbani-100 dark:bg-qurbani-500/15 text-qurbani-700 dark:text-qurbani-200">
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-qurbani-700">How skin collection works</h4>
+              <h4 className="text-sm font-semibold text-qurbani-700 dark:text-qurbani-200">How skin collection works</h4>
               <ul className="mt-2 space-y-1 text-xs text-qurbani-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

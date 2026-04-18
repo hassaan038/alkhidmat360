@@ -25,17 +25,17 @@ function BookingRow({ booking, onOpenPayment }) {
     <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
       <CardContent className="p-5">
         <div className="flex flex-col md:flex-row gap-5">
-          <div className="w-full md:w-44 aspect-[4/3] md:aspect-square bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center">
+          <div className="w-full md:w-44 aspect-[4/3] md:aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center">
             {img ? (
               <img src={img} alt={listing.name} className="w-full h-full object-cover" />
             ) : (
-              <ImageIcon className="w-8 h-8 text-gray-400" />
+              <ImageIcon className="w-8 h-8 text-gray-400 dark:text-gray-500" />
             )}
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-              <h3 className="text-lg font-semibold text-gray-900 truncate">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50 truncate">
                 {listing.name || `Booking #${booking.id}`}
               </h3>
               <div className="flex items-center gap-1.5 flex-wrap">
@@ -48,24 +48,24 @@ function BookingRow({ booking, onOpenPayment }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-600 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
               <div>
-                <span className="text-gray-500">Hissas:</span>{' '}
-                <span className="text-gray-900 font-medium tabular-nums">{booking.hissaCount}</span>
+                <span className="text-gray-500 dark:text-gray-400">Hissas:</span>{' '}
+                <span className="text-gray-900 dark:text-gray-50 font-medium tabular-nums">{booking.hissaCount}</span>
               </div>
               <div>
-                <span className="text-gray-500">Total:</span>{' '}
-                <span className="text-gray-900 font-medium tabular-nums">{formatCurrency(total)}</span>
+                <span className="text-gray-500 dark:text-gray-400">Total:</span>{' '}
+                <span className="text-gray-900 dark:text-gray-50 font-medium tabular-nums">{formatCurrency(total)}</span>
               </div>
               {listing.pickupDate && (
                 <div className="flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4 text-gray-400" />
+                  <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                   <span>{formatDate(listing.pickupDate)}</span>
                 </div>
               )}
               {listing.pickupLocation && (
                 <div className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-gray-400" />
+                  <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                   <span className="truncate">{listing.pickupLocation}</span>
                 </div>
               )}

@@ -84,7 +84,7 @@ export default function QurbaniSkinPickups() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full">
-                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
+                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
                         <Th>#</Th><Th>User</Th><Th>Phone</Th><Th>Skins</Th>
                         <Th>Address / Map</Th><Th>Preferred</Th><Th>Status</Th><Th></Th>
@@ -98,20 +98,20 @@ export default function QurbaniSkinPickups() {
                         return (
                           <>
                             <tr key={p.id} className="transition-colors hover:bg-qurbani-50/40 align-top">
-                              <td className="px-4 py-3 text-sm font-medium text-gray-900">#{p.id}</td>
+                              <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-50">#{p.id}</td>
                               <td className="px-4 py-3 text-sm">
-                                <div className="font-medium text-gray-900">
+                                <div className="font-medium text-gray-900 dark:text-gray-50">
                                   {p.user?.fullName || '—'}
                                 </div>
-                                <div className="text-xs text-gray-500">{p.user?.email}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">{p.user?.email}</div>
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-700">
+                              <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                                 {p.contactPhone}
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-900">
+                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-50">
                                 {p.numberOfSkins}
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-700 max-w-xs">
+                              <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300 max-w-xs">
                                 <p className="line-clamp-2">{p.address}</p>
                                 {hasCoords && (
                                   <a
@@ -125,7 +125,7 @@ export default function QurbaniSkinPickups() {
                                   </a>
                                 )}
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-700">
+                              <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                                 {p.preferredDate ? formatDate(p.preferredDate) : '—'}
                               </td>
                               <td className="px-4 py-3">
@@ -146,7 +146,7 @@ export default function QurbaniSkinPickups() {
                                 <button
                                   type="button"
                                   onClick={() => toggleExpand(p.id)}
-                                  className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
+                                  className="rounded-md p-1 text-gray-400 dark:text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
                                   aria-label={expanded === p.id ? 'Collapse row' : 'Expand row'}
                                 >
                                   {expanded === p.id ? (
@@ -159,21 +159,21 @@ export default function QurbaniSkinPickups() {
                             </tr>
                             {expanded === p.id && (
                               <tr key={`${p.id}-details`}>
-                                <td colSpan={8} className="px-4 py-4 bg-gray-50">
+                                <td colSpan={8} className="px-4 py-4 bg-gray-50 dark:bg-gray-900">
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-1 text-sm text-gray-800">
+                                    <div className="space-y-1 text-sm text-gray-800 dark:text-gray-100">
                                       <div>
-                                        <span className="text-gray-500">Coordinates:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">Coordinates:</span>{' '}
                                         {hasCoords
                                           ? `${lat.toFixed(5)}, ${lng.toFixed(5)}`
                                           : 'Not provided'}
                                       </div>
                                       <div>
-                                        <span className="text-gray-500">Notes:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">Notes:</span>{' '}
                                         {p.additionalDetails || '—'}
                                       </div>
                                       <div>
-                                        <span className="text-gray-500">Submitted:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">Submitted:</span>{' '}
                                         {p.createdAt
                                           ? new Date(p.createdAt).toLocaleString()
                                           : '—'}
@@ -181,7 +181,7 @@ export default function QurbaniSkinPickups() {
                                     </div>
                                     {p.housePhotoUrl && (
                                       <div>
-                                        <p className="text-xs text-gray-500 mb-1">House photo</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">House photo</p>
                                         <a
                                           href={imageUrl(p.housePhotoUrl)}
                                           target="_blank"
@@ -190,7 +190,7 @@ export default function QurbaniSkinPickups() {
                                           <img
                                             src={imageUrl(p.housePhotoUrl)}
                                             alt="House"
-                                            className="w-full max-w-xs h-40 object-cover rounded-lg border border-gray-200 hover:opacity-90 transition"
+                                            className="w-full max-w-xs h-40 object-cover rounded-lg border border-gray-200 dark:border-gray-800 hover:opacity-90 transition"
                                           />
                                         </a>
                                       </div>
@@ -214,7 +214,7 @@ export default function QurbaniSkinPickups() {
 
 function Th({ children }) {
   return (
-    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
       {children}
     </th>
   );

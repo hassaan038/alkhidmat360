@@ -98,15 +98,15 @@ export default function LoanApplication() {
                     className={cn(
                       'relative flex cursor-pointer flex-col items-center justify-center rounded-xl border p-4 transition-colors duration-200',
                       selected
-                        ? 'border-loan-500 bg-loan-50 ring-1 ring-inset ring-loan-200'
-                        : 'border-gray-200 hover:border-loan-300 hover:bg-gray-50'
+                        ? 'border-loan-500 bg-loan-50 dark:bg-loan-500/10 ring-1 ring-inset ring-loan-200 dark:ring-loan-700/40'
+                        : 'border-gray-200 dark:border-gray-800 hover:border-loan-300 hover:bg-gray-50'
                     )}
                   >
                     <input type="radio" value={type.value} {...register('loanType')} className="sr-only" />
                     <span
                       className={cn(
                         'flex h-10 w-10 items-center justify-center rounded-lg mb-2 transition-colors',
-                        selected ? 'bg-loan-100 text-loan-700' : 'bg-gray-100 text-gray-500'
+                        selected ? 'bg-loan-100 dark:bg-loan-500/15 text-loan-700 dark:text-loan-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'
                       )}
                     >
                       <TypeIcon className="h-5 w-5" />
@@ -193,13 +193,13 @@ export default function LoanApplication() {
           </div>
         </form>
 
-        <div className="rounded-2xl border border-loan-100 bg-loan-50/60 p-5">
+        <div className="rounded-2xl border border-loan-100 dark:border-loan-700/40 bg-loan-50/60 dark:bg-loan-500/10 p-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-loan-100 text-loan-700">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-loan-100 dark:bg-loan-500/15 text-loan-700 dark:text-loan-200">
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-loan-700">Important information</h4>
+              <h4 className="text-sm font-semibold text-loan-700 dark:text-loan-200">Important information</h4>
               <ul className="mt-2 space-y-1 text-xs text-loan-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

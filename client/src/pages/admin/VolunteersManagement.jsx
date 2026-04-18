@@ -94,7 +94,7 @@ export default function VolunteersManagement() {
         )}
 
         <Card className="overflow-hidden">
-          <div className="flex flex-col gap-3 border-b border-gray-100 bg-gray-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="w-full sm:max-w-xs">
               <Input
                 leftIcon={Search}
@@ -113,7 +113,7 @@ export default function VolunteersManagement() {
                     'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer',
                     filterStatus === c.id
                       ? 'bg-volunteer-600 text-white shadow-sm'
-                      : 'bg-white text-gray-600 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900'
+                      : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900'
                   )}
                 >
                   {c.label}
@@ -136,7 +136,7 @@ export default function VolunteersManagement() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
+                <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                   <tr>
                     <Th>Volunteer</Th>
                     <Th>Contact</Th>
@@ -151,32 +151,32 @@ export default function VolunteersManagement() {
                     <tr key={v.id} className="transition-colors hover:bg-volunteer-50/40">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3 min-w-0">
-                          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-volunteer-100 text-volunteer-700 text-xs font-semibold">
+                          <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-volunteer-100 dark:bg-volunteer-500/15 text-volunteer-700 dark:text-volunteer-200 text-xs font-semibold">
                             {initials(v.fullName)}
                           </span>
                           <div className="min-w-0">
-                            <div className="text-sm font-semibold text-gray-900 truncate">{v.fullName}</div>
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <div className="text-sm font-semibold text-gray-900 dark:text-gray-50 truncate">{v.fullName}</div>
+                            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                               <Mail className="w-3 h-3 flex-shrink-0" />
                               <span className="truncate">{v.email}</span>
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-700">
+                      <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                         <div className="flex items-center gap-1.5">
-                          <Phone className="w-3.5 h-3.5 text-gray-400" />
+                          <Phone className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                           {v.phoneNumber}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-700">
+                      <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                         {v.cnic ? (
                           <div className="flex items-center gap-1.5">
-                            <CreditCard className="w-3.5 h-3.5 text-gray-400" />
+                            <CreditCard className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                             {v.cnic}
                           </div>
                         ) : (
-                          <span className="text-gray-400 italic">Not provided</span>
+                          <span className="text-gray-400 dark:text-gray-500 italic">Not provided</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -189,9 +189,9 @@ export default function VolunteersManagement() {
                           {v.isActive ? 'Active' : 'Inactive'}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600 tabular-nums">
+                      <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums">
                         <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                          <Calendar className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
                           {formatDate(v.createdAt)}
                         </div>
                       </td>
@@ -209,7 +209,7 @@ export default function VolunteersManagement() {
 
 function Th({ children }) {
   return (
-    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
       {children}
     </th>
   );

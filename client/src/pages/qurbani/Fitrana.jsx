@@ -92,9 +92,9 @@ function FitranaRow({ fitrana }) {
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div>
-            <p className="text-xs text-gray-500">Submission #{fitrana.id}</p>
-            <p className="text-lg font-semibold text-gray-900">{formatCurrency(total)}</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">Submission #{fitrana.id}</p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">{formatCurrency(total)}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {fitrana.numberOfPeople} people × {formatCurrency(perPerson)}
             </p>
           </div>
@@ -104,19 +104,19 @@ function FitranaRow({ fitrana }) {
           </div>
         </div>
 
-        <div className="space-y-1 text-sm text-gray-700">
+        <div className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-gray-400" />
+            <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
             <span>{basisLabel}</span>
           </div>
           {fitrana.createdAt && (
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <Calendar className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
               <span>{formatDate(fitrana.createdAt)}</span>
             </div>
           )}
           {fitrana.notes && (
-            <p className="text-xs text-gray-500 pt-2 border-t border-gray-100">
+            <p className="text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
               {fitrana.notes}
             </p>
           )}
@@ -201,13 +201,13 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-2xl shadow-large w-full max-w-lg max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Complete Fitrana Payment</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-large w-full max-w-lg max-h-[90vh] flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Complete Fitrana Payment</h2>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"
+            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 dark:text-gray-400"
             aria-label="Close"
           >
             <XIcon className="w-5 h-5" />
@@ -229,13 +229,13 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
 
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Banknote className="w-4 h-4 text-gray-500" />
-              <h4 className="text-sm font-semibold text-gray-900">Bank Details</h4>
+              <Banknote className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-50">Bank Details</h4>
             </div>
             {loadingBank ? (
-              <div className="h-24 bg-gray-100 rounded-lg animate-pulse" />
+              <div className="h-24 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
             ) : bankDetails ? (
-              <pre className="whitespace-pre-wrap font-sans text-sm bg-gray-50 border border-gray-200 rounded-lg p-4 text-gray-800 leading-relaxed">
+              <pre className="whitespace-pre-wrap font-sans text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 text-gray-800 dark:text-gray-100 leading-relaxed">
                 {bankDetails}
               </pre>
             ) : (
@@ -265,7 +265,7 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
           {errorMsg && <p className="text-sm text-error">{errorMsg}</p>}
         </div>
 
-        <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end gap-3">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-end gap-3">
           <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
             Cancel
           </Button>
@@ -395,7 +395,7 @@ export default function Fitrana() {
                 <CardContent className="space-y-6">
                   {/* People */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Number of People in Family <span className="text-error">*</span>
                     </label>
                     <input
@@ -407,9 +407,9 @@ export default function Fitrana() {
                         const v = parseInt(e.target.value, 10);
                         setNumberOfPeople(Number.isNaN(v) ? 1 : Math.max(1, Math.min(100, v)));
                       }}
-                      className="w-full sm:w-48 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full sm:w-48 px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       Include every member of the household — adults, children, infants, and any
                       household help. Fitrana is obligatory for each one.
                     </p>
@@ -417,7 +417,7 @@ export default function Fitrana() {
 
                   {/* Basis */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Calculation Basis <span className="text-error">*</span>
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -432,24 +432,24 @@ export default function Fitrana() {
                             className={cn(
                               'text-left p-4 border rounded-xl transition-colors duration-200 cursor-pointer',
                               active
-                                ? 'border-zakat-500 bg-zakat-50 ring-1 ring-inset ring-zakat-200'
-                                : 'border-gray-200 hover:border-zakat-300 hover:bg-gray-50'
+                                ? 'border-zakat-500 bg-zakat-50 dark:bg-zakat-500/10 ring-1 ring-inset ring-zakat-200 dark:ring-zakat-700/40'
+                                : 'border-gray-200 dark:border-gray-800 hover:border-zakat-300 hover:bg-gray-50'
                             )}
                           >
                             <div className="flex items-center justify-between mb-1">
-                              <span className={cn('flex h-8 w-8 items-center justify-center rounded-lg', active ? 'bg-zakat-100 text-zakat-700' : 'bg-gray-100 text-gray-500')}>
+                              <span className={cn('flex h-8 w-8 items-center justify-center rounded-lg', active ? 'bg-zakat-100 dark:bg-zakat-500/15 text-zakat-700 dark:text-zakat-200' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400')}>
                                 <Icon className="w-4 h-4" />
                               </span>
                               {b.amount != null && (
-                                <span className="text-xs font-semibold text-gray-700 tabular-nums">
+                                <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 tabular-nums">
                                   {formatCurrency(b.amount)}/person
                                 </span>
                               )}
                             </div>
-                            <p className={cn('text-sm font-semibold mt-2', active ? 'text-zakat-700' : 'text-gray-900')}>
+                            <p className={cn('text-sm font-semibold mt-2', active ? 'text-zakat-700 dark:text-zakat-200' : 'text-gray-900 dark:text-gray-50')}>
                               {b.label}
                             </p>
-                            <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{b.description}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{b.description}</p>
                           </button>
                         );
                       })}
@@ -459,7 +459,7 @@ export default function Fitrana() {
                   {/* Custom amount */}
                   {basisKey === 'custom' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Per-Person Amount (PKR) <span className="text-error">*</span>
                       </label>
                       <input
@@ -468,7 +468,7 @@ export default function Fitrana() {
                         value={customAmount}
                         onChange={(e) => setCustomAmount(e.target.value)}
                         placeholder="e.g. 500"
-                        className="w-full sm:w-48 px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full sm:w-48 px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
                   )}
@@ -476,7 +476,7 @@ export default function Fitrana() {
                   {/* Optional details */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Contact Phone (Optional)
                       </label>
                       <input
@@ -484,11 +484,11 @@ export default function Fitrana() {
                         value={contactPhone}
                         onChange={(e) => setContactPhone(e.target.value)}
                         placeholder="03001234567"
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Notes (Optional)
                       </label>
                       <input
@@ -496,18 +496,18 @@ export default function Fitrana() {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="On behalf of…"
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
                   </div>
 
                   {/* Total + CTA */}
-                  <div className="bg-zakat-50 border border-zakat-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="bg-zakat-50 dark:bg-zakat-500/10 border border-zakat-200 dark:border-zakat-700/40 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                      <p className="text-xs uppercase tracking-wider text-zakat-700 font-semibold">
+                      <p className="text-xs uppercase tracking-wider text-zakat-700 dark:text-zakat-200 font-semibold">
                         Total fitrana
                       </p>
-                      <p className="text-3xl font-bold text-zakat-700 tabular-nums">
+                      <p className="text-3xl font-bold text-zakat-700 dark:text-zakat-200 tabular-nums">
                         {formatCurrency(totalAmount)}
                       </p>
                       <p className="text-xs text-zakat-700/80 mt-0.5">
@@ -524,7 +524,7 @@ export default function Fitrana() {
                     </Button>
                   </div>
 
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     Nothing is recorded until you mark the payment as done on the next step. You
                     can cancel or close anytime.
                   </p>

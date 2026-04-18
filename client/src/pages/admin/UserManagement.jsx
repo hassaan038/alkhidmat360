@@ -93,7 +93,7 @@ export default function UserManagement() {
             </div>
 
             <Card className="overflow-hidden">
-              <div className="flex flex-col gap-3 border-b border-gray-100 bg-gray-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="w-full sm:max-w-xs">
                   <Input
                     leftIcon={Search}
@@ -112,7 +112,7 @@ export default function UserManagement() {
                         'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer',
                         filter === k
                           ? 'bg-primary-600 text-white shadow-sm'
-                          : 'bg-white text-gray-600 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900'
+                          : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900'
                       )}
                     >
                       {k === 'all' ? 'All' : k.charAt(0) + k.slice(1).toLowerCase()}
@@ -130,7 +130,7 @@ export default function UserManagement() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200">
+                    <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
                         <Th>Name</Th>
                         <Th>Email</Th>
@@ -143,9 +143,9 @@ export default function UserManagement() {
                     <tbody className="divide-y divide-gray-100">
                       {filtered.map((user) => (
                         <tr key={user.id} className="transition-colors hover:bg-primary-50/40">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900">{user.fullName}</td>
-                          <td className="px-4 py-3 text-sm text-gray-700">{user.email}</td>
-                          <td className="px-4 py-3 text-sm text-gray-700">{user.phoneNumber || '—'}</td>
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-50">{user.fullName}</td>
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{user.email}</td>
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">{user.phoneNumber || '—'}</td>
                           <td className="px-4 py-3">
                             <Badge variant={USER_TYPE_BADGE[user.userType] || 'neutral'} size="sm">
                               {user.userType}
@@ -156,7 +156,7 @@ export default function UserManagement() {
                               {user.isActive ? 'Active' : 'Inactive'}
                             </Badge>
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-600 tabular-nums">{formatDate(user.createdAt)}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums">{formatDate(user.createdAt)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -173,7 +173,7 @@ export default function UserManagement() {
 
 function Th({ children }) {
   return (
-    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
+    <th className="px-4 py-3 text-left text-[11px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
       {children}
     </th>
   );
