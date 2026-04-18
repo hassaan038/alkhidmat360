@@ -24,7 +24,7 @@ export default function QurbaniModuleSettings() {
       .getQurbaniModuleFlag()
       .then((res) => setEnabled(!!res.data?.enabled))
       .catch((err) =>
-        toast.error('Failed to load module flag', { description: formatApiError(err) })
+        toast.error('Failed to load booking status', { description: formatApiError(err) })
       )
       .finally(() => setLoadingFlag(false));
 
@@ -43,7 +43,7 @@ export default function QurbaniModuleSettings() {
     try {
       await systemConfigService.updateQurbaniModuleFlag(next);
       setEnabled(next);
-      toast.success(`Module ${next ? 'activated' : 'deactivated'}`);
+      toast.success(`Qurbani booking ${next ? 'activated' : 'deactivated'}`);
       // Refresh store so sidebar reacts
       await refreshFlag();
     } catch (error) {
@@ -74,9 +74,9 @@ export default function QurbaniModuleSettings() {
               <Settings className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Qurbani Module Settings</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Qurbani Booking Settings</h1>
               <p className="text-sm text-gray-600">
-                Control module visibility and payment instructions
+                Control booking visibility and payment instructions
               </p>
             </div>
           </div>
@@ -88,16 +88,16 @@ export default function QurbaniModuleSettings() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Power className="w-5 h-5 text-primary-600" />
-                Module Status
+                Booking Status
               </CardTitle>
               <CardDescription>
-                When inactive, users will not see the Qurbani Module in their sidebar.
+                When inactive, users will not see the Qurbani Booking link in their sidebar.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
                 <div>
-                  <p className="font-medium text-gray-900">Module Active</p>
+                  <p className="font-medium text-gray-900">Booking Active</p>
                   <p className="text-sm text-gray-500 mt-0.5">
                     Status:{' '}
                     {loadingFlag ? (
@@ -116,7 +116,7 @@ export default function QurbaniModuleSettings() {
                   className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 ${
                     enabled ? 'bg-primary-600' : 'bg-gray-300'
                   }`}
-                  aria-label="Toggle module"
+                  aria-label="Toggle qurbani booking"
                 >
                   <span
                     className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${

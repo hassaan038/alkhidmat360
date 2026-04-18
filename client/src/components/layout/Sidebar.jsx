@@ -22,13 +22,13 @@ import {
   ListChecks,
 } from 'lucide-react';
 
-// Qurbani module items shown to non-admin users when the flag is on
+// Qurbani items shown to non-admin users when the flag is on
 const qurbaniUserItems = [
   {
-    label: 'Qurbani Module',
+    label: 'Qurbani Booking',
     icon: Drumstick,
     path: '/dashboard/user/qurbani-module',
-    description: 'Book hissas in shared qurbani',
+    description: 'Book your hissas this Eid',
   },
   {
     label: 'My Hissa Bookings',
@@ -56,7 +56,7 @@ const qurbaniAdminItems = [
     label: 'Qurbani Settings',
     icon: Settings,
     path: '/dashboard/admin/qurbani-settings',
-    description: 'Module flag & bank details',
+    description: 'Visibility & bank details',
   },
 ];
 

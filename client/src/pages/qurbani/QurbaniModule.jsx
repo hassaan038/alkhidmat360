@@ -44,9 +44,9 @@ export default function QurbaniModule() {
               <Heart className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Qurbani Module</h1>
+              <h1 className="text-3xl font-bold text-gray-900">Qurbani Booking</h1>
               <p className="text-gray-600 mt-1">
-                Book hissas in shared qurbani animals for Eid-ul-Adha
+                Book your hissas in this Eid's shared qurbani animals
               </p>
             </div>
           </div>
@@ -62,8 +62,8 @@ export default function QurbaniModule() {
         ) : moduleEnabled === false ? (
           <FadeIn direction="up" delay={100}>
             <EmptyState
-              title="Module is currently inactive"
-              description="The Qurbani booking module is not active right now. Please check back later."
+              title="Qurbani booking is currently closed"
+              description="Qurbani bookings are not open right now. Please check back closer to Eid-ul-Adha."
             />
           </FadeIn>
         ) : listings.length === 0 ? (

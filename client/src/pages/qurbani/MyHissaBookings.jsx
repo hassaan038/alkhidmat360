@@ -150,7 +150,7 @@ export default function MyHissaBookings() {
           <FadeIn direction="up" delay={100}>
             <EmptyState
               title="No bookings yet"
-              description="You haven't booked any hissas yet. Head to the Qurbani Module to book one."
+              description="You haven't booked any hissas yet. Head to Qurbani Booking to book one."
             />
           </FadeIn>
         ) : (
