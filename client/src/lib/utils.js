@@ -53,3 +53,16 @@ export function getStatusColor(status) {
 
   return statusColors[status] || 'bg-gray-100 text-gray-700 border-gray-300';
 }
+
+/**
+ * Build a human-readable error description from an api.js rejection.
+ * Surfaces the first field-level validation error if present, else the message.
+ */
+export function formatApiError(err) {
+  if (!err) return 'Something went wrong';
+  if (Array.isArray(err.errors) && err.errors.length > 0) {
+    const first = err.errors[0];
+    return first.field ? `${first.field}: ${first.message}` : first.message;
+  }
+  return err.message || 'Something went wrong';
+}

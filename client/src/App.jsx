@@ -29,6 +29,13 @@ import DonationsManagement from './pages/admin/DonationsManagement';
 import ApplicationsManagement from './pages/admin/ApplicationsManagement';
 import VolunteersManagement from './pages/admin/VolunteersManagement';
 import CreateAdmin from './pages/admin/CreateAdmin';
+import QurbaniListings from './pages/admin/QurbaniListings';
+import QurbaniBookings from './pages/admin/QurbaniBookings';
+import QurbaniModuleSettings from './pages/admin/QurbaniModuleSettings';
+
+// Qurbani Module Pages (any authenticated non-admin user)
+import QurbaniModule from './pages/qurbani/QurbaniModule';
+import MyHissaBookings from './pages/qurbani/MyHissaBookings';
 
 // Protected Route Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -144,6 +151,28 @@ function App() {
             }
           />
 
+          {/* Qurbani Module (shared: donor, beneficiary, volunteer) */}
+          <Route
+            path="/dashboard/user/qurbani-module"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['DONOR', 'BENEFICIARY', 'VOLUNTEER']}>
+                  <QurbaniModule />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/user/qurbani-bookings"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['DONOR', 'BENEFICIARY', 'VOLUNTEER']}>
+                  <MyHissaBookings />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+
           {/* Protected Routes - Admin Dashboard */}
           <Route
             path="/dashboard/admin"
@@ -203,6 +232,38 @@ function App() {
               <ProtectedRoute>
                 <RoleBasedRoute allowedRoles={['ADMIN']}>
                   <CreateAdmin />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Qurbani Module routes */}
+          <Route
+            path="/dashboard/admin/qurbani-listings"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['ADMIN']}>
+                  <QurbaniListings />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/admin/qurbani-bookings"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['ADMIN']}>
+                  <QurbaniBookings />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/admin/qurbani-settings"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['ADMIN']}>
+                  <QurbaniModuleSettings />
                 </RoleBasedRoute>
               </ProtectedRoute>
             }

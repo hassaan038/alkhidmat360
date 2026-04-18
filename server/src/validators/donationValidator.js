@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Qurbani Donation Validator
 export const qurbaniDonationSchema = z.object({
-  animalType: z.enum(['GOAT', 'COW', 'CAMEL'], {
+  animalType: z.enum(['GOAT', 'CAMEL'], {
     errorMap: () => ({ message: 'Please select a valid animal type' }),
   }),
   quantity: z.number().int().min(1, 'Quantity must be at least 1'),

@@ -1,5 +1,7 @@
+import { useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import { cn } from '../../lib/utils';
 import {
   LayoutDashboard,
@@ -13,7 +15,50 @@ import {
   HandHeart,
   X,
   UserPlus,
+  Drumstick,
+  BookOpen,
+  ClipboardList,
+  Settings,
+  ListChecks,
 } from 'lucide-react';
+
+// Qurbani module items shown to non-admin users when the flag is on
+const qurbaniUserItems = [
+  {
+    label: 'Qurbani Module',
+    icon: Drumstick,
+    path: '/dashboard/user/qurbani-module',
+    description: 'Book hissas in shared qurbani',
+  },
+  {
+    label: 'My Hissa Bookings',
+    icon: BookOpen,
+    path: '/dashboard/user/qurbani-bookings',
+    description: 'Track your bookings',
+  },
+];
+
+// Qurbani module items always shown to admin
+const qurbaniAdminItems = [
+  {
+    label: 'Qurbani Listings',
+    icon: ListChecks,
+    path: '/dashboard/admin/qurbani-listings',
+    description: 'Manage animal listings',
+  },
+  {
+    label: 'Qurbani Bookings',
+    icon: ClipboardList,
+    path: '/dashboard/admin/qurbani-bookings',
+    description: 'Review hissa bookings',
+  },
+  {
+    label: 'Qurbani Settings',
+    icon: Settings,
+    path: '/dashboard/admin/qurbani-settings',
+    description: 'Module flag & bank details',
+  },
+];
 
 // Menu items for different user types
 const menuItems = {
@@ -128,8 +173,35 @@ const menuItems = {
 export default function Sidebar({ isOpen, onClose }) {
   const { user } = useAuthStore();
   const location = useLocation();
+  const moduleEnabled = useQurbaniModuleStore((s) => s.moduleEnabled);
+  const fetchFlag = useQurbaniModuleStore((s) => s.fetchFlag);
 
-  const currentMenuItems = menuItems[user?.userType] || [];
+  // Fetch the qurbani module flag once on mount
+  useEffect(() => {
+    fetchFlag();
+  }, [fetchFlag]);
+
+  const currentMenuItems = useMemo(() => {
+    const role = user?.userType;
+    const base = menuItems[role] || [];
+    if (!role) return base;
+
+    if (role === 'ADMIN') {
+      // Admins always see qurbani admin menu regardless of flag
+      return [...base, ...qurbaniAdminItems];
+    }
+
+    // DONOR / BENEFICIARY / VOLUNTEER — only when flag is true
+    if (moduleEnabled === true) {
+      // Keep Dashboard as the first entry, then prepend qurbani items
+      const [dashboard, ...rest] = base;
+      return dashboard
+        ? [dashboard, ...qurbaniUserItems, ...rest]
+        : [...qurbaniUserItems, ...base];
+    }
+
+    return base;
+  }, [user?.userType, moduleEnabled]);
 
   const isActive = (path) => {
     return location.pathname === path;

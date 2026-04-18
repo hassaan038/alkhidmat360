@@ -3,12 +3,19 @@ import cors from 'cors';
 import session from 'express-session';
 import MySQLStore from 'express-mysql-session';
 import mysql from 'mysql2/promise';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import donationRoutes from './routes/donationRoutes.js';
 import applicationRoutes from './routes/applicationRoutes.js';
 import volunteerRoutes from './routes/volunteerRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import qurbaniModuleRoutes from './routes/qurbaniModuleRoutes.js';
+import configRoutes from './routes/configRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -67,6 +74,12 @@ app.get('/', (req, res) => {
   });
 });
 
+// Static serving for uploaded files (qurbani listing photos, etc.)
+app.use(
+  '/uploads',
+  express.static(path.resolve(__dirname, '../uploads'))
+);
+
 // API routes
 // Additional routes will be imported here as they are created
 app.use('/api/auth', authRoutes);
@@ -75,6 +88,8 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/volunteers', volunteerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/qurbani-module', qurbaniModuleRoutes);
+app.use('/api/config', configRoutes);
 
 // ============================================
 // ERROR HANDLING
@@ -98,6 +113,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     message,
+    ...(Array.isArray(err.errors) && err.errors.length > 0 && { errors: err.errors }),
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });

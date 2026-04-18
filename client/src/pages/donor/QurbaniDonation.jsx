@@ -12,7 +12,7 @@ import FadeIn from '../../components/animations/FadeIn';
 
 // Validation schema matching backend
 const qurbaniSchema = z.object({
-  animalType: z.enum(['GOAT', 'COW', 'CAMEL'], {
+  animalType: z.enum(['GOAT', 'CAMEL'], {
     required_error: 'Please select an animal type',
   }),
   quantity: z.coerce
@@ -56,10 +56,9 @@ export default function QurbaniDonation() {
   const getSuggestedPrice = () => {
     const prices = {
       GOAT: 30000,
-      COW: 180000,
       CAMEL: 300000,
     };
-    return prices[animalType] * (quantity || 1);
+    return (prices[animalType] || 0) * (quantity || 1);
   };
 
   const onSubmit = async (data) => {
@@ -112,8 +111,8 @@ export default function QurbaniDonation() {
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Animal Type <span className="text-error">*</span>
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {['GOAT', 'COW', 'CAMEL'].map((type) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {['GOAT', 'CAMEL'].map((type) => (
                     <label
                       key={type}
                       className={`relative flex items-center justify-center p-5 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-md ${
@@ -131,7 +130,6 @@ export default function QurbaniDonation() {
                       <div className="text-center">
                         <p className="text-3xl mb-2">
                           {type === 'GOAT' && '🐑'}
-                          {type === 'COW' && '🐄'}
                           {type === 'CAMEL' && '🐫'}
                         </p>
                         <p className="font-semibold text-gray-900">{type}</p>

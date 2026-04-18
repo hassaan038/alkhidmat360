@@ -23,6 +23,9 @@ export async function getDashboardStats() {
     loan,
     ramadan,
     orphan,
+    qurbaniListings,
+    qurbaniHissaBookings,
+    qurbaniPendingBookings,
   ] = await Promise.all([
     // Total donations across all types
     Promise.all([
@@ -70,6 +73,11 @@ export async function getDashboardStats() {
     prisma.loanApplication.count(),
     prisma.ramadanRationApplication.count(),
     prisma.orphanRegistration.count(),
+
+    // Qurbani module counts
+    prisma.qurbaniListing.count(),
+    prisma.qurbaniHissaBooking.count(),
+    prisma.qurbaniHissaBooking.count({ where: { status: 'pending' } }),
   ]);
 
   return {
@@ -81,6 +89,11 @@ export async function getDashboardStats() {
     pendingVolunteers,
     donationsByType: { qurbani, ration, skin, sponsorship },
     applicationsByType: { loan, ramadan, orphan },
+    qurbaniModule: {
+      listings: qurbaniListings,
+      bookings: qurbaniHissaBookings,
+      pendingBookings: qurbaniPendingBookings,
+    },
   };
 }
 

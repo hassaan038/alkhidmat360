@@ -42,6 +42,7 @@ model User {
   ramadanRations        RamadanRationApplication[]
   orphanRegistrations   OrphanRegistration[]
   volunteerTasks        VolunteerTask[]
+  qurbaniHissaBookings  QurbaniHissaBooking[]
 
   @@index([email])
   @@index([userType])
@@ -280,14 +281,77 @@ model VolunteerTask {
 }
 
 // ============================================
-// SESSIONS (for express-session)
+// QURBANI MODULE (seasonal — Eid-ul-Adha)
 // ============================================
 
-model Session {
-  id        String   @id
-  sid       String   @unique
-  data      String   @db.Text
-  expiresAt DateTime
+// Generic key-value store for feature flags and global config.
+model SystemConfig {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+  updatedBy Int?
+}
 
-  @@index([expiresAt])
+enum QurbaniListingStatus {
+  DRAFT
+  ACTIVE
+  FULL
+  CLOSED
+}
+
+model QurbaniListing {
+  id              Int                  @id @default(autoincrement())
+  name            String?
+  weightKg        Decimal?             @db.Decimal(10, 2)
+  totalHissas     Int                  @default(7)
+  pricePerHissa   Decimal              @db.Decimal(10, 2)
+  photoUrl        String?
+  pickupDate      DateTime
+  pickupLocation  String               @db.Text
+  description     String?              @db.Text
+  status          QurbaniListingStatus @default(DRAFT)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  bookings        QurbaniHissaBooking[]
+
+  @@index([status])
+}
+
+model QurbaniHissaBooking {
+  id              Int      @id @default(autoincrement())
+  listingId       Int
+  listing         QurbaniListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  hissaCount      Int
+  dedications     String   @db.Text // JSON array: [{ hissaNumber, dedicatedTo }]
+  totalAmount     Decimal  @db.Decimal(10, 2)
+  paymentMarked   Boolean  @default(false)
+  paymentMarkedAt DateTime?
+  notes           String?  @db.Text
+
+  status          String   @default("pending") // pending, confirmed, rejected
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([listingId])
+  @@index([userId])
+  @@index([status])
+}
+
+// ============================================
+// SESSIONS (managed at runtime by express-mysql-session)
+// ============================================
+// This model mirrors the actual `sessions` table that express-mysql-session
+// auto-creates on boot. Prisma does not write to it — declared here only so
+// `prisma migrate dev` does not detect drift.
+model Session {
+  sessionId String  @id @map("session_id") @db.VarChar(128)
+  expires   Int     @db.UnsignedInt
+  data      String? @db.MediumText
+
+  @@map("sessions")
 }

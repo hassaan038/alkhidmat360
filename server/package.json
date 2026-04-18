@@ -15,15 +15,16 @@
     "db:seed": "node prisma/seed.js"
   },
   "dependencies": {
-    "express": "^4.21.2",
     "@prisma/client": "^6.2.0",
-    "prisma": "^6.2.0",
     "bcryptjs": "^2.4.3",
-    "express-session": "^1.18.1",
-    "express-mysql-session": "^3.0.3",
-    "mysql2": "^3.12.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-mysql-session": "^3.0.3",
+    "express-session": "^1.18.1",
+    "multer": "^2.1.1",
+    "mysql2": "^3.12.0",
+    "prisma": "^6.2.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

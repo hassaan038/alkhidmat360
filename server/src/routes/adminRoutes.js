@@ -1,8 +1,16 @@
 import express from 'express';
 import * as adminController from '../controllers/adminController.js';
+import * as qurbaniModuleController from '../controllers/qurbaniModuleController.js';
 import { requireAuth, requireRole } from '../middleware/authMiddleware.js';
 import { validateRequest } from '../middleware/validationMiddleware.js';
+import { uploadQurbaniPhoto } from '../middleware/uploadMiddleware.js';
 import { statusUpdateSchema, createAdminSchema } from '../validators/adminValidator.js';
+import {
+  createListingSchema,
+  updateListingSchema,
+  listingStatusUpdateSchema,
+  bookingStatusUpdateSchema,
+} from '../validators/qurbaniModuleValidator.js';
 
 const router = express.Router();
 
@@ -106,6 +114,49 @@ router.post(
   '/create-admin',
   validateRequest(createAdminSchema),
   adminController.createAdmin
+);
+
+// ============================================
+// QURBANI MODULE — LISTINGS
+// ============================================
+
+router.get('/qurbani-listings', qurbaniModuleController.adminListListings);
+
+router.post(
+  '/qurbani-listings',
+  uploadQurbaniPhoto.single('photo'),
+  validateRequest(createListingSchema),
+  qurbaniModuleController.adminCreateListing
+);
+
+router.patch(
+  '/qurbani-listings/:id',
+  uploadQurbaniPhoto.single('photo'),
+  validateRequest(updateListingSchema),
+  qurbaniModuleController.adminUpdateListing
+);
+
+router.delete(
+  '/qurbani-listings/:id',
+  qurbaniModuleController.adminDeleteListing
+);
+
+router.patch(
+  '/qurbani-listings/:id/status',
+  validateRequest(listingStatusUpdateSchema),
+  qurbaniModuleController.adminUpdateListingStatus
+);
+
+// ============================================
+// QURBANI MODULE — BOOKINGS
+// ============================================
+
+router.get('/qurbani-bookings', qurbaniModuleController.adminListBookings);
+
+router.patch(
+  '/qurbani-bookings/:id/status',
+  validateRequest(bookingStatusUpdateSchema),
+  qurbaniModuleController.adminUpdateBookingStatus
 );
 
 export default router;
