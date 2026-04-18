@@ -13,6 +13,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import qurbaniModuleRoutes from './routes/qurbaniModuleRoutes.js';
 import qurbaniSkinPickupRoutes from './routes/qurbaniSkinPickupRoutes.js';
+import fitranaRoutes from './routes/fitranaRoutes.js';
 import configRoutes from './routes/configRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -91,6 +92,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/qurbani-module', qurbaniModuleRoutes);
 app.use('/api/qurbani-skin-pickup', qurbaniSkinPickupRoutes);
+app.use('/api/fitrana', fitranaRoutes);
 app.use('/api/config', configRoutes);
 
 // ============================================

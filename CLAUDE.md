@@ -186,6 +186,12 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 | POST | `/` | uploadSkinPickupPhoto.single('housePhoto') → createSkinPickupSchema → qurbaniSkinPickupController.createPickup (multipart; photo optional, address conditionally required when no GPS coords) |
 | GET | `/me` | qurbaniSkinPickupController.getMyPickups |
 
+### `/api/fitrana` (requireAuth + requireQurbaniModuleActive — any authenticated user)
+| Method | Path | Handler |
+|--------|------|---------|
+| POST | `/` | createFitranaSchema → fitranaController.createFitrana (accepts paymentMarked: true to record + flag in one shot) |
+| GET | `/me` | fitranaController.getMyFitranas |
+
 ### `/api/config` (requireAuth)
 | Method | Path | Auth | Handler |
 |--------|------|------|---------|
@@ -231,6 +237,8 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 | PATCH | `/qurbani-bookings/:id/status` | bookingStatusUpdateSchema → qurbaniModuleController.adminUpdateBookingStatus (pending\|confirmed\|rejected) |
 | GET | `/qurbani-skin-pickups` | qurbaniSkinPickupController.adminListPickups (includes user) |
 | PATCH | `/qurbani-skin-pickups/:id/status` | skinPickupStatusUpdateSchema → qurbaniSkinPickupController.adminUpdatePickupStatus (pending\|scheduled\|collected\|cancelled) |
+| GET | `/fitrana` | fitranaController.adminListFitranas (includes user) |
+| PATCH | `/fitrana/:id/status` | fitranaStatusUpdateSchema → fitranaController.adminUpdateFitranaStatus (pending\|confirmed\|rejected) |
 
 Admin list endpoints include nested `user: { id, email, fullName, phoneNumber }`.
 
@@ -437,6 +445,24 @@ createdAt, updatedAt
 - Optional `housePhoto` uploaded via multer (`uploadSkinPickupPhoto`) to `server/uploads/skin-pickup/`; field name on multipart body is `housePhoto`. Mobile form uses `<input capture="environment">` for direct camera capture.
 - Status transitions free-form via `skinPickupStatusUpdateSchema`. UI rendered through OSM (no API key) — `osmEmbedUrl(lat,lng)` for the iframe preview, `osmLink(lat,lng)` for the "view on map" link.
 
+### Fitrana (Sadaqat al-Fitr — calculated per family member)
+```
+id, userId (FK cascade),
+numberOfPeople Int,
+calculationBasis String,        // 'wheat'|'barley'|'dates'|'raisins'|'alkhidmat'|'custom'
+amountPerPerson Decimal(10,2),  // rate at submission time (rates change yearly)
+totalAmount Decimal(10,2),      // = numberOfPeople * amountPerPerson
+contactPhone? String, notes? Text,
+paymentMarked Bool @default(false), paymentMarkedAt DateTime?,
+status String @default("pending"),  // pending, confirmed, rejected
+createdAt, updatedAt
+@@index([userId]) @@index([status])
+```
+- Religious context: traditionally tied to **Eid-ul-Fitr** (end of Ramadan), but currently gated by the same `qurbani_module_enabled` flag as the qurbani booking module (product decision — easy to split onto its own flag later).
+- `calculationBasis` is a free string (not a Prisma enum) so adding a new basis later is a code-only change.
+- 2026 PKR/person rates baked into the client (`FITRANA_BASES` in `pages/qurbani/Fitrana.jsx`): wheat 300, barley 1100, dates 1600, raisins 3800, alkhidmat 600, custom user-entered. Update annually.
+- Same deferred-write payment flow as Qurbani Booking — record only persists when user clicks "I've Paid" in the modal.
+
 ### Session (mapped to runtime express-mysql-session table — do not write from Prisma)
 ```
 sessionId String @id @map("session_id") @db.VarChar(128)
@@ -486,6 +512,7 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/user/qurbani-module` | QurbaniModule (listings grid) | DONOR, BENEFICIARY, VOLUNTEER |
 | `/dashboard/user/qurbani-bookings` | MyHissaBookings | DONOR, BENEFICIARY, VOLUNTEER |
 | `/dashboard/user/qurbani-skin-pickup` | SkinPickup (form + own list, with geolocation) | DONOR, BENEFICIARY, VOLUNTEER |
+| `/dashboard/user/fitrana` | Fitrana (calculator + deferred payment modal + own list) | DONOR, BENEFICIARY, VOLUNTEER |
 | `/dashboard/admin` | AdminDashboard | ADMIN |
 | `/dashboard/admin/users` | UserManagement | ADMIN |
 | `/dashboard/admin/donations` | DonationsManagement | ADMIN |
@@ -494,6 +521,7 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/admin/qurbani-listings` | QurbaniListings (CRUD + photo upload) | ADMIN |
 | `/dashboard/admin/qurbani-bookings` | QurbaniBookings (approve/reject) | ADMIN |
 | `/dashboard/admin/qurbani-skin-pickups` | QurbaniSkinPickups (status updates) | ADMIN |
+| `/dashboard/admin/fitrana` | AdminFitrana (confirm/reject) | ADMIN |
 | `/dashboard/admin/qurbani-settings` | QurbaniModuleSettings (toggle + bank details) | ADMIN |
 | `/dashboard/admin/create-admin` | CreateAdmin | ADMIN |
 | `*` | 404 page | — |
@@ -529,6 +557,7 @@ One file per backend resource. All import the shared `api.js` — **do not creat
 - `qurbaniModuleService.js` — listActiveListings, getListing, createBooking, markBookingPaid, getMyBookings + admin: adminListListings, adminCreateListing(FormData), adminUpdateListing(FormData), adminDeleteListing, adminUpdateListingStatus, adminListBookings, adminUpdateBookingStatus
 - `systemConfigService.js` — getQurbaniModuleFlag, updateQurbaniModuleFlag(enabled), getBankDetails, updateBankDetails(text)
 - `qurbaniSkinPickupService.js` — createSkinPickup, getMySkinPickups + admin: adminListSkinPickups, adminUpdateSkinPickupStatus
+- `fitranaService.js` — createFitrana, getMyFitranas + admin: adminListFitranas, adminUpdateFitranaStatus
 
 ### Stores (`store/`)
 - `authStore.js` — auth state (see Auth store section above)
@@ -578,11 +607,12 @@ pages/
   donor/        QurbaniDonation.jsx, RationDonation.jsx, SkinCollection.jsx, OrphanSponsorship.jsx
   beneficiary/  LoanApplication.jsx, RamadanRationApplication.jsx, OrphanRegistration.jsx
   volunteer/    VolunteerTaskRegistration.jsx
-  qurbani/      QurbaniModule.jsx (listings grid), MyHissaBookings.jsx, SkinPickup.jsx (form + own list)
+  qurbani/      QurbaniModule.jsx (listings grid), MyHissaBookings.jsx,
+                SkinPickup.jsx (form + own list), Fitrana.jsx (calculator + payment)
   admin/        UserManagement.jsx, DonationsManagement.jsx, ApplicationsManagement.jsx,
                 VolunteersManagement.jsx, CreateAdmin.jsx,
                 QurbaniListings.jsx, QurbaniBookings.jsx, QurbaniModuleSettings.jsx,
-                QurbaniSkinPickups.jsx
+                QurbaniSkinPickups.jsx, AdminFitrana.jsx
 ```
 
 ### Form pattern (all form pages)

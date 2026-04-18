@@ -44,6 +44,7 @@ model User {
   volunteerTasks        VolunteerTask[]
   qurbaniHissaBookings  QurbaniHissaBooking[]
   qurbaniSkinPickups    QurbaniSkinPickup[]
+  fitranaCollections    Fitrana[]
 
   @@index([email])
   @@index([userType])
@@ -364,6 +365,37 @@ model QurbaniSkinPickup {
   status            String    @default("pending") // pending, scheduled, collected, cancelled
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+// Fitrana (Sadaqat al-Fitr) — calculated per family member, payable
+// before Eid prayer. Traditionally tied to Eid-ul-Fitr but currently
+// gated by the same qurbani_module_enabled flag in this app.
+//
+// calculationBasis is a free string ('wheat' | 'barley' | 'dates' |
+// 'raisins' | 'alkhidmat' | 'custom') so adding new bases later does
+// not require a migration. amountPerPerson is what was used at the
+// time of submission (rates change yearly).
+model Fitrana {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  numberOfPeople  Int
+  calculationBasis String
+  amountPerPerson Decimal   @db.Decimal(10, 2)
+  totalAmount     Decimal   @db.Decimal(10, 2)
+  contactPhone    String?
+  notes           String?   @db.Text
+
+  paymentMarked   Boolean   @default(false)
+  paymentMarkedAt DateTime?
+
+  status          String    @default("pending") // pending, confirmed, rejected
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@index([userId])
   @@index([status])

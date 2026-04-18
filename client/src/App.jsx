@@ -38,6 +38,8 @@ import QurbaniModule from './pages/qurbani/QurbaniModule';
 import MyHissaBookings from './pages/qurbani/MyHissaBookings';
 import SkinPickup from './pages/qurbani/SkinPickup';
 import QurbaniSkinPickups from './pages/admin/QurbaniSkinPickups';
+import Fitrana from './pages/qurbani/Fitrana';
+import AdminFitrana from './pages/admin/AdminFitrana';
 
 // Protected Route Components
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -184,6 +186,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/dashboard/user/fitrana"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['DONOR', 'BENEFICIARY', 'VOLUNTEER']}>
+                  <Fitrana />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Protected Routes - Admin Dashboard */}
           <Route
@@ -286,6 +298,16 @@ function App() {
               <ProtectedRoute>
                 <RoleBasedRoute allowedRoles={['ADMIN']}>
                   <QurbaniSkinPickups />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/admin/fitrana"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['ADMIN']}>
+                  <AdminFitrana />
                 </RoleBasedRoute>
               </ProtectedRoute>
             }

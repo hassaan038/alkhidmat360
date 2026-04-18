@@ -20,6 +20,7 @@ import {
   ClipboardList,
   Settings,
   ListChecks,
+  HandCoins,
 } from 'lucide-react';
 
 // Qurbani items shown to non-admin users when the flag is on
@@ -42,6 +43,12 @@ const qurbaniUserItems = [
     path: '/dashboard/user/qurbani-skin-pickup',
     description: 'Free pickup of your qurbani animal skin',
   },
+  {
+    label: 'Fitrana',
+    icon: HandCoins,
+    path: '/dashboard/user/fitrana',
+    description: 'Calculate and pay sadaqat al-fitr',
+  },
 ];
 
 // Qurbani module items always shown to admin
@@ -63,6 +70,12 @@ const qurbaniAdminItems = [
     icon: Scissors,
     path: '/dashboard/admin/qurbani-skin-pickups',
     description: 'Schedule pickup requests',
+  },
+  {
+    label: 'Fitrana',
+    icon: HandCoins,
+    path: '/dashboard/admin/fitrana',
+    description: 'Review fitrana submissions',
   },
   {
     label: 'Qurbani Settings',

@@ -13,6 +13,8 @@ import {
 } from '../validators/qurbaniModuleValidator.js';
 import * as qurbaniSkinPickupController from '../controllers/qurbaniSkinPickupController.js';
 import { skinPickupStatusUpdateSchema } from '../validators/qurbaniSkinPickupValidator.js';
+import * as fitranaController from '../controllers/fitranaController.js';
+import { fitranaStatusUpdateSchema } from '../validators/fitranaValidator.js';
 
 const router = express.Router();
 
@@ -171,6 +173,18 @@ router.patch(
   '/qurbani-skin-pickups/:id/status',
   validateRequest(skinPickupStatusUpdateSchema),
   qurbaniSkinPickupController.adminUpdatePickupStatus
+);
+
+// ============================================
+// FITRANA
+// ============================================
+
+router.get('/fitrana', fitranaController.adminListFitranas);
+
+router.patch(
+  '/fitrana/:id/status',
+  validateRequest(fitranaStatusUpdateSchema),
+  fitranaController.adminUpdateFitranaStatus
 );
 
 export default router;
