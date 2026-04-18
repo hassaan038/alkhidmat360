@@ -17,17 +17,21 @@ import {
   Users,
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import SectionHeading from '../../components/ui/SectionHeading';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
+import { StatusBadge } from '../../components/ui/Badge';
+import Badge from '../../components/ui/Badge';
 import EmptyState from '../../components/common/EmptyState';
-import { SkeletonCard } from '../../components/common/Skeleton';
+import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import * as fitranaService from '../../services/fitranaService';
 import * as systemConfigService from '../../services/systemConfigService';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import PaymentScreenshotPicker from '../../components/qurbani/PaymentScreenshotPicker';
-import { cn, formatCurrency, formatDate, formatApiError, getStatusColor } from '../../lib/utils';
+import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 
 // Pakistan 2026 fitrana rates per person (PKR). Sourced from religious
 // councils + Alkhidmat Foundation. Update these annually.
@@ -94,20 +98,9 @@ function FitranaRow({ fitrana }) {
               {fitrana.numberOfPeople} people × {formatCurrency(perPerson)}
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            {fitrana.paymentMarked && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full border text-xs font-medium bg-info-light text-info-dark border-info">
-                <CheckCircle2 className="w-3 h-3" /> Paid
-              </span>
-            )}
-            <span
-              className={cn(
-                'inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-medium capitalize',
-                getStatusColor(fitrana.status)
-              )}
-            >
-              {fitrana.status}
-            </span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {fitrana.paymentMarked && <Badge variant="info" size="sm" icon={CheckCircle2}>Paid</Badge>}
+            <StatusBadge status={fitrana.status} size="sm" />
           </div>
         </div>
 
@@ -376,36 +369,28 @@ export default function Fitrana() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
-              <HandCoins className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Fitrana</h1>
-              <p className="text-gray-600 mt-1">
-                Calculate and pay Sadaqat al-Fitr for every member of your household.
-              </p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="max-w-5xl space-y-6">
+        <PageHeader
+          icon={HandCoins}
+          accent="zakat"
+          title="Fitrana"
+          description="Calculate and pay Sadaqat al-Fitr for every member of your household."
+        />
 
         {flagLoading ? (
-          <SkeletonCard />
+          <SkeletonStatCard />
         ) : moduleEnabled === false ? (
-          <FadeIn direction="up" delay={100}>
-            <EmptyState
-              title="Fitrana collection is currently closed"
-              description="Fitrana submissions open during the Eid season. Please check back closer to Eid."
-            />
-          </FadeIn>
+          <EmptyState
+            icon={HandCoins}
+            tone="zakat"
+            title="Fitrana collection is currently closed"
+            description="Fitrana submissions open during the Eid season. Please check back closer to Eid."
+          />
         ) : (
           <>
-            <FadeIn direction="up" delay={100}>
-              <Card className="shadow-medium mb-8">
+              <Card className="shadow-card">
                 <CardHeader>
-                  <CardTitle>Calculate Your Fitrana</CardTitle>
+                  <CardTitle>Calculate your fitrana</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* People */}
@@ -445,34 +430,26 @@ export default function Fitrana() {
                             type="button"
                             onClick={() => setBasisKey(b.key)}
                             className={cn(
-                              'text-left p-4 border-2 rounded-xl transition-all',
+                              'text-left p-4 border rounded-xl transition-colors duration-200 cursor-pointer',
                               active
-                                ? 'border-primary-500 bg-primary-50 shadow-glow-blue'
-                                : 'border-gray-200 hover:border-primary-200'
+                                ? 'border-zakat-500 bg-zakat-50 ring-1 ring-inset ring-zakat-200'
+                                : 'border-gray-200 hover:border-zakat-300 hover:bg-gray-50'
                             )}
                           >
                             <div className="flex items-center justify-between mb-1">
-                              <Icon
-                                className={cn(
-                                  'w-5 h-5',
-                                  active ? 'text-primary-600' : 'text-gray-500'
-                                )}
-                              />
+                              <span className={cn('flex h-8 w-8 items-center justify-center rounded-lg', active ? 'bg-zakat-100 text-zakat-700' : 'bg-gray-100 text-gray-500')}>
+                                <Icon className="w-4 h-4" />
+                              </span>
                               {b.amount != null && (
-                                <span className="text-xs font-semibold text-gray-700">
+                                <span className="text-xs font-semibold text-gray-700 tabular-nums">
                                   {formatCurrency(b.amount)}/person
                                 </span>
                               )}
                             </div>
-                            <p
-                              className={cn(
-                                'text-sm font-semibold',
-                                active ? 'text-primary-900' : 'text-gray-900'
-                              )}
-                            >
+                            <p className={cn('text-sm font-semibold mt-2', active ? 'text-zakat-700' : 'text-gray-900')}>
                               {b.label}
                             </p>
-                            <p className="text-xs text-gray-500 mt-0.5">{b.description}</p>
+                            <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{b.description}</p>
                           </button>
                         );
                       })}
@@ -525,15 +502,15 @@ export default function Fitrana() {
                   </div>
 
                   {/* Total + CTA */}
-                  <div className="bg-primary-50 border border-primary-200 rounded-lg p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div className="bg-zakat-50 border border-zakat-200 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-primary-700 font-semibold">
-                        Total Fitrana
+                      <p className="text-xs uppercase tracking-wider text-zakat-700 font-semibold">
+                        Total fitrana
                       </p>
-                      <p className="text-3xl font-bold text-primary-900">
+                      <p className="text-3xl font-bold text-zakat-700 tabular-nums">
                         {formatCurrency(totalAmount)}
                       </p>
-                      <p className="text-xs text-primary-700 mt-0.5">
+                      <p className="text-xs text-zakat-700/80 mt-0.5">
                         {numberOfPeople} people × {formatCurrency(amountPerPerson)}
                       </p>
                     </div>
@@ -542,9 +519,8 @@ export default function Fitrana() {
                       onClick={handleProceedToPayment}
                       disabled={!canProceed}
                       size="lg"
-                      className="bg-primary-600 hover:bg-primary-700 text-white"
                     >
-                      Continue to Payment
+                      Continue to payment
                     </Button>
                   </div>
 
@@ -554,32 +530,30 @@ export default function Fitrana() {
                   </p>
                 </CardContent>
               </Card>
-            </FadeIn>
 
-            {/* My submissions */}
-            <FadeIn direction="up" delay={150}>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">My Fitrana Submissions</h2>
+            <div>
+              <SectionHeading title="My fitrana submissions" description="Your fitrana history" size="md" />
               {loadingList ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <SkeletonCard />
-                  <SkeletonCard />
+                  <SkeletonStatCard />
+                  <SkeletonStatCard />
                 </div>
               ) : submissions.length === 0 ? (
                 <EmptyState
+                  icon={HandCoins}
+                  tone="zakat"
                   title="No submissions yet"
                   description="Once you complete a fitrana payment, it will appear here."
                 />
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {submissions.map((f) => (
-                    <FitranaRow key={f.id} fitrana={f} />
-                  ))}
+                  {submissions.map((f) => (<FitranaRow key={f.id} fitrana={f} />))}
                 </div>
               )}
-            </FadeIn>
+            </div>
           </>
         )}
-      </div>
+      </PageContainer>
 
       <PaymentModal
         open={paymentOpen}

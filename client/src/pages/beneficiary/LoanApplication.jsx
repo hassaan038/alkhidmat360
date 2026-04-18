@@ -3,30 +3,28 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import FormSection, { FormGrid, FormField } from '../../components/ui/FormSection';
+import Input, { Textarea, Select } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { createLoanApplication } from '../../services/applicationService';
 import { toast } from 'sonner';
-import { DollarSign, Loader2, Briefcase, GraduationCap, Stethoscope, Home, Heart, FileText } from 'lucide-react';
-import FadeIn from '../../components/animations/FadeIn';
+import {
+  DollarSign, Briefcase, GraduationCap, Stethoscope, Home, Heart, FileText,
+  User, Phone, CreditCard, Info, RotateCcw, ArrowRight, Coins, Users,
+} from 'lucide-react';
+import { cn } from '../../lib/utils';
 
-// Validation schema matching backend
 const loanApplicationSchema = z.object({
-  loanType: z.enum(['BUSINESS', 'EDUCATION', 'MEDICAL', 'HOUSING', 'MARRIAGE', 'OTHER'], {
-    required_error: 'Please select a loan type',
-  }),
+  loanType: z.enum(['BUSINESS', 'EDUCATION', 'MEDICAL', 'HOUSING', 'MARRIAGE', 'OTHER']),
   requestedAmount: z.coerce.number().positive('Requested amount must be positive'),
   monthlyIncome: z.coerce.number().nonnegative('Monthly income must be non-negative'),
-  familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member'),
-  employmentStatus: z.string().min(2).max(50, 'Employment status is required'),
-  purposeDescription: z
-    .string()
-    .min(10, 'Purpose description must be at least 10 characters'),
-  applicantName: z.string().min(2, 'Name must be at least 2 characters'),
-  applicantPhone: z
-    .string()
-    .min(11, 'Phone number must be at least 11 digits')
-    .max(15, 'Phone number must not exceed 15 digits'),
+  familyMembers: z.coerce.number().int().min(1),
+  employmentStatus: z.string().min(2).max(50),
+  purposeDescription: z.string().min(10, 'Purpose description must be at least 10 characters'),
+  applicantName: z.string().min(2),
+  applicantPhone: z.string().min(11).max(15),
   applicantCNIC: z.string().length(13, 'CNIC must be exactly 13 digits'),
   applicantAddress: z.string().min(10, 'Please provide a complete address'),
   guarantorName: z.string().min(2).optional().or(z.literal('')),
@@ -37,45 +35,40 @@ const loanApplicationSchema = z.object({
 });
 
 const loanTypes = [
-  { value: 'BUSINESS', label: 'Business Loan', icon: Briefcase },
-  { value: 'EDUCATION', label: 'Education Loan', icon: GraduationCap },
-  { value: 'MEDICAL', label: 'Medical Loan', icon: Stethoscope },
-  { value: 'HOUSING', label: 'Housing Loan', icon: Home },
-  { value: 'MARRIAGE', label: 'Marriage Loan', icon: Heart },
+  { value: 'BUSINESS', label: 'Business', icon: Briefcase },
+  { value: 'EDUCATION', label: 'Education', icon: GraduationCap },
+  { value: 'MEDICAL', label: 'Medical', icon: Stethoscope },
+  { value: 'HOUSING', label: 'Housing', icon: Home },
+  { value: 'MARRIAGE', label: 'Marriage', icon: Heart },
   { value: 'OTHER', label: 'Other', icon: FileText },
+];
+
+const infoPoints = [
+  'All loans are interest-free (Qarz-e-Hasna).',
+  'Applications are reviewed within 7–10 business days.',
+  'Document verification is required after initial review.',
+  'Repayment terms are discussed during approval.',
 ];
 
 export default function LoanApplication() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm({
+  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
     resolver: zodResolver(loanApplicationSchema),
-    defaultValues: {
-      loanType: 'BUSINESS',
-      familyMembers: 1,
-      monthlyIncome: 0,
-      requestedAmount: 0,
-    },
+    defaultValues: { loanType: 'BUSINESS', familyMembers: 1, monthlyIncome: 0, requestedAmount: 0 },
   });
-
   const selectedLoanType = watch('loanType');
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
       await createLoanApplication(data);
-      toast.success('Loan Application Submitted Successfully!', {
-        description: 'Your application will be reviewed within 7-10 business days.',
+      toast.success('Loan application submitted', {
+        description: 'Your application will be reviewed within 7–10 business days.',
       });
       reset();
     } catch (error) {
-      toast.error('Submission Failed', {
+      toast.error('Submission failed', {
         description: error.response?.data?.message || 'Please try again later',
       });
     } finally {
@@ -85,363 +78,140 @@ export default function LoanApplication() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-        {/* Page Header */}
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-md flex items-center justify-center">
-                <DollarSign className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Loan Application</h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  Apply for interest-free loan assistance
-                </p>
-              </div>
+      <PageContainer className="max-w-4xl space-y-6">
+        <PageHeader
+          icon={DollarSign}
+          accent="loan"
+          title="Loan Application"
+          description="Apply for an interest-free loan (Qarz-e-Hasna) — pick a purpose, fill the details, and submit."
+        />
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <FormSection title="Loan type" icon={Briefcase} description="What is this loan for?">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {loanTypes.map((type) => {
+                const TypeIcon = type.icon;
+                const selected = selectedLoanType === type.value;
+                return (
+                  <label
+                    key={type.value}
+                    className={cn(
+                      'relative flex cursor-pointer flex-col items-center justify-center rounded-xl border p-4 transition-colors duration-200',
+                      selected
+                        ? 'border-loan-500 bg-loan-50 ring-1 ring-inset ring-loan-200'
+                        : 'border-gray-200 hover:border-loan-300 hover:bg-gray-50'
+                    )}
+                  >
+                    <input type="radio" value={type.value} {...register('loanType')} className="sr-only" />
+                    <span
+                      className={cn(
+                        'flex h-10 w-10 items-center justify-center rounded-lg mb-2 transition-colors',
+                        selected ? 'bg-loan-100 text-loan-700' : 'bg-gray-100 text-gray-500'
+                      )}
+                    >
+                      <TypeIcon className="h-5 w-5" />
+                    </span>
+                    <span className="text-sm font-medium text-center">{type.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </FormSection>
+
+          <FormSection title="Financial information" icon={Coins}>
+            <FormGrid cols={2}>
+              <FormField label="Requested amount (PKR)" required htmlFor="ra" error={errors.requestedAmount?.message}>
+                <Input id="ra" type="number" min={0} {...register('requestedAmount')} placeholder="e.g., 50000" />
+              </FormField>
+              <FormField label="Monthly income (PKR)" required htmlFor="mi" error={errors.monthlyIncome?.message}>
+                <Input id="mi" type="number" min={0} {...register('monthlyIncome')} placeholder="e.g., 30000" />
+              </FormField>
+              <FormField label="Family members" required htmlFor="fm" error={errors.familyMembers?.message}>
+                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="e.g., 5" />
+              </FormField>
+              <FormField label="Employment status" required htmlFor="es" error={errors.employmentStatus?.message}>
+                <Select id="es" {...register('employmentStatus')}>
+                  <option value="">Select status</option>
+                  <option value="Employed">Employed</option>
+                  <option value="Self-Employed">Self-Employed</option>
+                  <option value="Unemployed">Unemployed</option>
+                  <option value="Daily Wage">Daily Wage</option>
+                  <option value="Retired">Retired</option>
+                  <option value="Student">Student</option>
+                </Select>
+              </FormField>
+              <FormField wide label="Purpose description" required htmlFor="pd" error={errors.purposeDescription?.message}>
+                <Textarea id="pd" rows={4} {...register('purposeDescription')} placeholder="Explain in detail why you need this loan and how it will be used" />
+              </FormField>
+            </FormGrid>
+          </FormSection>
+
+          <FormSection title="Applicant information" icon={User}>
+            <FormGrid cols={2}>
+              <FormField wide label="Full name" required htmlFor="an" error={errors.applicantName?.message}>
+                <Input id="an" leftIcon={User} {...register('applicantName')} placeholder="Your full name" />
+              </FormField>
+              <FormField label="Phone number" required htmlFor="ap" error={errors.applicantPhone?.message}>
+                <Input id="ap" type="tel" leftIcon={Phone} {...register('applicantPhone')} placeholder="03001234567" />
+              </FormField>
+              <FormField label="CNIC (13 digits)" required htmlFor="ac" error={errors.applicantCNIC?.message}>
+                <Input id="ac" leftIcon={CreditCard} maxLength={13} {...register('applicantCNIC')} placeholder="1234567890123" />
+              </FormField>
+              <FormField wide label="Address" required htmlFor="aa" error={errors.applicantAddress?.message}>
+                <Textarea id="aa" rows={3} {...register('applicantAddress')} placeholder="Complete residential address" />
+              </FormField>
+            </FormGrid>
+          </FormSection>
+
+          <FormSection title="Guarantor information" icon={Users} description="Optional — providing a guarantor improves your application.">
+            <FormGrid cols={2}>
+              <FormField wide label="Guarantor name" htmlFor="gn">
+                <Input id="gn" leftIcon={User} {...register('guarantorName')} placeholder="Full name" />
+              </FormField>
+              <FormField label="Guarantor phone" htmlFor="gp">
+                <Input id="gp" type="tel" leftIcon={Phone} {...register('guarantorPhone')} placeholder="03001234567" />
+              </FormField>
+              <FormField label="Guarantor CNIC" htmlFor="gc">
+                <Input id="gc" leftIcon={CreditCard} maxLength={13} {...register('guarantorCNIC')} placeholder="1234567890123" />
+              </FormField>
+              <FormField wide label="Guarantor address" htmlFor="ga">
+                <Textarea id="ga" rows={2} {...register('guarantorAddress')} placeholder="Complete residential address" />
+              </FormField>
+              <FormField wide label="Additional notes" htmlFor="add">
+                <Textarea id="add" rows={2} {...register('additionalNotes')} placeholder="Anything else you'd like to share" />
+              </FormField>
+            </FormGrid>
+          </FormSection>
+
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset()} disabled={isSubmitting}>
+              Reset
+            </Button>
+            <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
+              Submit application
+            </Button>
+          </div>
+        </form>
+
+        <div className="rounded-2xl border border-loan-100 bg-loan-50/60 p-5">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-loan-100 text-loan-700">
+              <Info className="h-4 w-4" />
+            </span>
+            <div>
+              <h4 className="text-sm font-semibold text-loan-700">Important information</h4>
+              <ul className="mt-2 space-y-1 text-xs text-loan-700/90">
+                {infoPoints.map((p) => (
+                  <li key={p} className="flex gap-2">
+                    <span className="mt-1.5 block h-1 w-1 flex-shrink-0 rounded-full bg-loan-500" />
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
-        </FadeIn>
-
-        {/* Form Card */}
-        <FadeIn direction="up" delay={150}>
-          <Card className="shadow-medium hover:shadow-large transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle>Application Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Loan Type Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Loan Type <span className="text-error">*</span>
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {loanTypes.map((type) => {
-                    const TypeIcon = type.icon;
-                    const selected = selectedLoanType === type.value;
-                    return (
-                      <label
-                        key={type.value}
-                        className={`relative flex flex-col items-center justify-center p-5 border rounded-xl cursor-pointer transition-colors duration-200 ${
-                          selected
-                            ? 'border-primary-500 bg-primary-50 ring-1 ring-inset ring-primary-200 shadow-glow-blue'
-                            : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          value={type.value}
-                          {...register('loanType')}
-                          className="sr-only"
-                        />
-                        <div
-                          className={`flex h-10 w-10 items-center justify-center rounded-lg mb-2 transition-colors ${
-                            selected ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'
-                          }`}
-                        >
-                          <TypeIcon className="h-5 w-5" />
-                        </div>
-                        <span className="text-sm font-medium text-center">{type.label}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-                {errors.loanType && (
-                  <p className="mt-1 text-sm text-error">{errors.loanType.message}</p>
-                )}
-              </div>
-
-              {/* Financial Information */}
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Financial Information
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Requested Amount (PKR) <span className="text-error">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      {...register('requestedAmount')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                      placeholder="e.g., 50000"
-                    />
-                    {errors.requestedAmount && (
-                      <p className="mt-1 text-sm text-error">{errors.requestedAmount.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Monthly Income (PKR) <span className="text-error">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      {...register('monthlyIncome')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                      placeholder="e.g., 30000"
-                    />
-                    {errors.monthlyIncome && (
-                      <p className="mt-1 text-sm text-error">{errors.monthlyIncome.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Family Members <span className="text-error">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      {...register('familyMembers')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                      placeholder="e.g., 5"
-                    />
-                    {errors.familyMembers && (
-                      <p className="mt-1 text-sm text-error">{errors.familyMembers.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Employment Status <span className="text-error">*</span>
-                    </label>
-                    <select
-                      {...register('employmentStatus')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                    >
-                      <option value="">Select status</option>
-                      <option value="Employed">Employed</option>
-                      <option value="Self-Employed">Self-Employed</option>
-                      <option value="Unemployed">Unemployed</option>
-                      <option value="Daily Wage">Daily Wage</option>
-                      <option value="Retired">Retired</option>
-                      <option value="Student">Student</option>
-                    </select>
-                    {errors.employmentStatus && (
-                      <p className="mt-1 text-sm text-error">{errors.employmentStatus.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Purpose Description <span className="text-error">*</span>
-                  </label>
-                  <textarea
-                    {...register('purposeDescription')}
-                    rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Please explain in detail why you need this loan and how it will be used"
-                  />
-                  {errors.purposeDescription && (
-                    <p className="mt-1 text-sm text-error">{errors.purposeDescription.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Applicant Information */}
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Applicant Information
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name <span className="text-error">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      {...register('applicantName')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                      placeholder="Enter your full name"
-                    />
-                    {errors.applicantName && (
-                      <p className="mt-1 text-sm text-error">{errors.applicantName.message}</p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number <span className="text-error">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        {...register('applicantPhone')}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                        placeholder="03001234567"
-                      />
-                      {errors.applicantPhone && (
-                        <p className="mt-1 text-sm text-error">{errors.applicantPhone.message}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        CNIC (13 digits) <span className="text-error">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        {...register('applicantCNIC')}
-                        maxLength={13}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                        placeholder="1234567890123"
-                      />
-                      {errors.applicantCNIC && (
-                        <p className="mt-1 text-sm text-error">{errors.applicantCNIC.message}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Address <span className="text-error">*</span>
-                    </label>
-                    <textarea
-                      {...register('applicantAddress')}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                      placeholder="Enter your complete address"
-                    />
-                    {errors.applicantAddress && (
-                      <p className="mt-1 text-sm text-error">{errors.applicantAddress.message}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Guarantor Information (Optional) */}
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Guarantor Information (Optional)
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Providing a guarantor can improve your application chances
-                </p>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Guarantor Name
-                    </label>
-                    <input
-                      type="text"
-                      {...register('guarantorName')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                      placeholder="Enter guarantor's full name"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Guarantor Phone
-                      </label>
-                      <input
-                        type="tel"
-                        {...register('guarantorPhone')}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                        placeholder="03001234567"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Guarantor CNIC
-                      </label>
-                      <input
-                        type="text"
-                        {...register('guarantorCNIC')}
-                        maxLength={13}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                        placeholder="1234567890123"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Guarantor Address
-                    </label>
-                    <textarea
-                      {...register('guarantorAddress')}
-                      rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                      placeholder="Enter guarantor's complete address"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Additional Notes
-                    </label>
-                    <textarea
-                      {...register('additionalNotes')}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors duration-150"
-                      placeholder="Any additional information you'd like to share"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex gap-3 pt-6 border-t border-gray-200">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <DollarSign className="w-4 h-4 mr-2" />
-                      Submit Application
-                    </>
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => reset()}
-                  disabled={isSubmitting}
-                  className="transition-colors duration-200"
-                >
-                  Reset
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-        </FadeIn>
-
-        {/* Info Card */}
-        <FadeIn delay={300}>
-          <Card className="mt-6 bg-primary-50 border-primary-200 shadow-sm hover:shadow-md transition-shadow duration-300">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-lg">ℹ️</span>
-              </div>
-              <div>
-                <h4 className="font-semibold text-primary-900 mb-1">Important Information</h4>
-                <ul className="text-sm text-primary-800 space-y-1">
-                  <li>• All loans are interest-free (Qarz-e-Hasna)</li>
-                  <li>• Applications are reviewed within 7-10 business days</li>
-                  <li>• Document verification will be required</li>
-                  <li>• Loan repayment terms will be discussed during approval</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        </FadeIn>
-      </div>
+        </div>
+      </PageContainer>
     </DashboardLayout>
   );
 }

@@ -16,14 +16,17 @@ import {
 } from 'lucide-react';
 import { imageUrl } from '../../lib/imageUrl';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import SectionHeading from '../../components/ui/SectionHeading';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
+import { StatusBadge } from '../../components/ui/Badge';
 import EmptyState from '../../components/common/EmptyState';
-import { SkeletonCard } from '../../components/common/Skeleton';
+import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import * as qurbaniSkinPickupService from '../../services/qurbaniSkinPickupService';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
-import { cn, formatDate, formatApiError } from '../../lib/utils';
+import { formatDate, formatApiError } from '../../lib/utils';
 
 const skinPickupSchema = z.object({
   contactPhone: z
@@ -35,27 +38,6 @@ const skinPickupSchema = z.object({
   preferredDate: z.string().optional(),
   additionalDetails: z.string().optional(),
 });
-
-const STATUS_LABELS = {
-  pending: 'Pending',
-  scheduled: 'Scheduled',
-  collected: 'Collected',
-  cancelled: 'Cancelled',
-};
-
-const STATUS_BADGE_CLASS = (status) => {
-  switch (status) {
-    case 'scheduled':
-      return 'bg-info-light text-info-dark border-info';
-    case 'collected':
-      return 'bg-success-light text-success-dark border-success';
-    case 'cancelled':
-      return 'bg-error-light text-error-dark border-error';
-    case 'pending':
-    default:
-      return 'bg-warning-light text-warning-dark border-warning';
-  }
-};
 
 function osmEmbedUrl(lat, lng) {
   const d = 0.005;
@@ -83,14 +65,7 @@ function PickupCard({ pickup }) {
               {pickup.numberOfSkins} skin{pickup.numberOfSkins > 1 ? 's' : ''}
             </p>
           </div>
-          <span
-            className={cn(
-              'inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-medium',
-              STATUS_BADGE_CLASS(pickup.status)
-            )}
-          >
-            {STATUS_LABELS[pickup.status] || pickup.status}
-          </span>
+          <StatusBadge status={pickup.status} size="sm" />
         </div>
 
         <div className="space-y-2 text-sm text-gray-700">
@@ -291,36 +266,27 @@ export default function SkinPickup() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
-              <Scissors className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Qurbani Skin Pickup</h1>
-              <p className="text-gray-600 mt-1">
-                Request a free pickup of your qurbani animal skin — proceeds support
-                Alkhidmat's relief work.
-              </p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="max-w-4xl space-y-6">
+        <PageHeader
+          icon={Scissors}
+          accent="qurbani"
+          title="Qurbani Skin Pickup"
+          description="Request a free pickup of your Qurbani animal skin — proceeds support Alkhidmat's relief work."
+        />
 
         {flagLoading ? (
-          <SkeletonCard />
+          <SkeletonStatCard />
         ) : moduleEnabled === false ? (
-          <FadeIn direction="up" delay={100}>
-            <EmptyState
-              title="Skin collection is currently closed"
-              description="Skin collection requests open during Eid-ul-Adha season. Please check back closer to the date."
-            />
-          </FadeIn>
+          <EmptyState
+            icon={Scissors}
+            tone="qurbani"
+            title="Skin collection is currently closed"
+            description="Skin collection requests open during Eid-ul-Adha season. Please check back closer to the date."
+          />
         ) : (
           <>
             {/* Form */}
-            <FadeIn direction="up" delay={100}>
-              <Card className="shadow-medium mb-8">
+              <Card className="shadow-card">
                 <CardHeader>
                   <CardTitle>New Pickup Request</CardTitle>
                 </CardHeader>
@@ -536,34 +502,30 @@ export default function SkinPickup() {
                   </form>
                 </CardContent>
               </Card>
-            </FadeIn>
 
-            {/* My pickups */}
-            <FadeIn direction="up" delay={150}>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                My Pickup Requests
-              </h2>
+            <div>
+              <SectionHeading title="My pickup requests" description="Your pickup history" size="md" />
               {loadingPickups ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <SkeletonCard />
-                  <SkeletonCard />
+                  <SkeletonStatCard />
+                  <SkeletonStatCard />
                 </div>
               ) : pickups.length === 0 ? (
                 <EmptyState
+                  icon={Scissors}
+                  tone="qurbani"
                   title="No pickup requests yet"
                   description="Once you submit a request, it will appear here."
                 />
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {pickups.map((p) => (
-                    <PickupCard key={p.id} pickup={p} />
-                  ))}
+                  {pickups.map((p) => (<PickupCard key={p.id} pickup={p} />))}
                 </div>
               )}
-            </FadeIn>
+            </div>
           </>
         )}
-      </div>
+      </PageContainer>
     </DashboardLayout>
   );
 }

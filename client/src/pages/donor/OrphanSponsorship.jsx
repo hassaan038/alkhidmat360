@@ -3,31 +3,23 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import FormSection, { FormGrid, FormField } from '../../components/ui/FormSection';
+import Input, { Textarea, Select } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { createOrphanSponsorship } from '../../services/donationService';
-import { Baby, Loader2, Heart } from 'lucide-react';
-import FadeIn from '../../components/animations/FadeIn';
+import { Baby, Heart, User, Phone, Mail, RotateCcw, ArrowRight } from 'lucide-react';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
+import { cn } from '../../lib/utils';
 
-// Validation schema matching backend
 const orphanSponsorshipSchema = z.object({
-  sponsorshipType: z
-    .string()
-    .min(2, 'Sponsorship type must be at least 2 characters')
-    .max(50, 'Sponsorship type must not exceed 50 characters'),
+  sponsorshipType: z.string().min(2).max(50),
   monthlyAmount: z.coerce.number().positive('Monthly amount must be positive'),
-  duration: z.coerce
-    .number()
-    .int()
-    .min(1, 'Duration must be at least 1 month')
-    .max(120, 'Maximum duration is 120 months (10 years)'),
+  duration: z.coerce.number().int().min(1).max(120),
   totalAmount: z.coerce.number().positive('Total amount must be positive'),
   sponsorName: z.string().min(2, 'Name must be at least 2 characters'),
-  sponsorPhone: z
-    .string()
-    .min(11, 'Phone number must be at least 11 digits')
-    .max(15, 'Phone number must not exceed 15 digits'),
+  sponsorPhone: z.string().min(11).max(15),
   sponsorEmail: z.string().email('Invalid email address'),
   sponsorAddress: z.string().min(10, 'Please provide a complete address'),
   orphanAge: z.string().optional(),
@@ -37,24 +29,17 @@ const orphanSponsorshipSchema = z.object({
 });
 
 const sponsorshipTypes = [
-  {
-    id: 'basic',
-    name: 'Basic Education Support',
-    monthlyAmount: 5000,
-    description: 'School fees, books, and basic supplies',
-  },
-  {
-    id: 'standard',
-    name: 'Standard Care Package',
-    monthlyAmount: 8000,
-    description: 'Education + clothing + monthly stipend',
-  },
-  {
-    id: 'premium',
-    name: 'Complete Care Support',
-    monthlyAmount: 12000,
-    description: 'Full support including healthcare and extras',
-  },
+  { id: 'basic', name: 'Basic Education Support', monthlyAmount: 5000, description: 'School fees, books, and basic supplies' },
+  { id: 'standard', name: 'Standard Care Package', monthlyAmount: 8000, description: 'Education + clothing + monthly stipend' },
+  { id: 'premium', name: 'Complete Care Support', monthlyAmount: 12000, description: 'Full support including healthcare and extras' },
+];
+
+const benefits = [
+  'Monthly progress reports and updates about the child',
+  'Annual comprehensive report with photos',
+  'Opportunity to write letters to the sponsored child',
+  'Full transparency on fund utilization',
+  'Tax exemption certificate provided',
 ];
 
 export default function OrphanSponsorship() {
@@ -64,22 +49,10 @@ export default function OrphanSponsorship() {
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [pendingPayload, setPendingPayload] = useState(null);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-    setValue,
-  } = useForm({
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm({
     resolver: zodResolver(orphanSponsorshipSchema),
-    defaultValues: {
-      monthlyAmount: 0,
-      duration: 12,
-      totalAmount: 0,
-    },
+    defaultValues: { monthlyAmount: 0, duration: 12, totalAmount: 0 },
   });
-
   const monthlyAmount = watch('monthlyAmount');
   const duration = watch('duration');
 
@@ -88,8 +61,7 @@ export default function OrphanSponsorship() {
     setCustomMode(false);
     setValue('sponsorshipType', type.name, { shouldValidate: true });
     setValue('monthlyAmount', type.monthlyAmount);
-    const total = type.monthlyAmount * (duration || 1);
-    setValue('totalAmount', total);
+    setValue('totalAmount', type.monthlyAmount * (duration || 1));
   };
 
   const enableCustom = () => {
@@ -98,14 +70,11 @@ export default function OrphanSponsorship() {
     setValue('sponsorshipType', '', { shouldValidate: false });
   };
 
-  // Auto-calculate total when duration changes
   const handleDurationChange = (e) => {
     const newDuration = parseInt(e.target.value) || 0;
-    const total = (monthlyAmount || 0) * newDuration;
-    setValue('totalAmount', total);
+    setValue('totalAmount', (monthlyAmount || 0) * newDuration);
   };
 
-  // Stage payload locally; payment modal handles the actual API call.
   const onSubmit = (data) => {
     // eslint-disable-next-line no-unused-vars
     const { sponsorshipType, totalAmount, sponsorAddress, ...sponsorshipData } = data;
@@ -135,369 +104,167 @@ export default function OrphanSponsorship() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-        {/* Page Header */}
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
-                <Baby className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Orphan Sponsorship</h1>
-                <p className="text-gray-600 mt-1">
-                  Sponsor an orphan child and make a lasting impact
-                </p>
-              </div>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="max-w-4xl space-y-6">
+        <PageHeader
+          icon={Baby}
+          accent="orphan"
+          title="Orphan Sponsorship"
+          description="Sponsor an orphan child monthly and receive progress updates."
+        />
 
-        {/* Form Card */}
-        <FadeIn direction="up" delay={150}>
-          <Card className="shadow-medium hover:shadow-large transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle>Sponsorship Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Sponsorship Type Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Select Sponsorship Type <span className="text-error">*</span>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <FormSection title="Pick a sponsorship tier" icon={Heart}>
+            <div className="grid grid-cols-1 gap-3">
+              {sponsorshipTypes.map((type) => (
+                <label
+                  key={type.id}
+                  className={cn(
+                    'relative flex cursor-pointer items-center justify-between gap-4 rounded-xl border p-4 transition-colors duration-200',
+                    selectedType === type.id
+                      ? 'border-orphan-500 bg-orphan-50 ring-1 ring-inset ring-orphan-200'
+                      : 'border-gray-200 hover:border-orphan-300 hover:bg-gray-50'
+                  )}
+                  onClick={() => handleTypeSelect(type)}
+                >
+                  <input type="radio" value={type.name} {...register('sponsorshipType')} className="sr-only" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-gray-900">{type.name}</p>
+                    <p className="mt-0.5 text-xs text-gray-500">{type.description}</p>
+                  </div>
+                  <p className="flex-shrink-0 text-base font-bold text-orphan-600 tabular-nums">
+                    PKR {type.monthlyAmount.toLocaleString()}<span className="text-xs font-medium text-gray-500">/mo</span>
+                  </p>
                 </label>
-                <div className="grid grid-cols-1 gap-3">
-                  {sponsorshipTypes.map((type) => (
-                    <label
-                      key={type.id}
-                      className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 hover:shadow-md ${
-                        selectedType === type.id
-                          ? 'border-primary-500 bg-primary-50 shadow-glow-blue'
-                          : 'border-gray-200 hover:border-primary-200'
-                      }`}
-                      onClick={() => handleTypeSelect(type)}
-                    >
-                      <input
-                        type="radio"
-                        value={type.name}
-                        {...register('sponsorshipType')}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="font-semibold text-gray-900">{type.name}</p>
-                          <p className="text-lg font-bold text-primary-600">
-                            PKR {type.monthlyAmount.toLocaleString()}/month
-                          </p>
-                        </div>
-                        <p className="text-sm text-gray-600">{type.description}</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-                {!customMode && (
+              ))}
+            </div>
+
+            {!customMode ? (
+              <button
+                type="button"
+                onClick={enableCustom}
+                className="mt-3 text-sm font-medium text-orphan-600 hover:text-orphan-700 underline-offset-2 hover:underline cursor-pointer"
+              >
+                None of these fit? Enter a custom tier instead.
+              </button>
+            ) : (
+              <div className="mt-4 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700">Custom sponsorship type</label>
                   <button
                     type="button"
-                    onClick={enableCustom}
-                    className="mt-3 text-sm text-primary-600 hover:text-primary-700 font-medium underline-offset-2 hover:underline"
+                    onClick={() => { setCustomMode(false); setValue('sponsorshipType', '', { shouldValidate: false }); }}
+                    className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
                   >
-                    None of these fit? Enter a custom sponsorship type instead
+                    Use a preset instead
                   </button>
-                )}
-                {customMode && (
-                  <div className="mt-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Custom sponsorship type
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setCustomMode(false);
-                          setValue('sponsorshipType', '', { shouldValidate: false });
-                        }}
-                        className="text-xs text-gray-500 hover:text-gray-700"
-                      >
-                        Use one of the packages above instead
-                      </button>
-                    </div>
-                    <input
-                      type="text"
-                      {...register('sponsorshipType')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                      placeholder="e.g., Specialized Educational Support"
-                      autoFocus
-                    />
-                    <p className="mt-1 text-xs text-gray-500">
-                      You'll set the monthly amount yourself in the next field.
-                    </p>
-                  </div>
-                )}
-                {errors.sponsorshipType && (
-                  <p className="mt-1 text-sm text-error">{errors.sponsorshipType.message}</p>
-                )}
-              </div>
-
-              {/* Amount and Duration */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monthly Amount (PKR) <span className="text-error">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    {...register('monthlyAmount')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter amount"
-                  />
-                  {errors.monthlyAmount && (
-                    <p className="mt-1 text-sm text-error">{errors.monthlyAmount.message}</p>
-                  )}
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Duration (Months) <span className="text-error">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    {...register('duration', {
-                      onChange: handleDurationChange,
-                    })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                    placeholder="e.g., 12"
-                  />
-                  {errors.duration && (
-                    <p className="mt-1 text-sm text-error">{errors.duration.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Total Amount (PKR) <span className="text-error">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    {...register('totalAmount')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 bg-gray-50"
-                    placeholder="Auto-calculated"
-                    readOnly
-                  />
-                  {errors.totalAmount && (
-                    <p className="mt-1 text-sm text-error">{errors.totalAmount.message}</p>
-                  )}
-                </div>
+                <Input {...register('sponsorshipType')} placeholder="e.g., Specialized Educational Support" autoFocus />
+                <p className="text-xs text-gray-500">Set the monthly amount manually in the next field.</p>
               </div>
+            )}
+            {errors.sponsorshipType && <p className="mt-2 text-xs text-error-dark">{errors.sponsorshipType.message}</p>}
 
-              {/* Sponsor Information */}
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Sponsor Information
-                </h3>
+            <FormGrid cols={3} className="mt-5">
+              <FormField label="Monthly (PKR)" required htmlFor="ma" error={errors.monthlyAmount?.message}>
+                <Input id="ma" type="number" min={0} {...register('monthlyAmount')} />
+              </FormField>
+              <FormField label="Duration (months)" required htmlFor="du" error={errors.duration?.message}>
+                <Input id="du" type="number" min={1} {...register('duration', { onChange: handleDurationChange })} />
+              </FormField>
+              <FormField label="Total (PKR)" required htmlFor="ta" error={errors.totalAmount?.message} hint="Auto-calculated">
+                <Input id="ta" type="number" readOnly {...register('totalAmount')} className="bg-gray-50" />
+              </FormField>
+            </FormGrid>
+          </FormSection>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name <span className="text-error">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      {...register('sponsorName')}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Enter your full name"
-                    />
-                    {errors.sponsorName && (
-                      <p className="mt-1 text-sm text-error">{errors.sponsorName.message}</p>
-                    )}
-                  </div>
+          <FormSection title="Sponsor information" icon={User}>
+            <FormGrid cols={2}>
+              <FormField wide label="Full name" required htmlFor="sn" error={errors.sponsorName?.message}>
+                <Input id="sn" leftIcon={User} {...register('sponsorName')} placeholder="Your full name" />
+              </FormField>
+              <FormField label="Phone number" required htmlFor="sp" error={errors.sponsorPhone?.message}>
+                <Input id="sp" type="tel" leftIcon={Phone} {...register('sponsorPhone')} placeholder="03001234567" />
+              </FormField>
+              <FormField label="Email address" required htmlFor="se" error={errors.sponsorEmail?.message}>
+                <Input id="se" type="email" leftIcon={Mail} {...register('sponsorEmail')} placeholder="you@example.com" />
+              </FormField>
+              <FormField wide label="Address" required htmlFor="sa" error={errors.sponsorAddress?.message}>
+                <Textarea id="sa" rows={3} {...register('sponsorAddress')} placeholder="Complete mailing address" />
+              </FormField>
+            </FormGrid>
+          </FormSection>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number <span className="text-error">*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        {...register('sponsorPhone')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                        placeholder="03001234567"
-                      />
-                      {errors.sponsorPhone && (
-                        <p className="mt-1 text-sm text-error">{errors.sponsorPhone.message}</p>
-                      )}
-                    </div>
+          <FormSection title="Orphan preferences (optional)" icon={Baby} description="Help us match you with a child.">
+            <FormGrid cols={3}>
+              <FormField label="Preferred age" htmlFor="oa">
+                <Select id="oa" {...register('orphanAge')}>
+                  <option value="">Any age</option>
+                  <option value="0-5">0–5 years</option>
+                  <option value="6-10">6–10 years</option>
+                  <option value="11-15">11–15 years</option>
+                  <option value="16-18">16–18 years</option>
+                </Select>
+              </FormField>
+              <FormField label="Preferred gender" htmlFor="og">
+                <Select id="og" {...register('orphanGender')}>
+                  <option value="">Any gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </Select>
+              </FormField>
+              <FormField label="Start date" htmlFor="sd">
+                <Input id="sd" type="date" {...register('startDate')} />
+              </FormField>
+              <FormField wide label="Additional notes" htmlFor="nt">
+                <Textarea id="nt" rows={2} {...register('notes')} placeholder="Any special message or requirement" />
+              </FormField>
+            </FormGrid>
+          </FormSection>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Email Address <span className="text-error">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        {...register('sponsorEmail')}
-                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                        placeholder="your@email.com"
-                      />
-                      {errors.sponsorEmail && (
-                        <p className="mt-1 text-sm text-error">{errors.sponsorEmail.message}</p>
-                      )}
-                    </div>
-                  </div>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => { reset(); setSelectedType(''); setCustomMode(false); }} disabled={isSubmitting}>
+              Reset
+            </Button>
+            <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
+              Continue to first payment
+            </Button>
+          </div>
+        </form>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Address <span className="text-error">*</span>
-                    </label>
-                    <textarea
-                      {...register('sponsorAddress')}
-                      rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Enter your complete address"
-                    />
-                    {errors.sponsorAddress && (
-                      <p className="mt-1 text-sm text-error">{errors.sponsorAddress.message}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Orphan Preferences (Optional)
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">
-                          Preferred Age
-                        </label>
-                        <select
-                          {...register('orphanAge')}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                        >
-                          <option value="">Any Age</option>
-                          <option value="0-5">0-5 years</option>
-                          <option value="6-10">6-10 years</option>
-                          <option value="11-15">11-15 years</option>
-                          <option value="16-18">16-18 years</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">
-                          Preferred Gender
-                        </label>
-                        <select
-                          {...register('orphanGender')}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                        >
-                          <option value="">Any Gender</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs text-gray-600 mb-1">
-                          Start Date
-                        </label>
-                        <input
-                          type="date"
-                          {...register('startDate')}
-                          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Additional Notes (Optional)
-                    </label>
-                    <textarea
-                      {...register('notes')}
-                      rows={3}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
-                      placeholder="Any special message or requirements"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex gap-3 pt-6 border-t border-gray-200">
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 hover:bg-primary-700 text-white hover:shadow-md transition-all duration-200"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Baby className="w-4 h-4 mr-2" />
-                      Continue to First Payment
-                    </>
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    reset();
-                    setSelectedType('');
-                    setCustomMode(false);
-                  }}
-                  disabled={isSubmitting}
-                  className="transition-colors duration-200"
-                >
-                  Reset
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-        </FadeIn>
-
-        {/* Info Card */}
-        <FadeIn delay={300}>
-          <Card className="mt-6 bg-primary-50 border-primary-200 shadow-sm hover:shadow-md transition-shadow duration-300">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Heart className="w-4 h-4 text-primary-600 fill-primary-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-primary-900 mb-1">What Your Sponsorship Includes</h4>
-                <ul className="text-sm text-primary-800 space-y-1">
-                  <li>• Monthly progress reports and updates about the child</li>
-                  <li>• Annual comprehensive report with photos</li>
-                  <li>• Opportunity to write letters to the sponsored child</li>
-                  <li>• Full transparency on fund utilization</li>
-                  <li>• Tax exemption certificate provided</li>
-                </ul>
-              </div>
+        <div className="rounded-2xl border border-orphan-100 bg-orphan-50/60 p-5">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-orphan-100 text-orphan-700">
+              <Heart className="h-4 w-4 fill-orphan-600" />
+            </span>
+            <div>
+              <h4 className="text-sm font-semibold text-orphan-700">What your sponsorship includes</h4>
+              <ul className="mt-2 space-y-1 text-xs text-orphan-700/90">
+                {benefits.map((b) => (
+                  <li key={b} className="flex gap-2">
+                    <span className="mt-1.5 block h-1 w-1 flex-shrink-0 rounded-full bg-orphan-500" />
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </CardContent>
-        </Card>
-        </FadeIn>
-      </div>
+          </div>
+        </div>
+      </PageContainer>
 
       <PaymentConfirmModal
         open={paymentOpen}
         onClose={() => setPaymentOpen(false)}
-        title="Complete First Month's Sponsorship"
+        title="Complete first month's sponsorship"
         totalAmount={Number(pendingPayload?.monthlyAmount) || 0}
-        summaryLabel="First Month's Payment"
+        summaryLabel="First month's payment"
         summaryHint={
           pendingPayload
-            ? `${pendingPayload.duration}-month commitment · total ${
-                Number(pendingPayload._totalCommitment || 0).toLocaleString()
-              } PKR`
+            ? `${pendingPayload.duration}-month commitment · total PKR ${Number(pendingPayload._totalCommitment || 0).toLocaleString()}`
             : undefined
         }
         onConfirmedSubmit={handlePaymentConfirmed}
         successMessage="Sponsorship recorded"
-        successDescription="Thank you for changing a life. We will reach out shortly with next steps."
+        successDescription="Thank you for changing a life. We'll reach out shortly with next steps."
       />
     </DashboardLayout>
   );

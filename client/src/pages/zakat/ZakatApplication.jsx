@@ -14,13 +14,16 @@ import {
   CreditCard,
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import SectionHeading from '../../components/ui/SectionHeading';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
+import { StatusBadge } from '../../components/ui/Badge';
 import EmptyState from '../../components/common/EmptyState';
-import { SkeletonCard } from '../../components/common/Skeleton';
+import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import * as zakatService from '../../services/zakatService';
-import { cn, formatCurrency, formatDate, formatApiError, getStatusColor } from '../../lib/utils';
+import { formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
 
 const applicationSchema = z.object({
@@ -79,14 +82,7 @@ function ApplicationCard({ application }) {
             <p className="text-xs text-gray-500">Application #{application.id}</p>
             <p className="text-lg font-semibold text-gray-900">{application.applicantName}</p>
           </div>
-          <span
-            className={cn(
-              'inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-medium capitalize',
-              getStatusColor(application.status)
-            )}
-          >
-            {application.status.replace('_', ' ')}
-          </span>
+          <StatusBadge status={application.status} size="sm" />
         </div>
 
         <div className="space-y-1.5 text-sm text-gray-700">
@@ -220,26 +216,17 @@ export default function ZakatApplication() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
-              <Coins className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Apply for Zakat</h1>
-              <p className="text-gray-600 mt-1">
-                Submit your application to be considered eligible for zakat assistance.
-                All information stays confidential.
-              </p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="max-w-4xl space-y-6">
+        <PageHeader
+          icon={Coins}
+          accent="zakat"
+          title="Apply for Zakat"
+          description="Submit your application for zakat assistance. All information stays confidential."
+        />
 
-        <FadeIn direction="up" delay={100}>
-          <Card className="shadow-medium mb-8">
+          <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>New Application</CardTitle>
+              <CardTitle>New application</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -490,30 +477,29 @@ export default function ZakatApplication() {
               </form>
             </CardContent>
           </Card>
-        </FadeIn>
 
         {/* Past applications */}
-        <FadeIn direction="up" delay={150}>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">My Applications</h2>
+        <div>
+          <SectionHeading title="My applications" description="Track the status of your requests" size="md" />
           {loadingPast ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <SkeletonCard />
-              <SkeletonCard />
+              <SkeletonStatCard />
+              <SkeletonStatCard />
             </div>
           ) : past.length === 0 ? (
             <EmptyState
+              icon={Coins}
+              tone="zakat"
               title="No applications yet"
               description="Once you submit one, it will appear here with its current status."
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {past.map((a) => (
-                <ApplicationCard key={a.id} application={a} />
-              ))}
+              {past.map((a) => (<ApplicationCard key={a.id} application={a} />))}
             </div>
           )}
-        </FadeIn>
-      </div>
+        </div>
+      </PageContainer>
     </DashboardLayout>
   );
 }
