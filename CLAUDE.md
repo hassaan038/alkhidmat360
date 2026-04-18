@@ -114,8 +114,9 @@ Module-gating middleware: `requireQurbaniModuleActive` (in `middleware/qurbaniMo
 File upload middleware (in `middleware/uploadMiddleware.js`):
 - `uploadQurbaniPhoto` — multer disk storage at `server/uploads/qurbani/`, image-only, 5 MB cap. Use as `.single('photo')`.
 - `uploadSkinPickupPhoto` — multer disk storage at `server/uploads/skin-pickup/`, image-only, 5 MB cap. Use as `.single('housePhoto')`.
+- `uploadPaymentScreenshot` — multer disk storage at `server/uploads/payments/`, image-only, 5 MB cap. Use as `.single('paymentScreenshot')`. Used by qurbani booking POST, qurbani mark-paid POST, and fitrana POST so users can optionally attach proof of bank transfer.
 
-Both must run BEFORE `validateRequest` so Zod sees text fields. Validators must use `z.coerce.number()` for numeric multipart fields.
+All must run BEFORE `validateRequest` so Zod sees text fields. Validators must use `z.coerce.number()` for numeric multipart fields, and `z.union([z.boolean(), z.string()]).transform(v => v === 'true' || v === true)` for boolean fields like `paymentMarked` (multipart sends "true"/"false" as strings).
 
 ### Utilities (`utils/`)
 
@@ -424,6 +425,7 @@ createdAt, updatedAt
 ```
 - `createBooking` runs in `prisma.$transaction` with `Prisma.TransactionIsolationLevel.Serializable`. Aggregates pending+confirmed `hissaCount`, rejects with 409 "Not enough hissas available" if overflow, auto-flips listing to FULL on capacity. P2034/serialization aborts surface as 409 "Booking conflict — please try again".
 - `createBookingSchema` accepts an optional `paymentMarked: boolean` (default false). The user-facing flow only writes the booking when the user clicks "I've Paid" in the modal — at that point the client posts `paymentMarked: true` so the slot is locked + flagged in a single transaction. Cancel/close at any point before that means **no DB write at all**.
+- Optional `paymentScreenshotUrl` captured on both POST `/bookings` (when paying inline) and POST `/bookings/:id/mark-paid` (when paying for a previously-created pending booking). Multipart field name is always `paymentScreenshot`. Stored under `/uploads/payments/<file>`.
 - Service helper `parseDedications` converts the stored JSON string back to an array on every read path so the client always gets a real array.
 - The `dedications` feature is currently disabled in the UI (always stored as `'[]'`) — column kept for backwards-compatibility with prior bookings.
 
@@ -462,6 +464,7 @@ createdAt, updatedAt
 - `calculationBasis` is a free string (not a Prisma enum) so adding a new basis later is a code-only change.
 - 2026 PKR/person rates baked into the client (`FITRANA_BASES` in `pages/qurbani/Fitrana.jsx`): wheat 300, barley 1100, dates 1600, raisins 3800, alkhidmat 600, custom user-entered. Update annually.
 - Same deferred-write payment flow as Qurbani Booking — record only persists when user clicks "I've Paid" in the modal.
+- Same optional `paymentScreenshotUrl` mechanism — multipart field `paymentScreenshot`, stored under `/uploads/payments/<file>`.
 
 ### Session (mapped to runtime express-mysql-session table — do not write from Prisma)
 ```
@@ -592,10 +595,11 @@ components/
   illustrations/
     CharacterLaptop.jsx, CharacterProfessional.jsx, CharacterWave.jsx, CharacterGroup.jsx
   qurbani/
-    AnimatedBull.jsx       — SVG bull placeholder (uses animate-float) for listings without a photo
-    ListingCard.jsx        — photo/AnimatedBull, hissa progress grid, Book CTA
-    HissaSelector.jsx      — two-step modal: pick count + notes → PaymentPanel
-    PaymentPanel.jsx       — bank details + "I've Paid" button + "you'll be notified" success state
+    AnimatedBull.jsx              — SVG bull placeholder (uses animate-float) for listings without a photo
+    ListingCard.jsx               — photo/AnimatedBull, hissa progress grid, Book CTA
+    HissaSelector.jsx             — two-step modal: pick count + notes → payment + screenshot
+    PaymentPanel.jsx              — bank details + screenshot picker + "I've Paid" + success state
+    PaymentScreenshotPicker.jsx   — reusable file picker w/ live preview, used by all 3 payment surfaces
 ```
 
 ### Pages

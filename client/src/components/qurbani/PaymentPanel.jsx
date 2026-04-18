@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { Loader2, CheckCircle2, Banknote } from 'lucide-react';
 import Button from '../ui/Button';
 import Alert from '../ui/Alert';
+import PaymentScreenshotPicker from './PaymentScreenshotPicker';
 import * as systemConfigService from '../../services/systemConfigService';
 import * as qurbaniModuleService from '../../services/qurbaniModuleService';
 import { formatCurrency, formatApiError } from '../../lib/utils';
@@ -19,6 +20,8 @@ export default function PaymentPanel({ booking, onMarkedPaid }) {
   const [loadingBank, setLoadingBank] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [marked, setMarked] = useState(!!booking?.paymentMarked);
+  const [screenshot, setScreenshot] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -47,11 +50,19 @@ export default function PaymentPanel({ booking, onMarkedPaid }) {
     setMarked(!!booking?.paymentMarked);
   }, [booking?.paymentMarked]);
 
+  const handleScreenshotChange = (file) => {
+    setScreenshot(file);
+    setScreenshotPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return file ? URL.createObjectURL(file) : null;
+    });
+  };
+
   const handleMarkPaid = async () => {
     if (!booking?.id) return;
     setSubmitting(true);
     try {
-      const res = await qurbaniModuleService.markBookingPaid(booking.id);
+      const res = await qurbaniModuleService.markBookingPaid(booking.id, screenshot);
       setMarked(true);
       toast.success('Payment marked', {
         description: 'Awaiting admin confirmation.',
@@ -106,6 +117,17 @@ export default function PaymentPanel({ booking, onMarkedPaid }) {
           </Alert>
         )}
       </div>
+
+      {/* Screenshot (optional, only when not yet marked) */}
+      {!marked && (
+        <PaymentScreenshotPicker
+          file={screenshot}
+          previewUrl={screenshotPreview}
+          onChange={handleScreenshotChange}
+          onClear={() => handleScreenshotChange(null)}
+          disabled={submitting}
+        />
+      )}
 
       {/* Action */}
       {marked ? (

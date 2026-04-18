@@ -8,7 +8,11 @@ import * as fitranaService from '../services/fitranaService.js';
 
 export const createFitrana = asyncHandler(async (req, res) => {
   const userId = req.session.userId;
-  const fitrana = await fitranaService.createFitrana(userId, req.body);
+  const payload = { ...req.body };
+  if (req.file) {
+    payload.paymentScreenshotUrl = `/uploads/payments/${req.file.filename}`;
+  }
+  const fitrana = await fitranaService.createFitrana(userId, payload);
 
   res.status(201).json(
     new ApiResponse(201, { fitrana }, 'Fitrana submission saved')

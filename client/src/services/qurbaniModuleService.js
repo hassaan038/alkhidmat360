@@ -14,13 +14,29 @@ export async function getListing(id) {
   return response.data;
 }
 
-export async function createBooking(payload) {
-  const response = await api.post('/qurbani-module/bookings', payload);
+// Accepts either a plain object payload (existing callers) or a FormData
+// instance (when a payment screenshot is attached). Both routes are
+// multipart on the server, so we always send as multipart.
+export async function createBooking(payloadOrFormData) {
+  let body = payloadOrFormData;
+  if (!(payloadOrFormData instanceof FormData)) {
+    body = new FormData();
+    Object.entries(payloadOrFormData || {}).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) body.append(k, String(v));
+    });
+  }
+  const response = await api.post('/qurbani-module/bookings', body, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return response.data;
 }
 
-export async function markBookingPaid(id) {
-  const response = await api.post(`/qurbani-module/bookings/${id}/mark-paid`);
+export async function markBookingPaid(id, screenshotFile = null) {
+  const body = new FormData();
+  if (screenshotFile) body.append('paymentScreenshot', screenshotFile);
+  const response = await api.post(`/qurbani-module/bookings/${id}/mark-paid`, body, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return response.data;
 }
 

@@ -79,7 +79,10 @@ export async function getListingById(id) {
 // USER: BOOKINGS
 // ============================================
 
-export async function createBooking(userId, { listingId, hissaCount, notes, paymentMarked = false }) {
+export async function createBooking(
+  userId,
+  { listingId, hissaCount, notes, paymentMarked = false, paymentScreenshotUrl = null }
+) {
   try {
     const booking = await prisma.$transaction(
       async (tx) => {
@@ -127,6 +130,7 @@ export async function createBooking(userId, { listingId, hissaCount, notes, paym
             notes: notes || null,
             paymentMarked,
             paymentMarkedAt: paymentMarked ? new Date() : null,
+            paymentScreenshotUrl: paymentScreenshotUrl || null,
           },
         });
 
@@ -159,7 +163,7 @@ export async function createBooking(userId, { listingId, hissaCount, notes, paym
   }
 }
 
-export async function markBookingPaid(bookingId, userId) {
+export async function markBookingPaid(bookingId, userId, paymentScreenshotUrl = null) {
   const booking = await prisma.qurbaniHissaBooking.findUnique({
     where: { id: parseInt(bookingId) },
   });
@@ -185,6 +189,7 @@ export async function markBookingPaid(bookingId, userId) {
     data: {
       paymentMarked: true,
       paymentMarkedAt: new Date(),
+      ...(paymentScreenshotUrl ? { paymentScreenshotUrl } : {}),
     },
   });
   return parseDedications(updated);

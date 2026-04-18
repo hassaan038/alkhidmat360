@@ -9,6 +9,7 @@ import { SkeletonTable } from '../../components/common/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as fitranaService from '../../services/fitranaService';
 import { cn, formatCurrency, getStatusColor, formatApiError } from '../../lib/utils';
+import { imageUrl } from '../../lib/imageUrl';
 
 const BASIS_LABEL = {
   wheat: 'Wheat',
@@ -98,6 +99,7 @@ export default function AdminFitrana() {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Per Person</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Paid?</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Screenshot</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
@@ -130,6 +132,24 @@ export default function AdminFitrana() {
                               <span className="text-success-dark font-semibold">✓</span>
                             ) : (
                               <span className="text-gray-400">✗</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            {f.paymentScreenshotUrl ? (
+                              <a
+                                href={imageUrl(f.paymentScreenshotUrl)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Click to view full size"
+                              >
+                                <img
+                                  src={imageUrl(f.paymentScreenshotUrl)}
+                                  alt="Payment"
+                                  className="w-12 h-12 object-cover rounded border border-gray-200 hover:opacity-80 transition"
+                                />
+                              </a>
+                            ) : (
+                              <span className="text-xs text-gray-400">—</span>
                             )}
                           </td>
                           <td className="px-4 py-3">

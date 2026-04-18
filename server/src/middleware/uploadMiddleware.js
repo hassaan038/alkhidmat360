@@ -10,9 +10,10 @@ const __dirname = path.dirname(__filename);
 // Resolve uploads dir: server/uploads/qurbani
 const qurbaniUploadDir = path.resolve(__dirname, '../../uploads/qurbani');
 const skinPickupUploadDir = path.resolve(__dirname, '../../uploads/skin-pickup');
+const paymentUploadDir = path.resolve(__dirname, '../../uploads/payments');
 
 // Ensure directories exist
-for (const dir of [qurbaniUploadDir, skinPickupUploadDir]) {
+for (const dir of [qurbaniUploadDir, skinPickupUploadDir, paymentUploadDir]) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -71,7 +72,31 @@ export const uploadSkinPickupPhoto = multer({
   },
 });
 
+// ============================================
+// PAYMENT SCREENSHOT UPLOAD (qurbani booking, fitrana, mark-paid)
+// ============================================
+
+const paymentStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, paymentUploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    cb(null, `payment-${uniqueSuffix}${ext}`);
+  },
+});
+
+export const uploadPaymentScreenshot = multer({
+  storage: paymentStorage,
+  fileFilter: imageFileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+});
+
 export default {
   uploadQurbaniPhoto,
   uploadSkinPickupPhoto,
+  uploadPaymentScreenshot,
 };

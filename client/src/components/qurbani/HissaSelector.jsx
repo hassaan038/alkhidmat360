@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { Loader2, X, Banknote, CheckCircle2, AlertTriangle } from 'lucide-react';
 import Button from '../ui/Button';
 import Alert from '../ui/Alert';
+import PaymentScreenshotPicker from './PaymentScreenshotPicker';
 import * as qurbaniModuleService from '../../services/qurbaniModuleService';
 import * as systemConfigService from '../../services/systemConfigService';
 import { formatCurrency, formatApiError } from '../../lib/utils';
@@ -25,6 +26,8 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
 
   const [bankDetails, setBankDetails] = useState('');
   const [loadingBank, setLoadingBank] = useState(false);
+  const [screenshot, setScreenshot] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState(null);
 
   const pricePerHissa = parseFloat(listing?.pricePerHissa ?? 0);
   const available = listing?.hissasAvailable ?? 0;
@@ -39,9 +42,24 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
       setNotes('');
       setErrorMsg('');
       setBankDetails('');
+      setScreenshot(null);
+      setScreenshotPreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
       /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [open, listing?.id]);
+
+  const handleScreenshotChange = (file) => {
+    setScreenshot(file);
+    setScreenshotPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return file ? URL.createObjectURL(file) : null;
+    });
+  };
+
+  const clearScreenshot = () => handleScreenshotChange(null);
 
   // Fetch bank details once we hit step 2
   useEffect(() => {
@@ -97,12 +115,14 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
     setErrorMsg('');
     setSubmitting(true);
     try {
-      const res = await qurbaniModuleService.createBooking({
-        listingId: listing.id,
-        hissaCount,
-        paymentMarked: true,
-        ...(notes.trim() ? { notes: notes.trim() } : {}),
-      });
+      const fd = new FormData();
+      fd.append('listingId', String(listing.id));
+      fd.append('hissaCount', String(hissaCount));
+      fd.append('paymentMarked', 'true');
+      if (notes.trim()) fd.append('notes', notes.trim());
+      if (screenshot) fd.append('paymentScreenshot', screenshot);
+
+      const res = await qurbaniModuleService.createBooking(fd);
       const created = res.data?.booking;
       toast.success('Payment marked', {
         description: 'Your hissas are reserved. You will be notified once admin confirms.',
@@ -231,6 +251,14 @@ export default function HissaSelector({ listing, open, onClose, onSubmitted }) {
                   </Alert>
                 )}
               </div>
+
+              <PaymentScreenshotPicker
+                file={screenshot}
+                previewUrl={screenshotPreview}
+                onChange={handleScreenshotChange}
+                onClear={clearScreenshot}
+                disabled={submitting}
+              />
 
               <Alert variant="warning">
                 <div className="flex items-start gap-2">

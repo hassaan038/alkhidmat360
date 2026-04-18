@@ -38,17 +38,23 @@ export const listingStatusUpdateSchema = z.object({
 // BOOKINGS (user)
 // ============================================
 
+// Coerced because the route accepts multipart (so payment screenshot can
+// optionally come along) — multipart bodies arrive as strings.
 export const createBookingSchema = z.object({
-  listingId: z
+  listingId: z.coerce
     .number({ invalid_type_error: 'listingId must be a number' })
     .int()
     .positive('listingId must be a positive integer'),
-  hissaCount: z
+  hissaCount: z.coerce
     .number({ invalid_type_error: 'hissaCount must be a number' })
     .int()
     .min(1, 'Must book at least 1 hissa')
     .max(7, 'Cannot book more than 7 hissas'),
-  paymentMarked: z.boolean().optional().default(false),
+  paymentMarked: z
+    .union([z.boolean(), z.string()])
+    .optional()
+    .default(false)
+    .transform((v) => (typeof v === 'string' ? v === 'true' : !!v)),
   notes: z.string().optional(),
 });
 

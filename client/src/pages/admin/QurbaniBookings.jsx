@@ -9,6 +9,7 @@ import { SkeletonTable } from '../../components/common/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as qurbaniModuleService from '../../services/qurbaniModuleService';
 import { cn, formatCurrency, formatDate, getStatusColor, formatApiError } from '../../lib/utils';
+import { imageUrl } from '../../lib/imageUrl';
 
 export default function QurbaniBookings() {
   const [bookings, setBookings] = useState([]);
@@ -185,21 +186,41 @@ export default function QurbaniBookings() {
                             {expanded === b.id && (
                               <tr key={`${b.id}-details`}>
                                 <td colSpan={10} className="px-4 py-4 bg-gray-50">
-                                  <div className="space-y-1 text-sm text-gray-800">
-                                    <div>
-                                      <span className="text-gray-500">Notes:</span>{' '}
-                                      {b.notes || '—'}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="space-y-1 text-sm text-gray-800">
+                                      <div>
+                                        <span className="text-gray-500">Notes:</span>{' '}
+                                        {b.notes || '—'}
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">Created:</span>{' '}
+                                        {b.createdAt
+                                          ? new Date(b.createdAt).toLocaleString()
+                                          : '—'}
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">Payment marked:</span>{' '}
+                                        {b.paymentMarked ? 'Yes' : 'No'}
+                                      </div>
                                     </div>
-                                    <div>
-                                      <span className="text-gray-500">Created:</span>{' '}
-                                      {b.createdAt
-                                        ? new Date(b.createdAt).toLocaleString()
-                                        : '—'}
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">Payment marked:</span>{' '}
-                                      {b.paymentMarked ? 'Yes' : 'No'}
-                                    </div>
+                                    {b.paymentScreenshotUrl && (
+                                      <div>
+                                        <p className="text-xs text-gray-500 mb-1">
+                                          Payment screenshot
+                                        </p>
+                                        <a
+                                          href={imageUrl(b.paymentScreenshotUrl)}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          <img
+                                            src={imageUrl(b.paymentScreenshotUrl)}
+                                            alt="Payment screenshot"
+                                            className="w-full max-w-xs h-40 object-contain rounded-lg border border-gray-200 bg-white hover:opacity-90 transition"
+                                          />
+                                        </a>
+                                      </div>
+                                    )}
                                   </div>
                                 </td>
                               </tr>

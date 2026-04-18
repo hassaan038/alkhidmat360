@@ -26,7 +26,11 @@ export const getListingDetail = asyncHandler(async (req, res) => {
 
 export const createBooking = asyncHandler(async (req, res) => {
   const userId = req.session.userId;
-  const booking = await qurbaniModuleService.createBooking(userId, req.body);
+  const payload = { ...req.body };
+  if (req.file) {
+    payload.paymentScreenshotUrl = `/uploads/payments/${req.file.filename}`;
+  }
+  const booking = await qurbaniModuleService.createBooking(userId, payload);
 
   res.status(201).json(
     new ApiResponse(201, { booking }, 'Qurbani hissa booking created successfully')
@@ -35,7 +39,12 @@ export const createBooking = asyncHandler(async (req, res) => {
 
 export const markBookingPaid = asyncHandler(async (req, res) => {
   const userId = req.session.userId;
-  const booking = await qurbaniModuleService.markBookingPaid(req.params.id, userId);
+  const screenshotUrl = req.file ? `/uploads/payments/${req.file.filename}` : null;
+  const booking = await qurbaniModuleService.markBookingPaid(
+    req.params.id,
+    userId,
+    screenshotUrl
+  );
 
   res.json(
     new ApiResponse(200, { booking }, 'Payment marked successfully')

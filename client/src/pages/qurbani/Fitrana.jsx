@@ -26,6 +26,7 @@ import { SkeletonCard } from '../../components/common/Skeleton';
 import * as fitranaService from '../../services/fitranaService';
 import * as systemConfigService from '../../services/systemConfigService';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
+import PaymentScreenshotPicker from '../../components/qurbani/PaymentScreenshotPicker';
 import { cn, formatCurrency, formatDate, formatApiError, getStatusColor } from '../../lib/utils';
 
 // Pakistan 2026 fitrana rates per person (PKR). Sourced from religious
@@ -137,6 +138,8 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
   const [loadingBank, setLoadingBank] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [screenshot, setScreenshot] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState(null);
 
   useEffect(() => {
     if (!open) return;
@@ -144,6 +147,11 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoadingBank(true);
     setErrorMsg('');
+    setScreenshot(null);
+    setScreenshotPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
     systemConfigService
       .getBankDetails()
       .then((res) => {
@@ -162,18 +170,28 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
 
   if (!open || !calculation) return null;
 
+  const handleScreenshotChange = (file) => {
+    setScreenshot(file);
+    setScreenshotPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return file ? URL.createObjectURL(file) : null;
+    });
+  };
+
   const handleMarkPaid = async () => {
     setSubmitting(true);
     setErrorMsg('');
     try {
-      const res = await fitranaService.createFitrana({
-        numberOfPeople: calculation.numberOfPeople,
-        calculationBasis: calculation.calculationBasis,
-        amountPerPerson: calculation.amountPerPerson,
-        contactPhone: calculation.contactPhone || undefined,
-        notes: calculation.notes || undefined,
-        paymentMarked: true,
-      });
+      const fd = new FormData();
+      fd.append('numberOfPeople', String(calculation.numberOfPeople));
+      fd.append('calculationBasis', calculation.calculationBasis);
+      fd.append('amountPerPerson', String(calculation.amountPerPerson));
+      if (calculation.contactPhone) fd.append('contactPhone', calculation.contactPhone);
+      if (calculation.notes) fd.append('notes', calculation.notes);
+      fd.append('paymentMarked', 'true');
+      if (screenshot) fd.append('paymentScreenshot', screenshot);
+
+      const res = await fitranaService.createFitrana(fd);
       toast.success('Payment marked', {
         description: 'Your fitrana is recorded. You will be notified once admin confirms.',
       });
@@ -231,6 +249,14 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
               <Alert variant="warning">Bank details are not configured yet. Please contact support.</Alert>
             )}
           </div>
+
+          <PaymentScreenshotPicker
+            file={screenshot}
+            previewUrl={screenshotPreview}
+            onChange={handleScreenshotChange}
+            onClear={() => handleScreenshotChange(null)}
+            disabled={submitting}
+          />
 
           <Alert variant="warning">
             <div className="flex items-start gap-2">

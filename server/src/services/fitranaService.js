@@ -15,6 +15,7 @@ export async function createFitrana(userId, data) {
     contactPhone,
     notes,
     paymentMarked = false,
+    paymentScreenshotUrl = null,
   } = data;
 
   if (!numberOfPeople || numberOfPeople < 1) {
@@ -37,6 +38,7 @@ export async function createFitrana(userId, data) {
       notes: notes || null,
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
+      paymentScreenshotUrl: paymentScreenshotUrl || null,
     },
   });
 }

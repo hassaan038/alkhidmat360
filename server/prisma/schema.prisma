@@ -333,6 +333,7 @@ model QurbaniHissaBooking {
   totalAmount     Decimal  @db.Decimal(10, 2)
   paymentMarked   Boolean  @default(false)
   paymentMarkedAt DateTime?
+  paymentScreenshotUrl String? // /uploads/payments/<file> — optional proof
   notes           String?  @db.Text
 
   status          String   @default("pending") // pending, confirmed, rejected
@@ -392,6 +393,7 @@ model Fitrana {
 
   paymentMarked   Boolean   @default(false)
   paymentMarkedAt DateTime?
+  paymentScreenshotUrl String? // /uploads/payments/<file> — optional proof
 
   status          String    @default("pending") // pending, confirmed, rejected
   createdAt       DateTime  @default(now())
