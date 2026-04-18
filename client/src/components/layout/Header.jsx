@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
-import { LogOut, User, ChevronDown, Menu, Settings as SettingsIcon, ShieldCheck, HandHeart, Heart, HandCoins } from 'lucide-react';
+import {
+  LogOut, User, ChevronDown, Menu, Settings as SettingsIcon,
+  ShieldCheck, HandHeart, Heart, HandCoins, Search,
+} from 'lucide-react';
 import { cn } from '../../lib/utils';
 import logo from '../../assets/logo.jpg';
 
@@ -23,11 +26,26 @@ function initials(name) {
     .toUpperCase();
 }
 
+// Detect platform for the ⌘/Ctrl affordance on the search shortcut pill.
+function useIsMac() {
+  const [isMac, setIsMac] = useState(false);
+  useEffect(() => {
+    if (typeof navigator !== 'undefined') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsMac(/Mac|iPad|iPhone|iPod/.test(navigator.platform));
+    }
+  }, []);
+  return isMac;
+}
+
 export default function Header({ onMenuClick }) {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const isMac = useIsMac();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -39,9 +57,33 @@ export default function Header({ onMenuClick }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // ⌘K / Ctrl+K focuses the search input. Non-functional query is intentional
+  // for now — wired up on submit to prepare for a future results page.
+  useEffect(() => {
+    function handleKey(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    }
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
   const handleLogout = async () => {
     await logout();
     navigate('/login');
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    // Placeholder behaviour — navigates the user to the dashboard with the
+    // query in the URL. Replace with a proper results page when search
+    // endpoints land.
+    const dashboardPath = user?.userType === 'ADMIN' ? '/dashboard/admin' : '/dashboard/user';
+    navigate(`${dashboardPath}?q=${encodeURIComponent(q)}`);
   };
 
   const role = roleMeta[user?.userType] || roleMeta.DONOR;
@@ -51,6 +93,7 @@ export default function Header({ onMenuClick }) {
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-gray-200">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
+          {/* Left: menu + logo */}
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={onMenuClick}
@@ -73,7 +116,46 @@ export default function Header({ onMenuClick }) {
             </Link>
           </div>
 
+          {/* Middle: search */}
+          <form
+            onSubmit={handleSearchSubmit}
+            className="hidden md:flex flex-1 max-w-md"
+            role="search"
+          >
+            <label htmlFor="header-search" className="sr-only">
+              Search
+            </label>
+            <div className="relative w-full group">
+              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 transition-colors group-focus-within:text-primary-600" />
+              <input
+                id="header-search"
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                type="search"
+                placeholder="Search donations, applications, users…"
+                className="w-full h-9 pl-9 pr-20 rounded-full border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder:text-gray-400 transition-colors focus:outline-none focus:border-primary-500 focus:bg-white focus:ring-2 focus:ring-primary-500/20"
+              />
+              <kbd
+                aria-hidden
+                className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 rounded border border-gray-200 bg-white px-1.5 py-0.5 text-[10px] font-mono text-gray-500 shadow-sm"
+              >
+                {isMac ? '⌘K' : 'Ctrl K'}
+              </kbd>
+            </div>
+          </form>
+
+          {/* Right: role + user menu */}
           <div className="flex items-center gap-2">
+            {/* Mobile search button */}
+            <button
+              onClick={() => searchInputRef.current?.focus()}
+              aria-label="Search"
+              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
             {user && (
               <span
                 className={cn(

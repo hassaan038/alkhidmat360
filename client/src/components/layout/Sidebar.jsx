@@ -26,6 +26,8 @@ import {
   HelpCircle,
 } from 'lucide-react';
 
+// `Settings` is imported only so the admin "Qurbani Settings" entry keeps its icon.
+
 // ───────────────────────── Menu definitions ─────────────────────────
 // Each item: { label, icon, path, description?, tone? }
 // Tone keys map to module accent colors; falls back to primary if omitted.
@@ -128,9 +130,7 @@ const menuSections = {
   ],
 };
 
-const commonBottom = [
-  { label: 'Settings', icon: Settings, path: '/dashboard/settings' },
-];
+// Settings lives in the header user menu; we no longer duplicate it in the sidebar.
 
 // Tone → Tailwind class mapping for active state left-bar + hover tint.
 const toneAccent = {
@@ -255,29 +255,6 @@ export default function Sidebar({ isOpen, onClose }) {
             </div>
           ))}
 
-          <div className="mt-6 pt-4 border-t border-gray-100">
-            <nav className="space-y-0.5">
-              {commonBottom.map((item) => {
-                const Icon = item.icon;
-                const active = isActive(item.path);
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => onClose()}
-                    aria-current={active ? 'page' : undefined}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer text-sm',
-                      active ? 'bg-primary-50 text-primary-700 font-semibold' : 'text-gray-700 hover:bg-gray-50'
-                    )}
-                  >
-                    <Icon className={cn('w-4 h-4', active ? 'text-primary-600' : 'text-gray-400')} />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
         </div>
 
         <div className="border-t border-gray-200 p-3">
