@@ -7,6 +7,7 @@ import Label from '../../components/ui/Label';
 import Alert from '../../components/ui/Alert';
 import { Mail, Lock, LogIn, ShieldCheck, HeartHandshake, Coins, Eye, EyeOff } from 'lucide-react';
 import logo from '../../assets/logo.jpg';
+import heroImage from '../../assets/alkhidmat_hero_image.png';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -53,28 +54,37 @@ export default function Login() {
           </div>
         </div>
 
-        <div className="relative z-10 max-w-md">
-          <h2 className="text-3xl xl:text-4xl font-bold leading-tight tracking-tight">
+        <div className="relative z-10 flex flex-col items-center text-center max-w-md mx-auto">
+          <div className="relative mb-7 w-full max-w-sm">
+            {/* Soft glow around the hero */}
+            <div className="absolute inset-0 rounded-[2rem] bg-white/10 blur-2xl" aria-hidden />
+            <div className="relative rounded-[2rem] bg-white/10 ring-1 ring-white/20 backdrop-blur-sm p-3 shadow-2xl">
+              <img
+                src={heroImage}
+                alt="Alkhidmat Foundation — serving communities in need"
+                className="w-full rounded-[1.5rem] animate-float"
+              />
+            </div>
+          </div>
+
+          <h2 className="text-2xl xl:text-3xl font-bold leading-tight tracking-tight">
             Give with intention.<br />Track every impact.
           </h2>
-          <p className="mt-4 text-primary-100 leading-relaxed">
-            A unified platform for Qurbani, Zakat, Fitrana, disaster relief, and sponsorship programs — managed end-to-end by Alkhidmat Pakistan.
+          <p className="mt-3 text-primary-100 text-sm leading-relaxed">
+            A unified platform for Qurbani, Zakat, Fitrana, disaster relief, and sponsorship — managed end-to-end by Alkhidmat Pakistan.
           </p>
 
-          <ul className="mt-8 space-y-3.5">
+          <ul className="mt-6 grid grid-cols-1 gap-2.5 w-full text-left">
             {[
-              { icon: ShieldCheck, title: 'Bank-grade payment verification', sub: 'Every donation reviewed and confirmed' },
-              { icon: HeartHandshake, title: 'Direct beneficiary impact', sub: 'Apply, get vetted, receive support' },
-              { icon: Coins, title: 'Zakat & Fitrana calculators', sub: 'Automatic nisab & annual rate tracking' },
+              { icon: ShieldCheck, title: 'Bank-grade payment verification' },
+              { icon: HeartHandshake, title: 'Direct beneficiary impact' },
+              { icon: Coins, title: 'Zakat & Fitrana calculators built-in' },
             ].map((feat) => (
-              <li key={feat.title} className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/25 backdrop-blur-sm">
-                  <feat.icon className="h-4 w-4" />
+              <li key={feat.title} className="flex items-center gap-3 rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur-sm px-3 py-2">
+                <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white/15">
+                  <feat.icon className="h-3.5 w-3.5" />
                 </span>
-                <div>
-                  <p className="text-sm font-semibold">{feat.title}</p>
-                  <p className="text-xs text-primary-100/80">{feat.sub}</p>
-                </div>
+                <p className="text-sm font-medium text-white/95">{feat.title}</p>
               </li>
             ))}
           </ul>

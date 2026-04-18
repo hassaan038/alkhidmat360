@@ -10,6 +10,7 @@ import {
   Check, Eye, EyeOff, ShieldCheck, HeartHandshake, Coins,
 } from 'lucide-react';
 import logo from '../../assets/logo.jpg';
+import heroImage from '../../assets/alkhidmat_hero_image.png';
 import { cn } from '../../lib/utils';
 
 const userTypes = [
@@ -108,23 +109,34 @@ export default function Signup() {
           </div>
         </div>
 
-        <div className="relative z-10 max-w-md">
-          <h2 className="text-3xl xl:text-4xl font-bold leading-tight tracking-tight">
+        <div className="relative z-10 flex flex-col items-center text-center max-w-md mx-auto">
+          <div className="relative mb-6 w-full max-w-[18rem]">
+            <div className="absolute inset-0 rounded-[1.75rem] bg-white/10 blur-2xl" aria-hidden />
+            <div className="relative rounded-[1.75rem] bg-white/10 ring-1 ring-white/20 backdrop-blur-sm p-2.5 shadow-2xl">
+              <img
+                src={heroImage}
+                alt="Alkhidmat Foundation"
+                className="w-full rounded-[1.25rem] animate-float"
+              />
+            </div>
+          </div>
+
+          <h2 className="text-2xl xl:text-3xl font-bold leading-tight tracking-tight">
             Join a community<br />of meaningful giving.
           </h2>
-          <p className="mt-4 text-primary-100 leading-relaxed">
-            Create an account to donate, apply for support, or volunteer. Every step is tracked, verified, and backed by Alkhidmat Pakistan's infrastructure.
+          <p className="mt-3 text-primary-100 text-sm leading-relaxed">
+            Create an account to donate, apply for support, or volunteer — every step tracked and verified by Alkhidmat Pakistan.
           </p>
 
-          <ul className="mt-8 space-y-3.5">
+          <ul className="mt-6 grid grid-cols-1 gap-2 w-full text-left">
             {[
               { icon: ShieldCheck, title: 'Verified & transparent' },
               { icon: HeartHandshake, title: 'Direct beneficiary impact' },
               { icon: Coins, title: 'Zakat & Fitrana built-in' },
             ].map((feat) => (
-              <li key={feat.title} className="flex items-center gap-3 text-sm">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/25">
-                  <feat.icon className="h-4 w-4" />
+              <li key={feat.title} className="flex items-center gap-3 rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur-sm px-3 py-2 text-sm">
+                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15">
+                  <feat.icon className="h-3.5 w-3.5" />
                 </span>
                 <span className="font-medium text-white/90">{feat.title}</span>
               </li>
