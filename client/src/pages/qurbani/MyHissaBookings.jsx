@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, Calendar, MapPin, Image as ImageIcon, X, CheckCircle2, Clock } from 'lucide-react';
+import { BookOpen, Calendar, MapPin, Image as ImageIcon, CheckCircle2, Clock } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import PageContainer from '../../components/ui/PageContainer';
 import PageHeader from '../../components/ui/PageHeader';
 import { Card, CardContent } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Badge, { StatusBadge } from '../../components/ui/Badge';
+import Modal from '../../components/ui/Modal';
 import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import PaymentPanel from '../../components/qurbani/PaymentPanel';
@@ -133,34 +134,20 @@ export default function MyHissaBookings() {
           </div>
         )}
 
-        {paymentFor && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-large w-full max-w-lg max-h-[90vh] flex flex-col">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Complete payment</h2>
-                  <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
-                    {paymentFor.listing?.name || `Booking #${paymentFor.id}`}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setPaymentFor(null)}
-                  className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors cursor-pointer"
-                  aria-label="Close payment panel"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto px-6 py-5">
-                <PaymentPanel
-                  booking={paymentFor}
-                  onMarkedPaid={() => { load(); setTimeout(() => setPaymentFor(null), 600); }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        <Modal
+          open={!!paymentFor}
+          onClose={() => setPaymentFor(null)}
+          title="Complete payment"
+          description={paymentFor?.listing?.name || (paymentFor ? `Booking #${paymentFor.id}` : undefined)}
+          size="md"
+        >
+          {paymentFor && (
+            <PaymentPanel
+              booking={paymentFor}
+              onMarkedPaid={() => { load(); setTimeout(() => setPaymentFor(null), 600); }}
+            />
+          )}
+        </Modal>
       </PageContainer>
     </DashboardLayout>
   );
