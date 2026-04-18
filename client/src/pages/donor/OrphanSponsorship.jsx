@@ -9,6 +9,7 @@ import { createOrphanSponsorship } from '../../services/donationService';
 import { toast } from 'sonner';
 import { Baby, Loader2 } from 'lucide-react';
 import FadeIn from '../../components/animations/FadeIn';
+import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 
 // Validation schema matching backend
 const orphanSponsorshipSchema = z.object({
@@ -60,6 +61,8 @@ const sponsorshipTypes = [
 export default function OrphanSponsorship() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedType, setSelectedType] = useState('');
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [pendingPayload, setPendingPayload] = useState(null);
 
   const {
     register,
@@ -95,22 +98,28 @@ export default function OrphanSponsorship() {
     setValue('totalAmount', total);
   };
 
-  const onSubmit = async (data) => {
+  // Stage payload locally; payment modal handles the actual API call.
+  const onSubmit = (data) => {
+    // eslint-disable-next-line no-unused-vars
+    const { sponsorshipType, totalAmount, sponsorAddress, ...sponsorshipData } = data;
+    setPendingPayload({ ...sponsorshipData, _totalCommitment: totalAmount });
+    setPaymentOpen(true);
+  };
+
+  const handlePaymentConfirmed = async ({ paymentMarked, paymentScreenshot }) => {
     setIsSubmitting(true);
     try {
-      // Transform data to match backend schema
-      const { sponsorshipType, totalAmount, sponsorAddress, ...sponsorshipData } = data;
-
-      await createOrphanSponsorship(sponsorshipData);
-      toast.success('Orphan Sponsorship Submitted Successfully!', {
-        description: 'Thank you for changing a life. We will contact you shortly.',
+      const fd = new FormData();
+      Object.entries(pendingPayload || {}).forEach(([k, v]) => {
+        if (k.startsWith('_')) return;
+        if (v !== undefined && v !== null && v !== '') fd.append(k, String(v));
       });
+      fd.append('paymentMarked', String(paymentMarked));
+      if (paymentScreenshot) fd.append('paymentScreenshot', paymentScreenshot);
+      await createOrphanSponsorship(fd);
       reset();
       setSelectedType('');
-    } catch (error) {
-      toast.error('Submission Failed', {
-        description: error.response?.data?.message || 'Please try again later',
-      });
+      setPendingPayload(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -391,7 +400,7 @@ export default function OrphanSponsorship() {
                   ) : (
                     <>
                       <Baby className="w-4 h-4 mr-2" />
-                      Submit Sponsorship
+                      Continue to First Payment
                     </>
                   )}
                 </Button>
@@ -436,6 +445,24 @@ export default function OrphanSponsorship() {
         </Card>
         </FadeIn>
       </div>
+
+      <PaymentConfirmModal
+        open={paymentOpen}
+        onClose={() => setPaymentOpen(false)}
+        title="Complete First Month's Sponsorship"
+        totalAmount={Number(pendingPayload?.monthlyAmount) || 0}
+        summaryLabel="First Month's Payment"
+        summaryHint={
+          pendingPayload
+            ? `${pendingPayload.duration}-month commitment · total ${
+                Number(pendingPayload._totalCommitment || 0).toLocaleString()
+              } PKR`
+            : undefined
+        }
+        onConfirmedSubmit={handlePaymentConfirmed}
+        successMessage="Sponsorship recorded"
+        successDescription="Thank you for changing a life. We will reach out shortly with next steps."
+      />
     </DashboardLayout>
   );
 }

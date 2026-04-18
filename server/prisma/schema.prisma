@@ -76,6 +76,10 @@ model QurbaniDonation {
   deliveryDate  DateTime?
   notes         String?             @db.Text
 
+  paymentMarked        Boolean   @default(false)
+  paymentMarkedAt      DateTime?
+  paymentScreenshotUrl String?
+
   status        String              @default("pending") // pending, confirmed, completed, rejected
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
@@ -95,6 +99,10 @@ model RationDonation {
   amount        Decimal  @db.Decimal(10, 2)
   rationItems   String?  @db.Text // JSON string of items if specific
   notes         String?  @db.Text
+
+  paymentMarked        Boolean   @default(false)
+  paymentMarkedAt      DateTime?
+  paymentScreenshotUrl String?
 
   status        String   @default("pending")
   createdAt     DateTime @default(now())
@@ -139,6 +147,10 @@ model OrphanSponsorship {
   orphanGender     String?  // preference: "male", "female", "any"
   startDate        DateTime?
   notes            String?  @db.Text
+
+  paymentMarked        Boolean   @default(false)
+  paymentMarkedAt      DateTime?
+  paymentScreenshotUrl String?
 
   status           String   @default("pending")
   createdAt        DateTime @default(now())

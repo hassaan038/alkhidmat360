@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Check, X, Clock } from 'lucide-react';
 import Button from '../ui/Button';
 import { toast } from 'sonner';
+import { imageUrl } from '../../lib/imageUrl';
 
 // Status badge component
 const StatusBadge = ({ status }) => {
@@ -164,6 +165,29 @@ export default function DataTable({ columns, data, onStatusUpdate, type }) {
                         {Object.entries(row).map(([key, value]) => {
                           if (key === 'id' || key === 'userId' || key === 'user' || key === 'createdAt' || key === 'updatedAt') {
                             return null;
+                          }
+                          // Special-case payment screenshot — render as clickable thumbnail
+                          if (key === 'paymentScreenshotUrl' && value) {
+                            const url = imageUrl(value);
+                            return (
+                              <div key={`${row.id}-${key}`} className="md:col-span-2">
+                                <span className="font-medium text-gray-700">
+                                  Payment Screenshot:
+                                </span>
+                                <a
+                                  href={url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="ml-2 inline-block"
+                                >
+                                  <img
+                                    src={url}
+                                    alt="Payment"
+                                    className="mt-1 w-32 h-20 object-cover rounded border border-gray-200 hover:opacity-80 transition"
+                                  />
+                                </a>
+                              </div>
+                            );
                           }
                           return (
                             <div key={`${row.id}-${key}`}>

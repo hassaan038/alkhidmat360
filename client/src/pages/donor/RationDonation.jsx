@@ -9,6 +9,7 @@ import { createRationDonation } from '../../services/donationService';
 import { toast } from 'sonner';
 import { Package, Loader2 } from 'lucide-react';
 import FadeIn from '../../components/animations/FadeIn';
+import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 
 // Validation schema matching backend
 const rationSchema = z.object({
@@ -42,6 +43,8 @@ const packageTypes = [
 export default function RationDonation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState('');
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [pendingPayload, setPendingPayload] = useState(null);
 
   const {
     register,
@@ -66,34 +69,39 @@ export default function RationDonation() {
     setValue('amount', pkg.price * (quantity || 1));
   };
 
-  const onSubmit = async (data) => {
+  // Stage payload locally; actual submission happens when user clicks
+  // "I've Paid" in the payment modal.
+  const onSubmit = (data) => {
+    const rationData = {
+      donorName: data.donorName,
+      donorEmail: data.donorEmail,
+      donorPhone: data.donorPhone,
+      amount: data.amount,
+      rationItems: JSON.stringify({
+        packageType: data.packageType,
+        quantity: data.quantity,
+        address: data.donorAddress,
+        deliveryDate: data.deliveryDate,
+      }),
+      notes: data.notes,
+    };
+    setPendingPayload(rationData);
+    setPaymentOpen(true);
+  };
+
+  const handlePaymentConfirmed = async ({ paymentMarked, paymentScreenshot }) => {
     setIsSubmitting(true);
     try {
-      // Transform data to match backend schema
-      const rationData = {
-        donorName: data.donorName,
-        donorEmail: data.donorEmail,
-        donorPhone: data.donorPhone,
-        amount: data.amount,
-        rationItems: JSON.stringify({
-          packageType: data.packageType,
-          quantity: data.quantity,
-          address: data.donorAddress,
-          deliveryDate: data.deliveryDate,
-        }),
-        notes: data.notes,
-      };
-
-      await createRationDonation(rationData);
-      toast.success('Ration Donation Submitted Successfully!', {
-        description: 'Your donation has been recorded. Thank you for your generosity.',
+      const fd = new FormData();
+      Object.entries(pendingPayload || {}).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') fd.append(k, String(v));
       });
+      fd.append('paymentMarked', String(paymentMarked));
+      if (paymentScreenshot) fd.append('paymentScreenshot', paymentScreenshot);
+      await createRationDonation(fd);
       reset();
       setSelectedPackage('');
-    } catch (error) {
-      toast.error('Submission Failed', {
-        description: error.response?.data?.message || 'Please try again later',
-      });
+      setPendingPayload(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -317,7 +325,7 @@ export default function RationDonation() {
                   ) : (
                     <>
                       <Package className="w-4 h-4 mr-2" />
-                      Submit Donation
+                      Continue to Payment
                     </>
                   )}
                 </Button>
@@ -361,6 +369,17 @@ export default function RationDonation() {
         </Card>
         </FadeIn>
       </div>
+
+      <PaymentConfirmModal
+        open={paymentOpen}
+        onClose={() => setPaymentOpen(false)}
+        title="Complete Ration Donation Payment"
+        totalAmount={Number(pendingPayload?.amount) || 0}
+        summaryLabel="Total Donation"
+        onConfirmedSubmit={handlePaymentConfirmed}
+        successMessage="Donation recorded"
+        successDescription="Thank you for your generosity. You will be notified once admin confirms."
+      />
     </DashboardLayout>
   );
 }

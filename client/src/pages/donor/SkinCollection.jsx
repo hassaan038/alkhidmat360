@@ -10,7 +10,10 @@ import { toast } from 'sonner';
 import { Scissors, Loader2 } from 'lucide-react';
 import FadeIn from '../../components/animations/FadeIn';
 
-// Validation schema matching backend
+// Validation schema matching backend.
+// NOTE: This is a free pickup service — donor is donating the skin
+// itself. No money changes hands either way; we collect the skin and
+// process it ourselves.
 const skinCollectionSchema = z.object({
   animalType: z
     .string()
@@ -21,7 +24,6 @@ const skinCollectionSchema = z.object({
     .int()
     .min(1, 'Number of skins must be at least 1')
     .max(100, 'Maximum quantity is 100'),
-  estimatedValue: z.coerce.number().positive('Estimated value must be positive'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   donorPhone: z
     .string()
@@ -33,9 +35,9 @@ const skinCollectionSchema = z.object({
 });
 
 const skinTypes = [
-  { id: 'goat', name: 'Goat Skin', estimatedValue: 1500 },
-  { id: 'cow', name: 'Cow Skin', estimatedValue: 8000 },
-  { id: 'camel', name: 'Camel Skin', estimatedValue: 15000 },
+  { id: 'goat', name: 'Goat Skin', emoji: '🐑' },
+  { id: 'cow', name: 'Cow Skin', emoji: '🐄' },
+  { id: 'camel', name: 'Camel Skin', emoji: '🐫' },
 ];
 
 export default function SkinCollection() {
@@ -47,32 +49,25 @@ export default function SkinCollection() {
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
     setValue,
   } = useForm({
     resolver: zodResolver(skinCollectionSchema),
     defaultValues: {
       numberOfSkins: 1,
-      estimatedValue: 0,
     },
   });
-
-  const numberOfSkins = watch('numberOfSkins');
 
   const handleSkinSelect = (skin) => {
     setSelectedSkin(skin.id);
     setValue('animalType', skin.name);
-    setValue('estimatedValue', skin.estimatedValue * (numberOfSkins || 1));
   };
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      // Transform data to match backend schema (remove estimatedValue)
-      const { estimatedValue, ...skinData } = data;
-      await createSkinCollection(skinData);
+      await createSkinCollection(data);
       toast.success('Skin Collection Request Submitted!', {
-        description: 'Our team will contact you for pickup arrangements.',
+        description: 'Our team will contact you to schedule the pickup. Thank you for donating.',
       });
       reset();
       setSelectedSkin('');
@@ -98,7 +93,7 @@ export default function SkinCollection() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Skin Collection</h1>
                 <p className="text-gray-600 mt-1">
-                  Schedule pickup for Qurbani animal skins
+                  Donate your Qurbani animal skin — we collect it free of cost.
                 </p>
               </div>
             </div>
@@ -136,15 +131,8 @@ export default function SkinCollection() {
                         className="sr-only"
                       />
                       <div className="text-center">
-                        <p className="text-2xl mb-2">
-                          {skin.id === 'goat' && '🐑'}
-                          {skin.id === 'cow' && '🐄'}
-                          {skin.id === 'camel' && '🐫'}
-                        </p>
+                        <p className="text-2xl mb-2">{skin.emoji}</p>
                         <p className="font-medium text-gray-900">{skin.name}</p>
-                        <p className="text-sm text-gray-600 mt-1">
-                          ~PKR {skin.estimatedValue.toLocaleString()}
-                        </p>
                       </div>
                     </label>
                   ))}
@@ -165,40 +153,21 @@ export default function SkinCollection() {
                 )}
               </div>
 
-              {/* Number of Skins and Estimated Value */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Number of Skins <span className="text-error">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    {...register('numberOfSkins')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
-                    placeholder="Enter number of skins"
-                  />
-                  {errors.numberOfSkins && (
-                    <p className="mt-1 text-sm text-error">{errors.numberOfSkins.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Estimated Value (PKR) <span className="text-error">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    {...register('estimatedValue')}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
-                    placeholder="Enter estimated value"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Market rates may vary based on quality
-                  </p>
-                  {errors.estimatedValue && (
-                    <p className="mt-1 text-sm text-error">{errors.estimatedValue.message}</p>
-                  )}
-                </div>
+              {/* Number of Skins */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Number of Skins <span className="text-error">*</span>
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  {...register('numberOfSkins')}
+                  className="w-full sm:w-48 px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:scale-[1.01] transition-all duration-200"
+                  placeholder="Enter number of skins"
+                />
+                {errors.numberOfSkins && (
+                  <p className="mt-1 text-sm text-error">{errors.numberOfSkins.message}</p>
+                )}
               </div>
 
               {/* Donor Information */}
@@ -330,12 +299,12 @@ export default function SkinCollection() {
                 <span className="text-lg">ℹ️</span>
               </div>
               <div>
-                <h4 className="font-semibold text-primary-900 mb-1">Collection Guidelines</h4>
+                <h4 className="font-semibold text-primary-900 mb-1">How Skin Collection Works</h4>
                 <ul className="text-sm text-primary-800 space-y-1">
-                  <li>• Skins should be properly salted and dried before collection</li>
-                  <li>• Our team will verify and assess the skin quality</li>
-                  <li>• Payment will be processed within 7-10 business days</li>
-                  <li>• All proceeds go towards Alkhidmat welfare programs</li>
+                  <li>• You're donating the skin itself — there's no payment either way</li>
+                  <li>• Please salt and dry the skin before our team arrives</li>
+                  <li>• We collect, process, and the proceeds fund Alkhidmat welfare programs</li>
+                  <li>• Pickup is free of charge — our team will call before arriving</li>
                 </ul>
               </div>
             </div>

@@ -8,13 +8,15 @@ const prisma = new PrismaClient();
 // ============================================
 
 export async function createQurbaniDonation(userId, donationData) {
-  const { deliveryDate, ...rest } = donationData;
+  const { deliveryDate, paymentMarked = false, ...rest } = donationData;
 
   const donation = await prisma.qurbaniDonation.create({
     data: {
       userId,
       ...rest,
       deliveryDate: deliveryDate ? new Date(deliveryDate) : null,
+      paymentMarked,
+      paymentMarkedAt: paymentMarked ? new Date() : null,
     },
   });
 
@@ -35,10 +37,13 @@ export async function getUserQurbaniDonations(userId) {
 // ============================================
 
 export async function createRationDonation(userId, donationData) {
+  const { paymentMarked = false, ...rest } = donationData;
   const donation = await prisma.rationDonation.create({
     data: {
       userId,
-      ...donationData,
+      ...rest,
+      paymentMarked,
+      paymentMarkedAt: paymentMarked ? new Date() : null,
     },
   });
 
@@ -86,13 +91,15 @@ export async function getUserSkinCollections(userId) {
 // ============================================
 
 export async function createOrphanSponsorship(userId, sponsorshipData) {
-  const { startDate, ...rest } = sponsorshipData;
+  const { startDate, paymentMarked = false, ...rest } = sponsorshipData;
 
   const sponsorship = await prisma.orphanSponsorship.create({
     data: {
       userId,
       ...rest,
       startDate: startDate ? new Date(startDate) : null,
+      paymentMarked,
+      paymentMarkedAt: paymentMarked ? new Date() : null,
     },
   });
 

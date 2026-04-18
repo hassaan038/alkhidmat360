@@ -148,14 +148,16 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 ### `/api/donations` (all require requireAuth + requireRole('DONOR'))
 | Method | Path | Handler |
 |--------|------|---------|
-| POST | `/qurbani` | qurbaniDonationSchema → donationController.createQurbaniDonation |
+| POST | `/qurbani` | uploadPaymentScreenshot.single('paymentScreenshot') → qurbaniDonationSchema → donationController.createQurbaniDonation (multipart; optional screenshot) |
 | GET | `/qurbani` | donationController.getQurbaniDonations |
-| POST | `/ration` | rationDonationSchema → donationController.createRationDonation |
+| POST | `/ration` | uploadPaymentScreenshot.single('paymentScreenshot') → rationDonationSchema → donationController.createRationDonation (multipart; optional screenshot) |
 | GET | `/ration` | donationController.getRationDonations |
-| POST | `/skin-collection` | skinCollectionSchema → donationController.createSkinCollection |
+| POST | `/skin-collection` | skinCollectionSchema → donationController.createSkinCollection (NO payment — donor donates the physical skin, free pickup) |
 | GET | `/skin-collection` | donationController.getSkinCollections |
-| POST | `/orphan-sponsorship` | orphanSponsorshipSchema → donationController.createOrphanSponsorship |
+| POST | `/orphan-sponsorship` | uploadPaymentScreenshot.single('paymentScreenshot') → orphanSponsorshipSchema → donationController.createOrphanSponsorship (multipart; optional screenshot — first month's payment) |
 | GET | `/orphan-sponsorship` | donationController.getOrphanSponsorships |
+
+All 3 paid donor endpoints follow the same deferred-write pattern: form validates locally, opens `<PaymentConfirmModal>`, only writes to DB when user clicks "I've Paid" with `paymentMarked: true`.
 
 ### `/api/applications` (all require requireAuth + requireRole('BENEFICIARY'))
 | Method | Path | Handler |
@@ -308,6 +310,7 @@ id, userId (FK cascade), animalType QurbaniAnimalType,
 quantity Int, totalAmount Decimal(10,2),
 donorName, donorPhone, donorAddress Text,
 deliveryDate DateTime?, notes Text?,
+paymentMarked Bool default false, paymentMarkedAt DateTime?, paymentScreenshotUrl? String,
 status String @default("pending"),
 createdAt, updatedAt
 @@index([userId]) @@index([status])
@@ -318,7 +321,9 @@ createdAt, updatedAt
 id, userId (FK cascade),
 donorName, donorPhone, donorEmail,
 amount Decimal(10,2), rationItems Text? (JSON string),
-notes Text?, status String @default("pending"),
+notes Text?,
+paymentMarked Bool default false, paymentMarkedAt DateTime?, paymentScreenshotUrl? String,
+status String @default("pending"),
 createdAt, updatedAt
 @@index([userId]) @@index([status])
 ```
@@ -333,6 +338,7 @@ notes Text?, status String @default("pending"),
 createdAt, updatedAt
 @@index([userId]) @@index([status])
 ```
+**No payment fields** — donor is donating the physical skin (we collect it for free, process it ourselves, and proceeds fund welfare). Form was historically misleading with an "estimated value" field; removed.
 
 ### OrphanSponsorship
 ```
@@ -340,10 +346,13 @@ id, userId (FK cascade),
 sponsorName, sponsorPhone, sponsorEmail,
 monthlyAmount Decimal(10,2), duration Int (months),
 orphanAge String?, orphanGender String?, startDate DateTime?,
-notes Text?, status String @default("pending"),
+notes Text?,
+paymentMarked Bool default false, paymentMarkedAt DateTime?, paymentScreenshotUrl? String,
+status String @default("pending"),
 createdAt, updatedAt
 @@index([userId]) @@index([status])
 ```
+Payment is for the **first month** of the sponsorship; subsequent months are handled out-of-band.
 
 ### LoanApplication
 ```
@@ -656,7 +665,12 @@ components/
     ListingCard.jsx               — photo/AnimatedBull, hissa progress grid, Book CTA
     HissaSelector.jsx             — two-step modal: pick count + notes → payment + screenshot
     PaymentPanel.jsx              — bank details + screenshot picker + "I've Paid" + success state
-    PaymentScreenshotPicker.jsx   — reusable file picker w/ live preview, used by all 3 payment surfaces
+    PaymentScreenshotPicker.jsx   — reusable file picker w/ live preview, used by all payment surfaces
+  payments/
+    PaymentConfirmModal.jsx       — generic deferred-write payment popup. Used by donor flat forms
+                                    (qurbani donation, ration, orphan sponsorship). Accepts totalAmount,
+                                    summary copy, and an onConfirmedSubmit callback that receives
+                                    { paymentMarked, paymentScreenshot }. Cancel/X = no DB write.
 ```
 
 ### Pages

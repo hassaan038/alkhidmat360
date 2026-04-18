@@ -9,6 +9,7 @@ import { createQurbaniDonation } from '../../services/donationService';
 import { toast } from 'sonner';
 import { Heart, Loader2 } from 'lucide-react';
 import FadeIn from '../../components/animations/FadeIn';
+import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 
 // Validation schema matching backend
 const qurbaniSchema = z.object({
@@ -33,6 +34,8 @@ const qurbaniSchema = z.object({
 
 export default function QurbaniDonation() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [pendingPayload, setPendingPayload] = useState(null);
 
   const {
     register,
@@ -61,18 +64,25 @@ export default function QurbaniDonation() {
     return (prices[animalType] || 0) * (quantity || 1);
   };
 
-  const onSubmit = async (data) => {
+  // Form submit only stages the payload — no DB write happens until the
+  // user clicks "I've Paid" in the payment modal.
+  const onSubmit = (data) => {
+    setPendingPayload(data);
+    setPaymentOpen(true);
+  };
+
+  const handlePaymentConfirmed = async ({ paymentMarked, paymentScreenshot }) => {
     setIsSubmitting(true);
     try {
-      await createQurbaniDonation(data);
-      toast.success('Qurbani Donation Submitted Successfully!', {
-        description: 'Your donation has been recorded. May Allah accept it.',
+      const fd = new FormData();
+      Object.entries(pendingPayload || {}).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') fd.append(k, String(v));
       });
+      fd.append('paymentMarked', String(paymentMarked));
+      if (paymentScreenshot) fd.append('paymentScreenshot', paymentScreenshot);
+      await createQurbaniDonation(fd);
       reset();
-    } catch (error) {
-      toast.error('Submission Failed', {
-        description: error.response?.data?.message || 'Please try again later',
-      });
+      setPendingPayload(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -270,7 +280,7 @@ export default function QurbaniDonation() {
                   ) : (
                     <>
                       <Heart className="w-4 h-4 mr-2" />
-                      Submit Donation
+                      Continue to Payment
                     </>
                   )}
                 </Button>
@@ -311,6 +321,22 @@ export default function QurbaniDonation() {
         </Card>
         </FadeIn>
       </div>
+
+      <PaymentConfirmModal
+        open={paymentOpen}
+        onClose={() => setPaymentOpen(false)}
+        title="Complete Qurbani Payment"
+        totalAmount={Number(pendingPayload?.totalAmount) || 0}
+        summaryLabel="Total Donation"
+        summaryHint={
+          pendingPayload
+            ? `${pendingPayload.quantity} × ${pendingPayload.animalType?.toLowerCase()}`
+            : undefined
+        }
+        onConfirmedSubmit={handlePaymentConfirmed}
+        successMessage="Donation recorded"
+        successDescription="May Allah accept it. You will be notified once admin confirms."
+      />
     </DashboardLayout>
   );
 }

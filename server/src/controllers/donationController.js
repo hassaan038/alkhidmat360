@@ -8,7 +8,11 @@ import * as donationService from '../services/donationService.js';
 
 export const createQurbaniDonation = asyncHandler(async (req, res) => {
   const userId = req.session.userId;
-  const donation = await donationService.createQurbaniDonation(userId, req.body);
+  const payload = { ...req.body };
+  if (req.file) {
+    payload.paymentScreenshotUrl = `/uploads/payments/${req.file.filename}`;
+  }
+  const donation = await donationService.createQurbaniDonation(userId, payload);
 
   res.status(201).json(
     new ApiResponse(201, { donation }, 'Qurbani donation submitted successfully')
@@ -30,7 +34,11 @@ export const getQurbaniDonations = asyncHandler(async (req, res) => {
 
 export const createRationDonation = asyncHandler(async (req, res) => {
   const userId = req.session.userId;
-  const donation = await donationService.createRationDonation(userId, req.body);
+  const payload = { ...req.body };
+  if (req.file) {
+    payload.paymentScreenshotUrl = `/uploads/payments/${req.file.filename}`;
+  }
+  const donation = await donationService.createRationDonation(userId, payload);
 
   res.status(201).json(
     new ApiResponse(201, { donation }, 'Ration donation submitted successfully')
@@ -74,7 +82,11 @@ export const getSkinCollections = asyncHandler(async (req, res) => {
 
 export const createOrphanSponsorship = asyncHandler(async (req, res) => {
   const userId = req.session.userId;
-  const sponsorship = await donationService.createOrphanSponsorship(userId, req.body);
+  const payload = { ...req.body };
+  if (req.file) {
+    payload.paymentScreenshotUrl = `/uploads/payments/${req.file.filename}`;
+  }
+  const sponsorship = await donationService.createOrphanSponsorship(userId, payload);
 
   res.status(201).json(
     new ApiResponse(201, { sponsorship }, 'Orphan sponsorship submitted successfully')
