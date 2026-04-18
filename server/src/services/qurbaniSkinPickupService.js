@@ -21,7 +21,7 @@ function buildPickupData(userId, data) {
   return {
     userId,
     contactPhone,
-    address,
+    address: (address || '').trim(),
     latitude: latitude != null ? latitude : null,
     longitude: longitude != null ? longitude : null,
     numberOfSkins,

@@ -27,7 +27,7 @@ const skinPickupSchema = z.object({
     .string()
     .min(10, 'Please enter a valid phone number')
     .max(20, 'Phone number is too long'),
-  address: z.string().min(5, 'Please provide a complete address'),
+  address: z.string().optional(),
   numberOfSkins: z.coerce.number().int().min(1, 'At least 1').max(50),
   preferredDate: z.string().optional(),
   additionalDetails: z.string().optional(),
@@ -141,6 +141,8 @@ export default function SkinPickup() {
     register,
     handleSubmit,
     reset,
+    setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(skinPickupSchema),
@@ -204,8 +206,22 @@ export default function SkinPickup() {
   };
 
   const onSubmit = async (data) => {
+    const trimmedAddress = (data.address || '').trim();
+    const hasCoords = coords != null;
+
+    if (!hasCoords && trimmedAddress.length < 5) {
+      setError('address', {
+        type: 'manual',
+        message:
+          'Please provide a complete address, or click "Use My Location" to capture coordinates instead.',
+      });
+      return;
+    }
+    clearErrors('address');
+
     const payload = {
       ...data,
+      address: trimmedAddress,
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
       preferredDate: data.preferredDate || null,
@@ -303,7 +319,14 @@ export default function SkinPickup() {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="block text-sm font-medium text-gray-700">
-                          Pickup Address <span className="text-error">*</span>
+                          Pickup Address{' '}
+                          {coords ? (
+                            <span className="text-xs text-gray-500 font-normal">
+                              (optional — location captured)
+                            </span>
+                          ) : (
+                            <span className="text-error">*</span>
+                          )}
                         </label>
                         <Button
                           type="button"
@@ -329,7 +352,11 @@ export default function SkinPickup() {
                       <textarea
                         rows={2}
                         {...register('address')}
-                        placeholder="House #, street, area, city"
+                        placeholder={
+                          coords
+                            ? 'You can leave this blank or add a landmark / flat number'
+                            : 'House #, street, area, city'
+                        }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                       {errors.address && (
