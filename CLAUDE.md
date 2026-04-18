@@ -74,22 +74,26 @@ express-mysql-session (MySQLStore, parses DATABASE_URL, auto-creates `sessions` 
 express-session (name: SESSION_NAME, maxAge: 24h, httpOnly, secure in prod, sameSite: lax)
 
 GET  /                     → health check
+GET  /uploads/*            → express.static(server/uploads)  (qurbani photos)
 POST /api/auth/*           → authRoutes
 /api/donations/*           → donationRoutes
 /api/applications/*        → applicationRoutes
 /api/volunteers/*          → volunteerRoutes
 /api/admin/*               → adminRoutes
 /api/users/*               → userRoutes
+/api/qurbani-module/*      → qurbaniModuleRoutes  (seasonal, flag-gated)
+/api/config/*              → configRoutes         (system flags + bank details)
 
 404 handler → { success: false, message: 'Route not found' }
-Global error handler → { success: false, message, stack? (dev only) }
+Global error handler → { success: false, message, errors?, stack? (dev only) }
+  — propagates ApiError.errors[] (Zod validation field errors) to the client
 ```
 
 ### Sessions (critical)
 
 Auth is **session-cookie**, not JWT. Login stores `req.session.userId` (Int) and `req.session.user` (object with `userType`). Both are read by middleware — always set both.
 
-`express-mysql-session` auto-creates the `sessions` table; the Prisma `Session` model in `schema.prisma` is a schema artifact **not used** by the runtime store.
+`express-mysql-session` auto-creates the `sessions` table at boot. The Prisma `Session` model is mapped to that real table via `@@map("sessions")` (columns `session_id`, `expires`, `data`) so `prisma migrate dev` no longer detects drift. Prisma never writes to it — runtime store is sole owner. Migration `20260418150000_align_sessions_with_runtime` dropped the unused PascalCase `Session` table from the init migration and registered the runtime table idempotently.
 
 The client sends `withCredentials: true`; CORS must stay `credentials: true` with a specific origin (never wildcard).
 
@@ -104,6 +108,10 @@ Cookie name: `alkhidmat_sid` (from SESSION_NAME env). Logout calls `req.session.
 | `requireAdmin` | `req.session.user.userType === 'ADMIN'` | 403 |
 
 Validation middleware: `validateRequest(zodSchema)` (in `middleware/validationMiddleware.js`).
+
+Module-gating middleware: `requireQurbaniModuleActive` (in `middleware/qurbaniModuleMiddleware.js`) — reads SystemConfig key `qurbani_module_enabled`, throws 403 unless `'true'` (admins bypass).
+
+File upload middleware: `uploadQurbaniPhoto` (in `middleware/uploadMiddleware.js`) — multer disk storage at `server/uploads/qurbani/`, image-only, 5 MB cap, unique filename. Use as `.single('photo')` BEFORE `validateRequest` so the body fields exist.
 
 ### Utilities (`utils/`)
 
@@ -159,6 +167,23 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 | POST | `/task` | volunteerTaskSchema → volunteerController.createVolunteerTask |
 | GET | `/task` | volunteerController.getVolunteerTasks |
 
+### `/api/qurbani-module` (requireAuth + requireQurbaniModuleActive — any authenticated user)
+| Method | Path | Handler |
+|--------|------|---------|
+| GET | `/listings` | qurbaniModuleController.getActiveListings (only ACTIVE; includes hissasBooked, hissasAvailable) |
+| GET | `/listings/:id` | qurbaniModuleController.getListingDetail |
+| POST | `/bookings` | createBookingSchema → qurbaniModuleController.createBooking (transactional, 409 on overflow) |
+| POST | `/bookings/:id/mark-paid` | qurbaniModuleController.markBookingPaid |
+| GET | `/bookings/me` | qurbaniModuleController.getMyBookings (includes nested listing) |
+
+### `/api/config` (requireAuth)
+| Method | Path | Auth | Handler |
+|--------|------|------|---------|
+| GET | `/qurbani-module` | requireAuth | systemConfigController.getQurbaniModuleFlag → `{ enabled: boolean }` |
+| PATCH | `/qurbani-module` | + requireRole('ADMIN') | moduleToggleSchema → systemConfigController.updateQurbaniModuleFlag |
+| GET | `/bank-details` | requireAuth | systemConfigController.getBankDetails → `{ bankDetails: string }` |
+| PATCH | `/bank-details` | + requireRole('ADMIN') | bankDetailsSchema → systemConfigController.updateBankDetails |
+
 ### `/api/users` (requireAuth; user-type-filtered responses)
 | Method | Path | Handler |
 |--------|------|---------|
@@ -187,6 +212,13 @@ Client interceptor (in `api.js`) rejects with `{ message, errors, status }` — 
 | GET | `/volunteers/tasks` | adminController.getVolunteerTasks |
 | GET | `/volunteers` | adminController.getVolunteers |
 | PATCH | `/volunteers/tasks/:id/status` | statusUpdateSchema → adminController.updateVolunteerTaskStatus |
+| GET | `/qurbani-listings` | qurbaniModuleController.adminListListings (with computed booked/available) |
+| POST | `/qurbani-listings` | uploadQurbaniPhoto.single('photo') → createListingSchema → qurbaniModuleController.adminCreateListing (multipart; auto-names "Bull #N" if name omitted) |
+| PATCH | `/qurbani-listings/:id` | uploadQurbaniPhoto.single('photo') → updateListingSchema → qurbaniModuleController.adminUpdateListing |
+| DELETE | `/qurbani-listings/:id` | qurbaniModuleController.adminDeleteListing (409 if listing has bookings) |
+| PATCH | `/qurbani-listings/:id/status` | listingStatusUpdateSchema → qurbaniModuleController.adminUpdateListingStatus (DRAFT↔ACTIVE, ACTIVE→FULL/CLOSED, FULL→CLOSED) |
+| GET | `/qurbani-bookings` | qurbaniModuleController.adminListBookings (includes user + listing) |
+| PATCH | `/qurbani-bookings/:id/status` | bookingStatusUpdateSchema → qurbaniModuleController.adminUpdateBookingStatus (pending\|confirmed\|rejected) |
 
 Admin list endpoints include nested `user: { id, email, fullName, phoneNumber }`.
 
@@ -199,19 +231,23 @@ Schema file: `server/prisma/schema.prisma`
 ### Enums
 
 ```prisma
-enum UserType         { DONOR, BENEFICIARY, VOLUNTEER, ADMIN }
-enum QurbaniAnimalType { GOAT, COW, CAMEL }
-enum LoanType         { INTEREST_FREE, BUSINESS, EDUCATION, MEDICAL, HOUSING }
-enum TaskCategory     { DISTRIBUTION, FUNDRAISING, AWARENESS, ADMINISTRATIVE, FIELD_WORK, EVENT_SUPPORT }
+enum UserType            { DONOR, BENEFICIARY, VOLUNTEER, ADMIN }
+enum QurbaniAnimalType   { GOAT, COW, CAMEL }
+enum LoanType            { INTEREST_FREE, BUSINESS, EDUCATION, MEDICAL, HOUSING }
+enum TaskCategory        { DISTRIBUTION, FUNDRAISING, AWARENESS, ADMINISTRATIVE, FIELD_WORK, EVENT_SUPPORT }
+enum QurbaniListingStatus { DRAFT, ACTIVE, FULL, CLOSED }
 ```
 
 Note: `loanApplicationSchema` in the validator also allows `MARRIAGE` and `OTHER` as string values (not in enum — keep in sync if you add them to Prisma).
+
+Note: `qurbaniDonationSchema` (the flat donation form) restricts `animalType` to `['GOAT', 'CAMEL']` only — `COW` is intentionally rejected at the validator level so all bull-share donations go through the new Qurbani module instead. The Prisma enum still includes COW for legacy data and the new module's listings.
 
 ### Status values (String field, not enum)
 All form models use a `status String @default("pending")`:
 - Donations: `pending`, `confirmed`, `completed`, `rejected`
 - Applications: `pending`, `under_review`, `approved`, `rejected`
 - Volunteer tasks: `pending`, `approved`, `rejected`
+- Qurbani hissa bookings: `pending`, `confirmed`, `rejected` (controlled via `bookingStatusUpdateSchema`)
 - Controlled via `statusUpdateSchema`: enum `['pending','approved','rejected','confirmed','completed','under_review']`
 
 ### User model
@@ -228,7 +264,7 @@ createdAt   DateTime  @default(now())
 updatedAt   DateTime  @updatedAt
 -- relations: qurbaniDonations[], rationDonations[], skinCollections[],
              orphanSponsorships[], loanApplications[], ramadanRations[],
-             orphanRegistrations[], volunteerTasks[]
+             orphanRegistrations[], volunteerTasks[], qurbaniHissaBookings[]
 @@index([email]) @@index([userType])
 ```
 
@@ -332,10 +368,50 @@ createdAt, updatedAt
 @@index([userId]) @@index([status]) @@index([taskCategory])
 ```
 
-### Session (runtime store — do not modify)
+### SystemConfig (key-value flag/setting store)
 ```
-id String @id, sid String @unique, data Text, expiresAt DateTime
-@@index([expiresAt])
+id Int, key String @unique, value Text, updatedAt, updatedBy Int?
+```
+Used keys: `qurbani_module_enabled` ("true"/"false"), `qurbani_bank_details` (free text shown on PaymentPanel).
+
+### QurbaniListing (admin-managed bull listings — seasonal)
+```
+id, name?, weightKg Decimal?,
+totalHissas Int @default(7),
+pricePerHissa Decimal,
+photoUrl? (path served from /uploads/qurbani/<filename>),
+pickupDate DateTime, pickupLocation Text,
+description? Text,
+status QurbaniListingStatus @default(DRAFT),
+createdAt, updatedAt
+@@index([status])
+```
+- Service auto-names "Bull #N" (count+1) on create when `name` is omitted.
+- Admin form sends ESTIMATED bull price; client divides by 7 to compute pricePerHissa.
+- Status transitions enforced by `updateListingStatus`: DRAFT↔ACTIVE, ACTIVE→FULL/CLOSED, FULL→CLOSED.
+- Auto-flips DRAFT→FULL via service when bookings fill the listing.
+
+### QurbaniHissaBooking (per-user hissa booking against a listing)
+```
+id, listingId (FK cascade), userId (FK cascade),
+hissaCount Int, dedications Text (JSON; currently always '[]'),
+totalAmount Decimal,
+paymentMarked Bool @default(false), paymentMarkedAt DateTime?,
+notes? Text,
+status String @default("pending"),  // pending, confirmed, rejected
+createdAt, updatedAt
+@@index([listingId]) @@index([userId]) @@index([status])
+```
+- `createBooking` runs in `prisma.$transaction` with `Prisma.TransactionIsolationLevel.Serializable`. Aggregates pending+confirmed `hissaCount`, rejects with 409 "Not enough hissas available" if overflow, auto-flips listing to FULL on capacity. P2034/serialization aborts surface as 409 "Booking conflict — please try again".
+- Service helper `parseDedications` converts the stored JSON string back to an array on every read path so the client always gets a real array.
+- The `dedications` feature is currently disabled in the UI (always stored as `'[]'`) — column kept for backwards-compatibility with prior bookings.
+
+### Session (mapped to runtime express-mysql-session table — do not write from Prisma)
+```
+sessionId String @id @map("session_id") @db.VarChar(128)
+expires   Int    @db.UnsignedInt
+data      String? @db.MediumText
+@@map("sessions")
 ```
 
 ### Adding a new form type — checklist
@@ -347,6 +423,13 @@ id String @id, sid String @unique, data Text, expiresAt DateTime
 6. Add admin get + status-update endpoints to `adminRoutes.js` / `adminController.js` / `adminService.js`
 7. Surface counts in `adminService.getDashboardStats()` and `userService.getUserDashboardStats()`
 8. Add frontend service functions, page, route in `App.jsx`, sidebar link
+
+### Adding a feature flag (SystemConfig pattern)
+1. Pick a stable key (e.g. `feature_x_enabled`), default to `'false'`.
+2. Read via `systemConfigService.getConfig(key, 'false')`; write via `setConfig(key, value, userId)`.
+3. Expose GET (authed) + PATCH (admin) under `/api/config/<feature>` in `routes/configRoutes.js`.
+4. If the flag gates entire routes, write a middleware modeled on `requireQurbaniModuleActive` (admin bypass).
+5. Client: add a getter to `services/systemConfigService.js`, fetch once via a Zustand store, conditionally render sidebar links + show "module inactive" empty state on direct navigation.
 
 ---
 
@@ -369,13 +452,20 @@ Single source of truth for routes. Every protected route: `<ProtectedRoute>` →
 | `/dashboard/user/ramadan-ration` | RamadanRationApplication | BENEFICIARY |
 | `/dashboard/user/orphan` | OrphanRegistration | BENEFICIARY |
 | `/dashboard/user/volunteer-task` | VolunteerTaskRegistration | VOLUNTEER |
+| `/dashboard/user/qurbani-module` | QurbaniModule (listings grid) | DONOR, BENEFICIARY, VOLUNTEER |
+| `/dashboard/user/qurbani-bookings` | MyHissaBookings | DONOR, BENEFICIARY, VOLUNTEER |
 | `/dashboard/admin` | AdminDashboard | ADMIN |
 | `/dashboard/admin/users` | UserManagement | ADMIN |
 | `/dashboard/admin/donations` | DonationsManagement | ADMIN |
 | `/dashboard/admin/applications` | ApplicationsManagement | ADMIN |
 | `/dashboard/admin/volunteers` | VolunteersManagement | ADMIN |
+| `/dashboard/admin/qurbani-listings` | QurbaniListings (CRUD + photo upload) | ADMIN |
+| `/dashboard/admin/qurbani-bookings` | QurbaniBookings (approve/reject) | ADMIN |
+| `/dashboard/admin/qurbani-settings` | QurbaniModuleSettings (toggle + bank details) | ADMIN |
 | `/dashboard/admin/create-admin` | CreateAdmin | ADMIN |
 | `*` | 404 page | — |
+
+Sidebar conditionally injects qurbani user-side links only when the `qurbani_module_enabled` flag is `true`. Admin always sees the three qurbani admin links so they can prep listings during off-season.
 
 Root `/` redirects to `/login`.
 
@@ -403,6 +493,12 @@ One file per backend resource. All import the shared `api.js` — **do not creat
 - `applicationService.js` — CRUD for loan, ramadanRation, orphanRegistration
 - `volunteerService.js` — createVolunteerTask, getVolunteerTasks
 - `adminService.js` — getDashboardStats, get/updateStatus for all 8 form types, getVolunteers
+- `qurbaniModuleService.js` — listActiveListings, getListing, createBooking, markBookingPaid, getMyBookings + admin: adminListListings, adminCreateListing(FormData), adminUpdateListing(FormData), adminDeleteListing, adminUpdateListingStatus, adminListBookings, adminUpdateBookingStatus
+- `systemConfigService.js` — getQurbaniModuleFlag, updateQurbaniModuleFlag(enabled), getBankDetails, updateBankDetails(text)
+
+### Stores (`store/`)
+- `authStore.js` — auth state (see Auth store section above)
+- `qurbaniModuleStore.js` — `{ moduleEnabled: null|true|false, listings, loading }` + `fetchFlag()`, `refreshFlag()`, `fetchListings()`. `null` initial state lets the sidebar distinguish "still loading" from "flag=false" so qurbani links don't flash in.
 
 ### Components
 
@@ -432,6 +528,11 @@ components/
     DotPattern.jsx         — SVG dot overlay
   illustrations/
     CharacterLaptop.jsx, CharacterProfessional.jsx, CharacterWave.jsx, CharacterGroup.jsx
+  qurbani/
+    AnimatedBull.jsx       — SVG bull placeholder (uses animate-float) for listings without a photo
+    ListingCard.jsx        — photo/AnimatedBull, hissa progress grid, Book CTA
+    HissaSelector.jsx      — two-step modal: pick count + notes → PaymentPanel
+    PaymentPanel.jsx       — bank details + "I've Paid" button + "you'll be notified" success state
 ```
 
 ### Pages
@@ -443,8 +544,10 @@ pages/
   donor/        QurbaniDonation.jsx, RationDonation.jsx, SkinCollection.jsx, OrphanSponsorship.jsx
   beneficiary/  LoanApplication.jsx, RamadanRationApplication.jsx, OrphanRegistration.jsx
   volunteer/    VolunteerTaskRegistration.jsx
+  qurbani/      QurbaniModule.jsx (listings grid), MyHissaBookings.jsx
   admin/        UserManagement.jsx, DonationsManagement.jsx, ApplicationsManagement.jsx,
-                VolunteersManagement.jsx, CreateAdmin.jsx
+                VolunteersManagement.jsx, CreateAdmin.jsx,
+                QurbaniListings.jsx, QurbaniBookings.jsx, QurbaniModuleSettings.jsx
 ```
 
 ### Form pattern (all form pages)
@@ -472,9 +575,13 @@ cn(...inputs)           // clsx + twMerge
 formatCurrency(amount)  // → "PKR 1,000"
 formatDate(date)        // → "January 1, 2025"
 getStatusColor(status)  // → Tailwind class string for badge
+formatApiError(err)     // → "field: message" for first errors[] entry, else err.message
 ```
 
 Status badge colors: pending=warning, approved/completed=success, rejected=error, confirmed/under_review=info.
+
+### `lib/imageUrl.js`
+`imageUrl(path)` resolves server-relative `/uploads/...` paths to absolute by stripping `/api` from `VITE_API_URL`. Returns `null` for empty input, passes through absolute URLs unchanged. Used by `ListingCard` and admin listing/booking tables for photo thumbnails.
 
 ### Tailwind (`tailwind.config.js`)
 
@@ -497,3 +604,6 @@ Font: Inter.
 8. **Availability field** — stored as JSON string in VolunteerTask; stringify before create, parse on display.
 9. **One axios instance** — `client/src/services/api.js`; do not create additional instances.
 10. **Zustand `loading: true` default** — ProtectedRoute depends on this; `checkAuth()` sets it false after resolving.
+11. **Multipart routes** — multer middleware (`uploadQurbaniPhoto.single('photo')`) MUST run before `validateRequest` so the Zod schema sees the body fields. Numeric fields arrive as strings — use `z.coerce.number()` in those validators.
+12. **Concurrency-sensitive writes** — Qurbani booking uses `prisma.$transaction` with `Prisma.TransactionIsolationLevel.Serializable` and translates P2034/serialization aborts to 409 so the client retries. Apply the same pattern for any future limited-capacity allocation.
+13. **JSON-in-Text fields** — when a column stores JSON as `Text` (`dedications`, `availability`), stringify before insert and parse on every read path at the service layer so controllers/clients see arrays/objects, never raw strings.
