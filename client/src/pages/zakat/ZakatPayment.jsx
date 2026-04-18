@@ -11,22 +11,19 @@ import {
   Info,
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import FadeIn from '../../components/animations/FadeIn';
+import PageContainer from '../../components/ui/PageContainer';
+import PageHeader from '../../components/ui/PageHeader';
+import SectionHeading from '../../components/ui/SectionHeading';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Alert from '../../components/ui/Alert';
+import Badge, { StatusBadge } from '../../components/ui/Badge';
 import EmptyState from '../../components/common/EmptyState';
-import { SkeletonCard } from '../../components/common/Skeleton';
+import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import PaymentScreenshotPicker from '../../components/qurbani/PaymentScreenshotPicker';
 import * as zakatService from '../../services/zakatService';
 import * as systemConfigService from '../../services/systemConfigService';
-import {
-  cn,
-  formatCurrency,
-  formatDate,
-  formatApiError,
-  getStatusColor,
-} from '../../lib/utils';
+import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 
 // Pakistan 2026 reference rates — UPDATE ANNUALLY (or expose to admin
 // settings). Donors can override the per-gram rate inline if their
@@ -60,20 +57,9 @@ function PastPaymentCard({ payment }) {
               {payment.nisabBasis === 'gold' ? 'Gold nisab' : 'Silver nisab'}
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            {payment.paymentMarked && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full border text-xs font-medium bg-info-light text-info-dark border-info">
-                <CheckCircle2 className="w-3 h-3" /> Paid
-              </span>
-            )}
-            <span
-              className={cn(
-                'inline-flex items-center px-2.5 py-1 rounded-full border text-xs font-medium capitalize',
-                getStatusColor(payment.status)
-              )}
-            >
-              {payment.status}
-            </span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {payment.paymentMarked && <Badge variant="info" size="sm" icon={CheckCircle2}>Paid</Badge>}
+            <StatusBadge status={payment.status} size="sm" />
           </div>
         </div>
         {payment.createdAt && (
@@ -370,25 +356,16 @@ export default function ZakatPayment() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto">
-        <FadeIn direction="down" delay={0}>
-          <div className="mb-8 flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-md">
-              <Coins className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Zakat</h1>
-              <p className="text-gray-600 mt-1">
-                Calculate the 2.5% zakat on your wealth held above the nisab threshold for one
-                lunar year.
-              </p>
-            </div>
-          </div>
-        </FadeIn>
+      <PageContainer className="max-w-5xl space-y-6">
+        <PageHeader
+          icon={Coins}
+          accent="zakat"
+          title="Pay Zakat"
+          description="Calculate the 2.5% zakat on wealth held above nisab for one lunar year."
+        />
 
         {/* Reference rates */}
-        <FadeIn direction="up" delay={50}>
-          <Card className="shadow-soft mb-6 bg-gray-50/40">
+          <Card className="shadow-card bg-gray-50/40">
             <CardContent className="pt-5">
               <div className="flex items-start gap-2 mb-3 text-xs text-gray-600">
                 <Info className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -424,13 +401,11 @@ export default function ZakatPayment() {
               </div>
             </CardContent>
           </Card>
-        </FadeIn>
 
         {/* Calculator */}
-        <FadeIn direction="up" delay={100}>
-          <Card className="shadow-medium mb-8">
+          <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Your Zakatable Wealth</CardTitle>
+              <CardTitle>Your zakatable wealth</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -567,18 +542,13 @@ export default function ZakatPayment() {
                         type="button"
                         onClick={() => setNisabBasis(b.key)}
                         className={cn(
-                          'text-left p-4 border-2 rounded-xl transition-all',
+                          'text-left p-4 border rounded-xl transition-colors duration-200 cursor-pointer',
                           active
-                            ? 'border-primary-500 bg-primary-50 shadow-glow-blue'
-                            : 'border-gray-200 hover:border-primary-200'
+                            ? 'border-zakat-500 bg-zakat-50 ring-1 ring-inset ring-zakat-200'
+                            : 'border-gray-200 hover:border-zakat-300 hover:bg-gray-50'
                         )}
                       >
-                        <p
-                          className={cn(
-                            'text-sm font-semibold',
-                            active ? 'text-primary-900' : 'text-gray-900'
-                          )}
-                        >
+                        <p className={cn('text-sm font-semibold', active ? 'text-zakat-700' : 'text-gray-900')}>
                           {b.label}
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">
@@ -625,35 +595,28 @@ export default function ZakatPayment() {
               {/* Summary + CTA */}
               <div
                 className={cn(
-                  'rounded-lg p-5 border',
+                  'rounded-xl p-5 border',
                   isAboveNisab
-                    ? 'bg-primary-50 border-primary-200'
+                    ? 'bg-zakat-50 border-zakat-200'
                     : 'bg-gray-50 border-gray-200'
                 )}
               >
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-xs text-gray-600 uppercase tracking-wide">Total Wealth</p>
-                    <p className="text-lg font-semibold text-gray-900">
+                    <p className="text-xs text-gray-600 uppercase tracking-wider font-semibold">Total wealth</p>
+                    <p className="text-lg font-semibold text-gray-900 tabular-nums">
                       {formatCurrency(totalWealth)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 uppercase tracking-wide">
-                      Nisab Threshold
-                    </p>
-                    <p className="text-lg font-semibold text-gray-900">
+                    <p className="text-xs text-gray-600 uppercase tracking-wider font-semibold">Nisab threshold</p>
+                    <p className="text-lg font-semibold text-gray-900 tabular-nums">
                       {formatCurrency(nisabThreshold)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 uppercase tracking-wide">Zakat Due</p>
-                    <p
-                      className={cn(
-                        'text-2xl font-bold',
-                        isAboveNisab ? 'text-primary-900' : 'text-gray-500'
-                      )}
-                    >
+                    <p className="text-xs text-gray-600 uppercase tracking-wider font-semibold">Zakat due</p>
+                    <p className={cn('text-2xl font-bold tabular-nums', isAboveNisab ? 'text-zakat-700' : 'text-gray-500')}>
                       {formatCurrency(zakatAmount)}
                     </p>
                   </div>
@@ -662,21 +625,14 @@ export default function ZakatPayment() {
                 {!isAboveNisab && totalWealth > 0 && (
                   <Alert variant="default" className="mt-3">
                     <p className="text-xs">
-                      Your zakatable wealth is below the {nisabBasis} nisab threshold. Zakat is
-                      not obligatory on you for this period.
+                      Your zakatable wealth is below the {nisabBasis} nisab threshold. Zakat is not obligatory on you for this period.
                     </p>
                   </Alert>
                 )}
 
                 <div className="mt-4 flex justify-end">
-                  <Button
-                    type="button"
-                    onClick={handleProceed}
-                    disabled={!canProceed}
-                    size="lg"
-                    className="bg-primary-600 hover:bg-primary-700 text-white"
-                  >
-                    Continue to Payment
+                  <Button type="button" onClick={handleProceed} disabled={!canProceed} size="lg">
+                    Continue to payment
                   </Button>
                 </div>
               </div>
@@ -687,30 +643,29 @@ export default function ZakatPayment() {
               </p>
             </CardContent>
           </Card>
-        </FadeIn>
 
         {/* Past payments */}
-        <FadeIn direction="up" delay={150}>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">My Zakat Payments</h2>
+        <div>
+          <SectionHeading title="My zakat payments" description="Your payment history" size="md" />
           {loadingPast ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <SkeletonCard />
-              <SkeletonCard />
+              <SkeletonStatCard />
+              <SkeletonStatCard />
             </div>
           ) : past.length === 0 ? (
             <EmptyState
+              icon={Coins}
+              tone="zakat"
               title="No zakat payments yet"
               description="Once you complete a payment, it will appear here."
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {past.map((p) => (
-                <PastPaymentCard key={p.id} payment={p} />
-              ))}
+              {past.map((p) => (<PastPaymentCard key={p.id} payment={p} />))}
             </div>
           )}
-        </FadeIn>
-      </div>
+        </div>
+      </PageContainer>
 
       <PaymentModal
         open={paymentOpen}
