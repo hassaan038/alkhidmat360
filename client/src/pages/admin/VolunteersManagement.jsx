@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import * as adminService from '../../services/adminService';
 import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 function initials(name) {
   if (!name) return 'V';
@@ -25,6 +26,7 @@ function formatDate(iso) {
 }
 
 export default function VolunteersManagement() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [volunteers, setVolunteers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,16 +63,16 @@ export default function VolunteersManagement() {
   }, [volunteers, searchTerm, filterStatus]);
 
   const stats = [
-    { label: 'Total volunteers', value: volunteers.length, icon: Users, tone: 'volunteer' },
-    { label: 'Active', value: volunteers.filter((v) => v.isActive).length, icon: CheckCircle, tone: 'success' },
-    { label: 'Inactive', value: volunteers.filter((v) => !v.isActive).length, icon: XCircle, tone: 'neutral' },
-    { label: 'With tasks', value: volunteers.filter((v) => v.volunteerTasks?.length).length, icon: Briefcase, tone: 'sadqa' },
+    { label: t('roles.VOLUNTEER'), value: volunteers.length, icon: Users, tone: 'volunteer' },
+    { label: t('adminUsers.active'), value: volunteers.filter((v) => v.isActive).length, icon: CheckCircle, tone: 'success' },
+    { label: t('adminUsers.inactive'), value: volunteers.filter((v) => !v.isActive).length, icon: XCircle, tone: 'neutral' },
+    { label: t('volunteer.taskCategory'), value: volunteers.filter((v) => v.volunteerTasks?.length).length, icon: Briefcase, tone: 'sadqa' },
   ];
 
   const filterChips = [
-    { id: 'all', label: 'All' },
-    { id: 'active', label: 'Active' },
-    { id: 'inactive', label: 'Inactive' },
+    { id: 'all', label: t('common.all') },
+    { id: 'active', label: t('adminUsers.active') },
+    { id: 'inactive', label: t('adminUsers.inactive') },
   ];
 
   return (
@@ -79,8 +81,8 @@ export default function VolunteersManagement() {
         <PageHeader
           icon={HandHeart}
           accent="volunteer"
-          title="Volunteer Management"
-          description="Manage and track all registered volunteers."
+          title={t('adminVolunteers.title')}
+          description={t('adminVolunteers.description')}
         />
 
         {loading ? (
@@ -98,10 +100,10 @@ export default function VolunteersManagement() {
             <div className="w-full sm:max-w-xs">
               <Input
                 leftIcon={Search}
-                placeholder="Search by name, email, or phone…"
+                placeholder={t('common.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                aria-label="Search volunteers"
+                aria-label={t('common.search')}
               />
             </div>
             <div className="flex flex-wrap gap-1.5">
@@ -126,11 +128,11 @@ export default function VolunteersManagement() {
             <EmptyState
               icon={HandHeart}
               tone="volunteer"
-              title={searchTerm || filterStatus !== 'all' ? 'No volunteers found' : 'No volunteers yet'}
+              title={searchTerm || filterStatus !== 'all' ? t('table.noMatchingRecords') : t('table.noData')}
               description={
                 searchTerm || filterStatus !== 'all'
-                  ? 'Try adjusting your search or filters.'
-                  : 'Registrations will appear here once users sign up.'
+                  ? t('table.adjustFilters')
+                  : t('empty.description')
               }
             />
           ) : (
@@ -138,12 +140,12 @@ export default function VolunteersManagement() {
               <table className="w-full">
                 <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                   <tr>
-                    <Th>Volunteer</Th>
-                    <Th>Contact</Th>
-                    <Th>CNIC</Th>
-                    <Th>Tasks</Th>
-                    <Th>Status</Th>
-                    <Th>Joined</Th>
+                    <Th>{t('roles.VOLUNTEER')}</Th>
+                    <Th>{t('common.phone')}</Th>
+                    <Th>{t('settings.cnic')}</Th>
+                    <Th>{t('volunteer.taskCategory')}</Th>
+                    <Th>{t('common.status')}</Th>
+                    <Th>{t('adminUsers.joinDate')}</Th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -176,17 +178,17 @@ export default function VolunteersManagement() {
                             {v.cnic}
                           </div>
                         ) : (
-                          <span className="text-gray-400 dark:text-gray-500 italic">Not provided</span>
+                          <span className="text-gray-400 dark:text-gray-500 italic">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant="sadqa" size="sm" icon={Briefcase}>
-                          {v.volunteerTasks?.length || 0} {v.volunteerTasks?.length === 1 ? 'task' : 'tasks'}
+                          {v.volunteerTasks?.length || 0}
                         </Badge>
                       </td>
                       <td className="px-4 py-3">
                         <Badge variant={v.isActive ? 'success' : 'neutral'} size="sm" dot>
-                          {v.isActive ? 'Active' : 'Inactive'}
+                          {v.isActive ? t('adminUsers.active') : t('adminUsers.inactive')}
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums">

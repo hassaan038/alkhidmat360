@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,6 +11,7 @@ import Button from '../../components/ui/Button';
 import { createRamadanRationApplication } from '../../services/applicationService';
 import { toast } from 'sonner';
 import { Apple, User, Phone, CreditCard, Users, Info, RotateCcw, ArrowRight, Coins } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ramadanRationSchema = z.object({
   familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member'),
@@ -26,15 +27,16 @@ const ramadanRationSchema = z.object({
   additionalNotes: z.string().optional(),
 });
 
-const infoPoints = [
-  'Applications are reviewed based on need and eligibility.',
-  'Distribution centers are announced before Ramadan.',
-  'You will be notified via phone if approved.',
-  'CNIC verification is mandatory for collection.',
-];
-
 export default function RamadanRationApplication() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const infoPoints = useMemo(() => [
+    t('ramadanRation.info1'),
+    t('ramadanRation.info2'),
+    t('ramadanRation.info3'),
+    t('ramadanRation.info4'),
+  ], [t]);
 
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
     resolver: zodResolver(ramadanRationSchema),
@@ -46,10 +48,10 @@ export default function RamadanRationApplication() {
     setIsSubmitting(true);
     try {
       await createRamadanRationApplication(data);
-      toast.success('Application submitted', { description: 'Your application will be reviewed shortly.' });
+      toast.success(t('ramadanRation.submitted'), { description: t('ramadanRation.submittedDesc') });
       reset();
     } catch (error) {
-      toast.error('Submission failed', { description: error.response?.data?.message || 'Please try again later' });
+      toast.error(t('common.submissionFailed'), { description: error.response?.data?.message || t('common.tryAgainLater') });
     } finally {
       setIsSubmitting(false);
     }
@@ -61,18 +63,18 @@ export default function RamadanRationApplication() {
         <PageHeader
           icon={Apple}
           accent="ration"
-          title="Ramadan Ration Application"
-          description="Apply for a Ramadan ration package — we review by family size, income, and need."
+          title={t('ramadanRation.title')}
+          description={t('ramadanRation.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Family information" icon={Users}>
+          <FormSection title={t('ramadanRation.familyInformation')} icon={Users}>
             <FormGrid cols={2}>
-              <FormField label="Family members" required htmlFor="fm" error={errors.familyMembers?.message}>
-                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="e.g., 5" />
+              <FormField label={t('ramadanRation.familyMembers')} required htmlFor="fm" error={errors.familyMembers?.message}>
+                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="5" />
               </FormField>
-              <FormField label="Monthly income (PKR)" required htmlFor="mi" error={errors.monthlyIncome?.message}>
-                <Input id="mi" type="number" min={0} leftIcon={Coins} {...register('monthlyIncome')} placeholder="e.g., 15000" />
+              <FormField label={t('ramadanRation.monthlyIncome')} required htmlFor="mi" error={errors.monthlyIncome?.message}>
+                <Input id="mi" type="number" min={0} leftIcon={Coins} {...register('monthlyIncome')} placeholder="15000" />
               </FormField>
               <FormField wide htmlFor="dm">
                 <label className="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -82,37 +84,37 @@ export default function RamadanRationApplication() {
                     {...register('hasDisabledMembers')}
                     className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-primary-600 focus:ring-2 focus:ring-primary-500"
                   />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">My family has disabled or special needs members</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{t('ramadanRation.hasDisabledMembers')}</span>
                 </label>
               </FormField>
               {hasDisabledMembers && (
-                <FormField wide label="Disability details" htmlFor="dd">
-                  <Textarea id="dd" rows={3} {...register('disabilityDetails')} placeholder="Describe the condition and any special needs" />
+                <FormField wide label={t('ramadanRation.disabilityDetails')} htmlFor="dd">
+                  <Textarea id="dd" rows={3} {...register('disabilityDetails')} placeholder={t('form.specialInstructions')} />
                 </FormField>
               )}
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Applicant information" icon={User}>
+          <FormSection title={t('ramadanRation.applicantInformation')} icon={User}>
             <FormGrid cols={2}>
-              <FormField wide label="Full name" required htmlFor="an" error={errors.applicantName?.message}>
-                <Input id="an" leftIcon={User} {...register('applicantName')} placeholder="Your full name" />
+              <FormField wide label={t('ramadanRation.applicantName')} required htmlFor="an" error={errors.applicantName?.message}>
+                <Input id="an" leftIcon={User} {...register('applicantName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="ap" error={errors.applicantPhone?.message}>
-                <Input id="ap" type="tel" leftIcon={Phone} {...register('applicantPhone')} placeholder="03001234567" />
+              <FormField label={t('ramadanRation.applicantPhone')} required htmlFor="ap" error={errors.applicantPhone?.message}>
+                <Input id="ap" type="tel" leftIcon={Phone} {...register('applicantPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField label="CNIC (13 digits)" required htmlFor="ac" error={errors.applicantCNIC?.message}>
+              <FormField label={t('ramadanRation.applicantCNIC')} required htmlFor="ac" error={errors.applicantCNIC?.message}>
                 <Input id="ac" leftIcon={CreditCard} maxLength={13} {...register('applicantCNIC')} placeholder="1234567890123" />
               </FormField>
-              <FormField wide label="Address" required htmlFor="aa" error={errors.applicantAddress?.message}>
-                <Textarea id="aa" rows={3} {...register('applicantAddress')} placeholder="Complete address with area and landmarks" />
+              <FormField wide label={t('ramadanRation.applicantAddress')} required htmlFor="aa" error={errors.applicantAddress?.message}>
+                <Textarea id="aa" rows={3} {...register('applicantAddress')} placeholder={t('form.completeAddress')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Application details" icon={Apple}>
-            <FormField label="Reason for application" required htmlFor="re" error={errors.reasonForApplication?.message}>
-              <Textarea id="re" rows={4} {...register('reasonForApplication')} placeholder="Explain why you need the ration package and your current circumstances" />
+          <FormSection title={t('ramadanRation.applicationDetails')} icon={Apple}>
+            <FormField label={t('ramadanRation.reasonForApplication')} required htmlFor="re" error={errors.reasonForApplication?.message}>
+              <Textarea id="re" rows={4} {...register('reasonForApplication')} placeholder={t('form.specialInstructions')} />
             </FormField>
             <div className="mt-4">
               <label className="inline-flex items-center gap-2 cursor-pointer select-none">
@@ -121,20 +123,20 @@ export default function RamadanRationApplication() {
                   {...register('previouslyReceived')}
                   className="h-4 w-4 rounded border-gray-300 dark:border-gray-700 text-primary-600 focus:ring-2 focus:ring-primary-500"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">I have previously received ration from Alkhidmat</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{t('ramadanRation.previouslyReceived')}</span>
               </label>
             </div>
-            <FormField label="Additional notes" htmlFor="add" className="mt-4">
-              <Textarea id="add" rows={3} {...register('additionalNotes')} placeholder="Any additional information you'd like to share" />
+            <FormField label={t('ramadanRation.additionalNotes')} htmlFor="add" className="mt-4">
+              <Textarea id="add" rows={3} {...register('additionalNotes')} placeholder={t('form.specialInstructions')} />
             </FormField>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset()} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Submit application
+              {t('common.submitApplication')}
             </Button>
           </div>
         </form>
@@ -145,7 +147,7 @@ export default function RamadanRationApplication() {
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-ration-700 dark:text-ration-200">Distribution information</h4>
+              <h4 className="text-sm font-semibold text-ration-700 dark:text-ration-200">{t('rationDonation.distributionInformation')}</h4>
               <ul className="mt-2 space-y-1 text-xs text-ration-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

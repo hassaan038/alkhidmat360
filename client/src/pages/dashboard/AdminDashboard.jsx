@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useAuthStore from '../../store/authStore';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import PageContainer from '../../components/ui/PageContainer';
@@ -29,6 +30,7 @@ import ApplicationsPieChart from '../../components/charts/ApplicationsPieChart';
 
 export default function AdminDashboard() {
   const { user } = useAuthStore();
+  const { t } = useTranslation();
   const [rawStats, setRawStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -71,41 +73,41 @@ export default function AdminDashboard() {
 
   const kpis = rawStats
     ? [
-        { label: 'Total submissions', value: totalSubmissions, icon: BarChart2, tone: 'primary', hint: 'All categories' },
-        { label: 'Donations', value: rawStats.totalDonations ?? 0, icon: Heart, tone: 'sadqa', hint: `${rawStats.pendingDonations ?? 0} pending` },
-        { label: 'Applications', value: rawStats.totalApplications ?? 0, icon: FileText, tone: 'loan', hint: `${rawStats.pendingApplications ?? 0} pending` },
-        { label: 'Volunteers', value: rawStats.totalVolunteers ?? 0, icon: HandHeart, tone: 'volunteer', hint: `${rawStats.pendingVolunteers ?? 0} pending` },
+        { label: t('dashboard.stats.totalSubmissions'), value: totalSubmissions, icon: BarChart2, tone: 'primary', hint: t('dashboard.admin.allCategories') },
+        { label: t('sidebar.donations'), value: rawStats.totalDonations ?? 0, icon: Heart, tone: 'sadqa', hint: `${rawStats.pendingDonations ?? 0} ${t('common.pending')}` },
+        { label: t('sidebar.applications'), value: rawStats.totalApplications ?? 0, icon: FileText, tone: 'loan', hint: `${rawStats.pendingApplications ?? 0} ${t('common.pending')}` },
+        { label: t('sidebar.volunteers'), value: rawStats.totalVolunteers ?? 0, icon: HandHeart, tone: 'volunteer', hint: `${rawStats.pendingVolunteers ?? 0} ${t('common.pending')}` },
       ]
     : [];
 
   const quickActions = [
-    { title: 'User Management', description: 'View & manage all users', path: '/dashboard/admin/users', icon: Users, tone: 'primary' },
-    { title: 'Donations', description: 'Review donation submissions', path: '/dashboard/admin/donations', icon: Heart, tone: 'sadqa' },
-    { title: 'Applications', description: 'Review beneficiary applications', path: '/dashboard/admin/applications', icon: FileText, tone: 'loan' },
-    { title: 'Volunteers', description: 'Manage volunteer tasks', path: '/dashboard/admin/volunteers', icon: HandHeart, tone: 'volunteer' },
-    { title: 'Zakat Payments', description: 'Confirm donor zakat', path: '/dashboard/admin/zakat-payments', icon: Coins, tone: 'zakat' },
-    { title: 'Disaster Relief', description: 'Confirm campaign donations', path: '/dashboard/admin/disaster-relief', icon: LifeBuoy, tone: 'disaster' },
+    { title: t('adminUsers.title'), description: t('dashboard.admin.usersDesc'), path: '/dashboard/admin/users', icon: Users, tone: 'primary' },
+    { title: t('sidebar.donations'), description: t('dashboard.admin.donationsDesc'), path: '/dashboard/admin/donations', icon: Heart, tone: 'sadqa' },
+    { title: t('sidebar.applications'), description: t('dashboard.admin.applicationsDesc'), path: '/dashboard/admin/applications', icon: FileText, tone: 'loan' },
+    { title: t('sidebar.volunteers'), description: t('dashboard.admin.volunteersDesc'), path: '/dashboard/admin/volunteers', icon: HandHeart, tone: 'volunteer' },
+    { title: t('sidebar.zakatPayments'), description: t('dashboard.admin.zakatDesc'), path: '/dashboard/admin/zakat-payments', icon: Coins, tone: 'zakat' },
+    { title: t('sidebar.disasterRelief'), description: t('dashboard.admin.disasterDesc'), path: '/dashboard/admin/disaster-relief', icon: LifeBuoy, tone: 'disaster' },
   ];
 
   const pendingItems = rawStats
     ? [
         rawStats.pendingDonations > 0 && {
-          label: `${rawStats.pendingDonations} donation${rawStats.pendingDonations !== 1 ? 's' : ''}`,
-          sub: 'Awaiting review',
+          label: `${rawStats.pendingDonations} ${t('dashboard.admin.donations')}`,
+          sub: t('dashboard.admin.awaitingReview'),
           href: '/dashboard/admin/donations',
           icon: Heart,
           tone: 'sadqa',
         },
         rawStats.pendingApplications > 0 && {
-          label: `${rawStats.pendingApplications} application${rawStats.pendingApplications !== 1 ? 's' : ''}`,
-          sub: 'Awaiting review',
+          label: `${rawStats.pendingApplications} ${t('dashboard.admin.applications')}`,
+          sub: t('dashboard.admin.awaitingReview'),
           href: '/dashboard/admin/applications',
           icon: FileText,
           tone: 'loan',
         },
         rawStats.pendingVolunteers > 0 && {
-          label: `${rawStats.pendingVolunteers} volunteer task${rawStats.pendingVolunteers !== 1 ? 's' : ''}`,
-          sub: 'Awaiting match',
+          label: `${rawStats.pendingVolunteers} ${t('dashboard.admin.volunteerTasks')}`,
+          sub: t('dashboard.admin.awaitingMatch'),
           href: '/dashboard/admin/volunteers',
           icon: HandHeart,
           tone: 'volunteer',
@@ -125,19 +127,19 @@ export default function AdminDashboard() {
             <div className="min-w-0">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur px-3 py-1 ring-1 ring-white/20">
                 <ShieldCheck className="h-3.5 w-3.5" />
-                <span className="text-xs font-medium tracking-wide">ADMIN ACCESS</span>
+                <span className="text-xs font-medium tracking-wide">{t('dashboard.admin.adminAccess')}</span>
               </div>
               <h1 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
                 <Shield className="h-6 w-6" />
-                Operations overview
+                {t('dashboard.admin.operationsOverview')}
               </h1>
               <p className="mt-1 text-gray-300 text-sm leading-relaxed max-w-xl">
-                Welcome back, {user?.fullName}. Here's what's happening across the platform.
+                {t('dashboard.welcome')}, {user?.fullName}. {t('dashboard.admin.hereSummary')}
               </p>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="warning" size="lg" className="bg-warning-light/90 text-warning-dark">
-                {pendingReview} pending
+                {pendingReview} {t('common.pending')}
               </Badge>
             </div>
           </div>
@@ -156,8 +158,8 @@ export default function AdminDashboard() {
             <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
               <IconTile icon={BarChart2} tone="primary" size="sm" />
               <div>
-                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">Donations overview</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Submissions by donation type</p>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">{t('dashboard.admin.donationsOverview')}</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.admin.donationsOverviewDesc')}</p>
               </div>
             </div>
             <CardContent className="pt-5">
@@ -179,8 +181,8 @@ export default function AdminDashboard() {
             <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center gap-3">
               <IconTile icon={ListChecks} tone="loan" size="sm" />
               <div>
-                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">Applications overview</h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Breakdown by request type</p>
+                <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">{t('dashboard.admin.applicationsOverview')}</h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.admin.applicationsOverviewDesc')}</p>
               </div>
             </div>
             <CardContent className="pt-5">
@@ -206,7 +208,7 @@ export default function AdminDashboard() {
         {/* Quick actions + pending */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <SectionHeading title="Quick actions" description="Jump into the most common admin tasks" size="md" />
+            <SectionHeading title={t('dashboard.admin.quickActions')} description={t('dashboard.admin.quickActionsDesc')} size="md" />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {quickActions.map((action) => (
                 <Link key={action.path} to={action.path} className="block">
@@ -216,7 +218,7 @@ export default function AdminDashboard() {
                       <h3 className="text-base font-semibold text-gray-900 dark:text-gray-50">{action.title}</h3>
                       <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{action.description}</p>
                       <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary-600 transition-all group-hover:gap-2">
-                        <span>Open</span>
+                        <span>{t('dashboard.admin.open')}</span>
                         <ArrowRight className="w-4 h-4" />
                       </div>
                     </CardContent>
@@ -232,8 +234,8 @@ export default function AdminDashboard() {
                 <div className="flex items-center gap-3">
                   <IconTile icon={Clock} tone="warning" size="sm" />
                   <div>
-                    <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">Pending reviews</h2>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Require your action</p>
+                    <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">{t('dashboard.admin.pendingReviews')}</h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.admin.requireAction')}</p>
                   </div>
                 </div>
                 <span className="text-xs font-semibold tabular-nums text-warning-dark">
@@ -249,9 +251,9 @@ export default function AdminDashboard() {
                 ) : pendingItems.length === 0 ? (
                   <div className="flex flex-col items-center justify-center text-center py-8">
                     <IconTile icon={ShieldCheck} tone="success" size="lg" className="mb-3" />
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-50">All clear!</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-50">{t('dashboard.admin.allClear')}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-[240px]">
-                      No items awaiting review. New submissions will show up here.
+                      {t('dashboard.admin.allClearDesc')}
                     </p>
                   </div>
                 ) : (

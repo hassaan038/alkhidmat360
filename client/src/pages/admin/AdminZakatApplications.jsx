@@ -11,10 +11,12 @@ import EmptyState from '../../components/common/EmptyState';
 import * as zakatService from '../../services/zakatService';
 import { formatCurrency, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
+import { useTranslation } from 'react-i18next';
 
 const STATUS_OPTIONS = ['pending', 'under_review', 'approved', 'rejected'];
 
 export default function AdminZakatApplications() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
@@ -26,7 +28,7 @@ export default function AdminZakatApplications() {
       const res = await zakatService.adminListZakatApplications();
       setItems(res.data?.applications || []);
     } catch (err) {
-      toast.error('Failed to load applications', { description: formatApiError(err) });
+      toast.error(t('zakatApplication.failedToLoad'), { description: formatApiError(err) });
       setItems([]);
     } finally {
       setLoading(false);
@@ -42,10 +44,10 @@ export default function AdminZakatApplications() {
     setUpdatingId(id);
     try {
       await zakatService.adminUpdateZakatApplicationStatus(id, status);
-      toast.success('Status updated');
+      toast.success(t('table.statusUpdated'));
       load();
     } catch (err) {
-      toast.error('Update failed', { description: formatApiError(err) });
+      toast.error(t('table.statusUpdateFailed'), { description: formatApiError(err) });
     } finally {
       setUpdatingId(null);
     }
@@ -59,8 +61,8 @@ export default function AdminZakatApplications() {
         <PageHeader
           icon={Coins}
           accent="zakat"
-          title="Zakat Applications"
-          description="Review beneficiary applications and progress them through pending → under review → approved / rejected."
+          title={t('adminZakat.applicationsTitle')}
+          description={t('adminZakat.applicationsDesc')}
         />
 
           <Card className="overflow-hidden">
@@ -74,16 +76,16 @@ export default function AdminZakatApplications() {
                 <EmptyState
                   icon={Coins}
                   tone="zakat"
-                  title="No zakat applications yet"
-                  description="Beneficiary submissions will appear here."
+                  title={t('zakatApplication.noApplications')}
+                  description={t('zakatApplication.noApplicationsDesc')}
                 />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full">
                     <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
-                        <Th>#</Th><Th>Applicant</Th><Th>CNIC</Th>
-                        <Th>Family</Th><Th>Income</Th><Th>Status</Th><Th></Th>
+                        <Th>#</Th><Th>{t('zakatApplication.applicantName')}</Th><Th>{t('settings.cnic')}</Th>
+                        <Th>{t('zakatApplication.familyMembers')}</Th><Th>{t('zakatApplication.monthlyIncome')}</Th><Th>{t('common.status')}</Th><Th></Th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -127,7 +129,7 @@ export default function AdminZakatApplications() {
                                   type="button"
                                   onClick={() => toggleExpand(a.id)}
                                   className="rounded-md p-1 text-gray-400 dark:text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
-                                  aria-label={expanded === a.id ? 'Collapse row' : 'Expand row'}
+                                  aria-label={t('common.view')}
                                 >
                                   {expanded === a.id ? (
                                     <ChevronUp className="w-5 h-5" />
@@ -143,37 +145,36 @@ export default function AdminZakatApplications() {
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                     <div className="space-y-1 text-gray-800 dark:text-gray-100">
                                       <div>
-                                        <span className="text-gray-500 dark:text-gray-400">Address:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">{t('common.address')}:</span>{' '}
                                         {a.applicantAddress}
                                       </div>
                                       <div>
-                                        <span className="text-gray-500 dark:text-gray-400">Housing:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">{t('zakatApplication.housingStatus')}:</span>{' '}
                                         <span className="capitalize">{a.housingStatus}</span>
                                       </div>
                                       <div>
-                                        <span className="text-gray-500 dark:text-gray-400">Disability:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">{t('zakatApplication.disabilityDetails')}:</span>{' '}
                                         {a.hasDisabledMembers
-                                          ? `Yes — ${a.disabilityDetails || 'no detail provided'}`
-                                          : 'No'}
+                                          ? `${t('common.yes')} — ${a.disabilityDetails || '—'}`
+                                          : t('common.no')}
                                       </div>
                                       <div>
-                                        <span className="text-gray-500 dark:text-gray-400">Amount requested:</span>{' '}
+                                        <span className="text-gray-500 dark:text-gray-400">{t('zakatApplication.amountRequested')}:</span>{' '}
                                         {a.amountRequested
                                           ? formatCurrency(a.amountRequested)
                                           : '—'}
                                       </div>
                                       <div className="pt-2 border-t border-gray-200 dark:border-gray-800">
-                                        <div className="text-gray-500 dark:text-gray-400 mb-0.5">Reason:</div>
+                                        <div className="text-gray-500 dark:text-gray-400 mb-0.5">{t('zakatApplication.reasonForApplication')}:</div>
                                         <p className="text-gray-800 dark:text-gray-100">{a.reasonForApplication}</p>
                                       </div>
                                       {a.additionalNotes && (
                                         <div>
-                                          <span className="text-gray-500 dark:text-gray-400">Notes:</span>{' '}
+                                          <span className="text-gray-500 dark:text-gray-400">{t('common.notes')}:</span>{' '}
                                           {a.additionalNotes}
                                         </div>
                                       )}
                                       <div className="text-xs text-gray-500 dark:text-gray-400 pt-1">
-                                        Submitted{' '}
                                         {a.createdAt
                                           ? new Date(a.createdAt).toLocaleString()
                                           : '—'}
@@ -181,11 +182,11 @@ export default function AdminZakatApplications() {
                                     </div>
                                     {cnicDoc && (
                                       <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">CNIC document</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('zakatApplication.cnicDocument')}</p>
                                         <a href={cnicDoc} target="_blank" rel="noopener noreferrer">
                                           <img
                                             src={cnicDoc}
-                                            alt="CNIC"
+                                            alt={t('settings.cnic')}
                                             className="w-full max-w-sm h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-800 hover:opacity-90 transition"
                                           />
                                         </a>

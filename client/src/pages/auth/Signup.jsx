@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import useAuthStore from '../../store/authStore';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -13,28 +14,10 @@ import logo from '../../assets/logo.jpg';
 import heroImage from '../../assets/alkhidmat_hero_image.png';
 import { cn } from '../../lib/utils';
 
-const userTypes = [
-  {
-    value: 'DONOR',
-    label: 'Donor',
-    icon: Heart,
-    description: 'Make donations, pay Zakat, sponsor causes',
-    tone: 'primary',
-  },
-  {
-    value: 'BENEFICIARY',
-    label: 'Beneficiary',
-    icon: HandHeart,
-    description: 'Apply for loans, rations, and assistance',
-    tone: 'success',
-  },
-  {
-    value: 'VOLUNTEER',
-    label: 'Volunteer',
-    icon: Users,
-    description: 'Volunteer for tasks and events',
-    tone: 'warning',
-  },
+const userTypesMeta = [
+  { value: 'DONOR', icon: Heart, tone: 'primary' },
+  { value: 'BENEFICIARY', icon: HandHeart, tone: 'success' },
+  { value: 'VOLUNTEER', icon: Users, tone: 'warning' },
 ];
 
 const toneClasses = {
@@ -45,6 +28,7 @@ const toneClasses = {
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { signup, loading, error, clearError } = useAuthStore();
 
   const [formData, setFormData] = useState({
@@ -58,6 +42,12 @@ export default function Signup() {
   });
   const [validationError, setValidationError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  const userTypes = userTypesMeta.map((m) => ({
+    ...m,
+    label: t(`roles.${m.value}`),
+    description: t(`auth.signup.roleDesc_${m.value}`),
+  }));
 
   useEffect(() => {
     if (loading) useAuthStore.setState({ loading: false });
@@ -78,11 +68,11 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      setValidationError('Passwords do not match');
+      setValidationError(t('auth.signup.passwordMismatch'));
       return;
     }
     if (!formData.userType) {
-      setValidationError('Please select your account type');
+      setValidationError(t('auth.signup.selectRole'));
       return;
     }
     try {
@@ -105,7 +95,7 @@ export default function Signup() {
           <img src={logo} alt="" className="h-11 w-11 rounded-xl object-cover ring-2 ring-white/50 shadow-lg" />
           <div>
             <p className="text-lg font-bold leading-tight">Alkhidmat 360</p>
-            <p className="text-xs text-primary-100/90">Social Welfare Platform</p>
+            <p className="text-xs text-primary-100/90">{t('header.tagline')}</p>
           </div>
         </div>
 
@@ -122,17 +112,17 @@ export default function Signup() {
           </div>
 
           <h2 className="text-2xl xl:text-3xl font-bold leading-tight tracking-tight">
-            Join a community<br />of meaningful giving.
+            {t('auth.signup.heroTitle')}
           </h2>
           <p className="mt-3 text-primary-100 text-sm leading-relaxed">
-            Create an account to donate, apply for support, or volunteer — every step tracked and verified by Alkhidmat Pakistan.
+            {t('auth.signup.heroSubtitle')}
           </p>
 
           <ul className="mt-6 grid grid-cols-1 gap-2 w-full text-left">
             {[
-              { icon: ShieldCheck, title: 'Verified & transparent' },
-              { icon: HeartHandshake, title: 'Direct beneficiary impact' },
-              { icon: Coins, title: 'Zakat & Fitrana built-in' },
+              { icon: ShieldCheck, title: t('auth.login.feat1') },
+              { icon: HeartHandshake, title: t('auth.login.feat2') },
+              { icon: Coins, title: t('auth.login.feat3') },
             ].map((feat) => (
               <li key={feat.title} className="flex items-center gap-3 rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur-sm px-3 py-2 text-sm">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15">
@@ -160,8 +150,8 @@ export default function Signup() {
             <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary-50 text-primary-600 ring-8 ring-primary-50/50 mb-4">
               <UserPlus className="h-5 w-5" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Create your account</h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Takes less than a minute — pick a role and fill in your details.</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">{t('auth.signup.title')}</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('auth.signup.subtitle')}</p>
           </div>
 
           {(error || validationError) && (
@@ -173,12 +163,12 @@ export default function Signup() {
           <form onSubmit={handleSubmit} className="space-y-7">
             {/* Role picker */}
             <div>
-              <Label required className="mb-3 block">I want to</Label>
+              <Label required className="mb-3 block">{t('auth.signup.role')}</Label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {userTypes.map((type) => {
                   const Icon = type.icon;
                   const selected = formData.userType === type.value;
-                  const t = toneClasses[type.tone];
+                  const tc = toneClasses[type.tone];
                   return (
                     <button
                       key={type.value}
@@ -187,11 +177,11 @@ export default function Signup() {
                       disabled={loading}
                       className={cn(
                         'relative text-left p-4 rounded-xl border transition-colors duration-200 cursor-pointer',
-                        selected ? t.active : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary-300 hover:bg-gray-50'
+                        selected ? tc.active : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-primary-300 hover:bg-gray-50'
                       )}
                     >
                       <div className="flex items-start gap-3">
-                        <span className={cn('flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0', selected ? t.chip : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400')}>
+                        <span className={cn('flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0', selected ? tc.chip : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400')}>
                           <Icon className="h-5 w-5" />
                         </span>
                         <div className="flex-1 min-w-0">
@@ -213,23 +203,23 @@ export default function Signup() {
             {/* Personal info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="fullName" required>Full name</Label>
+                <Label htmlFor="fullName" required>{t('auth.signup.fullName')}</Label>
                 <Input id="fullName" name="fullName" type="text" leftIcon={User} placeholder="Your full name" value={formData.fullName} onChange={handleChange} required disabled={loading} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="email" required>Email address</Label>
+                <Label htmlFor="email" required>{t('auth.login.emailLabel')}</Label>
                 <Input id="email" name="email" type="email" leftIcon={Mail} placeholder="you@example.com" value={formData.email} onChange={handleChange} required autoComplete="email" disabled={loading} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="phoneNumber" required>Phone number</Label>
+                <Label htmlFor="phoneNumber" required>{t('common.phone')}</Label>
                 <Input id="phoneNumber" name="phoneNumber" type="tel" leftIcon={Phone} placeholder="+92-300-1234567" value={formData.phoneNumber} onChange={handleChange} required disabled={loading} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="cnic">CNIC <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span></Label>
+                <Label htmlFor="cnic">{t('settings.cnic')} <span className="text-gray-400 dark:text-gray-500 font-normal">({t('common.optional')})</span></Label>
                 <Input id="cnic" name="cnic" type="text" leftIcon={CreditCard} placeholder="12345-1234567-1" value={formData.cnic} onChange={handleChange} disabled={loading} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="password" required>Password</Label>
+                <Label htmlFor="password" required>{t('auth.login.passwordLabel')}</Label>
                 <div className="relative">
                   <Input id="password" name="password" type={showPassword ? 'text' : 'password'} leftIcon={Lock} placeholder="Minimum 6 characters" value={formData.password} onChange={handleChange} required minLength={6} autoComplete="new-password" disabled={loading} className="pr-10" />
                   <button
@@ -243,20 +233,20 @@ export default function Signup() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="confirmPassword" required>Confirm password</Label>
+                <Label htmlFor="confirmPassword" required>{t('auth.signup.confirmPassword')}</Label>
                 <Input id="confirmPassword" name="confirmPassword" type={showPassword ? 'text' : 'password'} leftIcon={Lock} placeholder="Re-enter password" value={formData.confirmPassword} onChange={handleChange} required minLength={6} autoComplete="new-password" disabled={loading} />
               </div>
             </div>
 
             <Button type="submit" size="lg" loading={loading} className="w-full">
-              {loading ? 'Creating account…' : 'Create account'}
+              {loading ? t('auth.signup.creatingAccount') : t('auth.signup.submit')}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-            Already have an account?{' '}
+            {t('auth.signup.haveAccount')}{' '}
             <Link to="/login" className="font-medium text-primary-600 hover:text-primary-700 hover:underline cursor-pointer">
-              Sign in
+              {t('auth.signup.signIn')}
             </Link>
           </div>
         </div>

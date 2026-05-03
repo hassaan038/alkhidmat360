@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronUp, Check, X, Search, Inbox } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
@@ -39,6 +40,7 @@ export default function DataTable({
   emptyTitle = 'No records found',
   emptyDescription = 'New submissions will appear here.',
 }) {
+  const { t } = useTranslation();
   const [expandedRow, setExpandedRow] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
   const [pendingAction, setPendingAction] = useState(null);
@@ -46,8 +48,8 @@ export default function DataTable({
   const [activeFilter, setActiveFilter] = useState('all');
 
   const labels = {
-    approve: 'Approve',
-    reject: 'Reject',
+    approve: t('table.approve'),
+    reject: t('table.reject'),
     approveStatus: 'approved',
     rejectStatus: 'rejected',
     ...actionLabels,
@@ -79,9 +81,9 @@ export default function DataTable({
     setPendingAction(null);
     try {
       await onStatusUpdate(id, newStatus);
-      toast.success('Status updated');
+      toast.success(t('table.statusUpdated'));
     } catch {
-      toast.error('Failed to update status');
+      toast.error(t('table.statusUpdateFailed'));
     } finally {
       setUpdatingId(null);
     }
@@ -99,7 +101,7 @@ export default function DataTable({
             <div className="w-full sm:max-w-xs">
               <Input
                 leftIcon={Search}
-                placeholder="Search records…"
+                placeholder={t('common.search') + '…'}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 aria-label="Search records"
@@ -146,8 +148,8 @@ export default function DataTable({
                 <td colSpan={columns.length + (onStatusUpdate ? 4 : 3)} className="p-0">
                   <EmptyState
                     icon={Inbox}
-                    title={data?.length === 0 ? emptyTitle : 'No matching records'}
-                    description={data?.length === 0 ? emptyDescription : 'Try adjusting your search or filters.'}
+                    title={data?.length === 0 ? emptyTitle : t('table.noMatchingRecords')}
+                    description={data?.length === 0 ? emptyDescription : t('table.adjustFilters')}
                   />
                 </td>
               </tr>

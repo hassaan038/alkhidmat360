@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,7 +10,8 @@ import Input, { Textarea, Select } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { createOrphanRegistration } from '../../services/applicationService';
 import { toast } from 'sonner';
-import { Baby, User, Phone, CreditCard, School, HeartPulse, Coins, Users, Info, RotateCcw, ArrowRight } from 'lucide-react';
+import { Baby, User, Phone, CreditCard, School, Coins, Users, Info, RotateCcw, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const orphanRegistrationSchema = z.object({
   orphanName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -31,15 +32,16 @@ const orphanRegistrationSchema = z.object({
   additionalNotes: z.string().optional(),
 });
 
-const infoPoints = [
-  'Our team verifies every registration within 7–10 days.',
-  'A home visit may be required for verification.',
-  'Required: Guardian CNIC, birth certificate (if available).',
-  'Approved orphans become eligible for sponsorship and support.',
-];
-
 export default function OrphanRegistration() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const infoPoints = useMemo(() => [
+    t('orphanReg.info1'),
+    t('orphanReg.info2'),
+    t('orphanReg.info3'),
+    t('orphanReg.info4'),
+  ], [t]);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     resolver: zodResolver(orphanRegistrationSchema),
@@ -53,10 +55,10 @@ export default function OrphanRegistration() {
     setIsSubmitting(true);
     try {
       await createOrphanRegistration(data);
-      toast.success('Registration submitted', { description: 'Our team will contact you for verification within 7 days.' });
+      toast.success(t('orphanReg.submitted'), { description: t('orphanReg.submittedDesc') });
       reset();
     } catch (error) {
-      toast.error('Submission failed', { description: error.response?.data?.message || 'Please try again later' });
+      toast.error(t('common.submissionFailed'), { description: error.response?.data?.message || t('common.tryAgainLater') });
     } finally {
       setIsSubmitting(false);
     }
@@ -68,97 +70,97 @@ export default function OrphanRegistration() {
         <PageHeader
           icon={Baby}
           accent="orphan"
-          title="Orphan Registration"
-          description="Register an orphan child for support and sponsorship. Our team verifies every entry."
+          title={t('orphanReg.title')}
+          description={t('orphanReg.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Orphan information" icon={Baby}>
+          <FormSection title={t('orphanReg.orphanInformation')} icon={Baby}>
             <FormGrid cols={2}>
-              <FormField wide label="Orphan full name" required htmlFor="on" error={errors.orphanName?.message}>
-                <Input id="on" {...register('orphanName')} placeholder="Orphan's full name" />
+              <FormField wide label={t('orphanReg.orphanName')} required htmlFor="on" error={errors.orphanName?.message}>
+                <Input id="on" {...register('orphanName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Age" required htmlFor="oa" error={errors.orphanAge?.message}>
-                <Input id="oa" type="number" min={0} max={18} {...register('orphanAge')} placeholder="e.g., 10" />
+              <FormField label={t('orphanReg.orphanAge')} required htmlFor="oa" error={errors.orphanAge?.message}>
+                <Input id="oa" type="number" min={0} max={18} {...register('orphanAge')} placeholder="10" />
               </FormField>
-              <FormField label="Gender" required htmlFor="og" error={errors.orphanGender?.message}>
+              <FormField label={t('orphanReg.orphanGender')} required htmlFor="og" error={errors.orphanGender?.message}>
                 <Select id="og" {...register('orphanGender')}>
-                  <option value="MALE">Male</option>
-                  <option value="FEMALE">Female</option>
+                  <option value="MALE">{t('orphanReg.male')}</option>
+                  <option value="FEMALE">{t('orphanReg.female')}</option>
                 </Select>
               </FormField>
-              <FormField label="Father status" required htmlFor="fs" error={errors.fatherStatus?.message}>
+              <FormField label={t('orphanReg.fatherStatus')} required htmlFor="fs" error={errors.fatherStatus?.message}>
                 <Select id="fs" {...register('fatherStatus')}>
-                  <option value="DECEASED">Deceased</option>
-                  <option value="UNKNOWN">Unknown</option>
-                  <option value="ABSENT">Absent</option>
+                  <option value="DECEASED">{t('orphanReg.deceased')}</option>
+                  <option value="UNKNOWN">{t('orphanReg.unknown')}</option>
+                  <option value="ABSENT">{t('orphanReg.absent')}</option>
                 </Select>
               </FormField>
-              <FormField label="Mother status" required htmlFor="ms" error={errors.motherStatus?.message}>
+              <FormField label={t('orphanReg.motherStatus')} required htmlFor="ms" error={errors.motherStatus?.message}>
                 <Select id="ms" {...register('motherStatus')}>
-                  <option value="DECEASED">Deceased</option>
-                  <option value="ALIVE">Alive</option>
-                  <option value="UNKNOWN">Unknown</option>
-                  <option value="ABSENT">Absent</option>
+                  <option value="DECEASED">{t('orphanReg.deceased')}</option>
+                  <option value="ALIVE">{t('orphanReg.alive')}</option>
+                  <option value="UNKNOWN">{t('orphanReg.unknown')}</option>
+                  <option value="ABSENT">{t('orphanReg.absent')}</option>
                 </Select>
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Education" icon={School}>
+          <FormSection title={t('orphanReg.education')} icon={School}>
             <FormGrid cols={2}>
-              <FormField label="Education level" required htmlFor="el" error={errors.educationLevel?.message}>
-                <Input id="el" {...register('educationLevel')} placeholder="e.g., Grade 5, Not enrolled" />
+              <FormField label={t('orphanReg.educationLevel')} required htmlFor="el" error={errors.educationLevel?.message}>
+                <Input id="el" {...register('educationLevel')} placeholder="Grade 5" />
               </FormField>
-              <FormField label="School name" htmlFor="sn" hint="If enrolled">
-                <Input id="sn" {...register('schoolName')} placeholder="School name" />
+              <FormField label={t('orphanReg.schoolName')} htmlFor="sn">
+                <Input id="sn" {...register('schoolName')} placeholder={t('orphanReg.schoolName')} />
               </FormField>
-              <FormField wide label="Health condition" htmlFor="hc">
-                <Textarea id="hc" rows={2} {...register('healthCondition')} placeholder="Any health issues, disabilities, or special needs" />
+              <FormField wide label={t('orphanReg.healthCondition')} htmlFor="hc">
+                <Textarea id="hc" rows={2} {...register('healthCondition')} placeholder={t('form.specialInstructions')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Guardian information" icon={User}>
+          <FormSection title={t('orphanReg.guardianInformation')} icon={User}>
             <FormGrid cols={2}>
-              <FormField label="Guardian name" required htmlFor="gn" error={errors.guardianName?.message}>
-                <Input id="gn" leftIcon={User} {...register('guardianName')} placeholder="Your full name" />
+              <FormField label={t('orphanReg.guardianName')} required htmlFor="gn" error={errors.guardianName?.message}>
+                <Input id="gn" leftIcon={User} {...register('guardianName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Relation to orphan" required htmlFor="gr" error={errors.guardianRelation?.message}>
-                <Input id="gr" {...register('guardianRelation')} placeholder="e.g., Uncle, Grandmother" />
+              <FormField label={t('orphanReg.guardianRelation')} required htmlFor="gr" error={errors.guardianRelation?.message}>
+                <Input id="gr" {...register('guardianRelation')} placeholder={t('orphanReg.guardianRelation')} />
               </FormField>
-              <FormField label="Guardian phone" required htmlFor="gp" error={errors.guardianPhone?.message}>
-                <Input id="gp" type="tel" leftIcon={Phone} {...register('guardianPhone')} placeholder="03001234567" />
+              <FormField label={t('orphanReg.guardianPhone')} required htmlFor="gp" error={errors.guardianPhone?.message}>
+                <Input id="gp" type="tel" leftIcon={Phone} {...register('guardianPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField label="Guardian CNIC" required htmlFor="gc" error={errors.guardianCNIC?.message}>
+              <FormField label={t('orphanReg.guardianCNIC')} required htmlFor="gc" error={errors.guardianCNIC?.message}>
                 <Input id="gc" leftIcon={CreditCard} maxLength={13} {...register('guardianCNIC')} placeholder="1234567890123" />
               </FormField>
-              <FormField wide label="Guardian address" required htmlFor="ga" error={errors.guardianAddress?.message}>
-                <Textarea id="ga" rows={3} {...register('guardianAddress')} placeholder="Complete residential address" />
+              <FormField wide label={t('orphanReg.guardianAddress')} required htmlFor="ga" error={errors.guardianAddress?.message}>
+                <Textarea id="ga" rows={3} {...register('guardianAddress')} placeholder={t('form.completeAddress')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Household information" icon={Users}>
+          <FormSection title={t('orphanReg.householdInformation')} icon={Users}>
             <FormGrid cols={2}>
-              <FormField label="Monthly income (PKR)" required htmlFor="mi" error={errors.monthlyIncome?.message}>
-                <Input id="mi" type="number" min={0} leftIcon={Coins} {...register('monthlyIncome')} placeholder="e.g., 20000" />
+              <FormField label={t('orphanReg.monthlyIncome')} required htmlFor="mi" error={errors.monthlyIncome?.message}>
+                <Input id="mi" type="number" min={0} leftIcon={Coins} {...register('monthlyIncome')} placeholder="20000" />
               </FormField>
-              <FormField label="Total family members" required htmlFor="fm" error={errors.familyMembers?.message}>
-                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="e.g., 6" />
+              <FormField label={t('orphanReg.familyMembers')} required htmlFor="fm" error={errors.familyMembers?.message}>
+                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="6" />
               </FormField>
-              <FormField wide label="Additional notes" htmlFor="an">
-                <Textarea id="an" rows={3} {...register('additionalNotes')} placeholder="Any additional information about the orphan's circumstances" />
+              <FormField wide label={t('orphanReg.additionalNotes')} htmlFor="an">
+                <Textarea id="an" rows={3} {...register('additionalNotes')} placeholder={t('form.specialInstructions')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset()} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Submit registration
+              {t('common.submitRegistration')}
             </Button>
           </div>
         </form>
@@ -169,7 +171,7 @@ export default function OrphanRegistration() {
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-orphan-700 dark:text-orphan-200">Registration process</h4>
+              <h4 className="text-sm font-semibold text-orphan-700 dark:text-orphan-200">{t('orphanReg.registrationProcess')}</h4>
               <ul className="mt-2 space-y-1 text-xs text-orphan-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

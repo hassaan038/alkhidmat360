@@ -11,6 +11,7 @@ import EmptyState from '../../components/common/EmptyState';
 import * as qurbaniSkinPickupService from '../../services/qurbaniSkinPickupService';
 import { formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
+import { useTranslation } from 'react-i18next';
 
 const STATUS_OPTIONS = ['pending', 'scheduled', 'collected', 'cancelled'];
 
@@ -19,6 +20,7 @@ function osmLink(lat, lng) {
 }
 
 export default function QurbaniSkinPickups() {
+  const { t } = useTranslation();
   const [pickups, setPickups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
@@ -63,7 +65,7 @@ export default function QurbaniSkinPickups() {
         <PageHeader
           icon={Scissors}
           accent="qurbani"
-          title="Skin Pickup Requests"
+          title={t('adminSkinPickups.title')}
           description="Schedule, mark collected, or cancel skin collection requests."
         />
 

@@ -8,25 +8,27 @@ import {
 import { cn } from '../../lib/utils';
 import logo from '../../assets/logo.jpg';
 import ThemeToggle from '../ui/ThemeToggle';
+import LanguageToggle from '../ui/LanguageToggle';
+import { useTranslation } from 'react-i18next';
 
 const roleMeta = {
   ADMIN: {
-    label: 'Admin', icon: ShieldCheck,
+    labelKey: 'roles.ADMIN', icon: ShieldCheck,
     chip: 'bg-primary-600 text-white',
     avatar: 'bg-primary-700 text-white',
   },
   DONOR: {
-    label: 'Donor', icon: Heart,
+    labelKey: 'roles.DONOR', icon: Heart,
     chip: 'bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-900/30 dark:text-primary-200 dark:ring-primary-800',
     avatar: 'bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-200',
   },
   BENEFICIARY: {
-    label: 'Beneficiary', icon: HandHeart,
+    labelKey: 'roles.BENEFICIARY', icon: HandHeart,
     chip: 'bg-success-light text-success-dark ring-1 ring-success/30 dark:bg-success/20 dark:text-success-light dark:ring-success/30',
     avatar: 'bg-success-light text-success-dark dark:bg-success/20 dark:text-success-light',
   },
   VOLUNTEER: {
-    label: 'Volunteer', icon: HandCoins,
+    labelKey: 'roles.VOLUNTEER', icon: HandCoins,
     chip: 'bg-warning-light text-warning-dark ring-1 ring-warning/30 dark:bg-warning/20 dark:text-warning-light dark:ring-warning/30',
     avatar: 'bg-warning-light text-warning-dark dark:bg-warning/20 dark:text-warning-light',
   },
@@ -43,7 +45,6 @@ function initials(name) {
     .toUpperCase();
 }
 
-// Detect platform for the ⌘/Ctrl affordance on the search shortcut pill.
 function useIsMac() {
   const [isMac, setIsMac] = useState(false);
   useEffect(() => {
@@ -58,6 +59,7 @@ function useIsMac() {
 export default function Header({ onMenuClick }) {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const { t } = useTranslation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef(null);
@@ -74,8 +76,6 @@ export default function Header({ onMenuClick }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // ⌘K / Ctrl+K focuses the search input. Non-functional query is intentional
-  // for now — wired up on submit to prepare for a future results page.
   useEffect(() => {
     function handleKey(e) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -96,15 +96,13 @@ export default function Header({ onMenuClick }) {
     e.preventDefault();
     const q = searchQuery.trim();
     if (!q) return;
-    // Placeholder behaviour — navigates the user to the dashboard with the
-    // query in the URL. Replace with a proper results page when search
-    // endpoints land.
     const dashboardPath = user?.userType === 'ADMIN' ? '/dashboard/admin' : '/dashboard/user';
     navigate(`${dashboardPath}?q=${encodeURIComponent(q)}`);
   };
 
   const role = roleMeta[user?.userType] || roleMeta.DONOR;
   const RoleIcon = role.icon;
+  const roleLabel = t(role.labelKey);
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-200 dark:border-gray-800">
@@ -128,7 +126,7 @@ export default function Header({ onMenuClick }) {
               />
               <div className="hidden sm:block min-w-0">
                 <h1 className="text-[15px] font-bold text-gray-900 dark:text-gray-50 leading-none">Alkhidmat 360</h1>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">Social Welfare Platform</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">{t('header.tagline')}</p>
               </div>
             </Link>
           </div>
@@ -140,7 +138,7 @@ export default function Header({ onMenuClick }) {
             role="search"
           >
             <label htmlFor="header-search" className="sr-only">
-              Search
+              {t('common.search')}
             </label>
             <div className="relative w-full group">
               <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500 transition-colors group-focus-within:text-primary-600 dark:group-focus-within:text-primary-400" />
@@ -150,7 +148,7 @@ export default function Header({ onMenuClick }) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 type="search"
-                placeholder="Search donations, applications, users…"
+                placeholder={t('header.searchPlaceholder')}
                 className="w-full h-9 pl-9 pr-20 rounded-full border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/20 border-gray-200 bg-gray-50 text-gray-800 placeholder:text-gray-400 focus:border-primary-500 focus:bg-white dark:border-gray-800 dark:bg-gray-800/60 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-primary-500 dark:focus:bg-gray-900"
               />
               <kbd
@@ -167,13 +165,14 @@ export default function Header({ onMenuClick }) {
             {/* Mobile search button */}
             <button
               onClick={() => searchInputRef.current?.focus()}
-              aria-label="Search"
+              aria-label={t('common.search')}
               className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
             >
               <Search className="w-5 h-5" />
             </button>
 
             <ThemeToggle />
+            <LanguageToggle />
 
             {user && (
               <span
@@ -183,7 +182,7 @@ export default function Header({ onMenuClick }) {
                 )}
               >
                 <RoleIcon className="h-3 w-3" />
-                {role.label}
+                {roleLabel}
               </span>
             )}
 
@@ -229,7 +228,7 @@ export default function Header({ onMenuClick }) {
                     </div>
                     <span className={cn('inline-flex items-center gap-1 mt-3 px-2 py-0.5 rounded-full text-[11px] font-medium', role.chip)}>
                       <RoleIcon className="h-3 w-3" />
-                      {role.label}
+                      {roleLabel}
                     </span>
                   </div>
 
@@ -240,14 +239,14 @@ export default function Header({ onMenuClick }) {
                       className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                     >
                       <SettingsIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                      <span>Settings</span>
+                      <span>{t('header.settings')}</span>
                     </Link>
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                     >
                       <LogOut className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                      <span>Sign out</span>
+                      <span>{t('header.signOut')}</span>
                     </button>
                   </div>
                 </div>

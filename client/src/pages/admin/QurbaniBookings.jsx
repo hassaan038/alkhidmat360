@@ -12,8 +12,10 @@ import EmptyState from '../../components/common/EmptyState';
 import * as qurbaniModuleService from '../../services/qurbaniModuleService';
 import { formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
+import { useTranslation } from 'react-i18next';
 
 export default function QurbaniBookings() {
+  const { t } = useTranslation();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(null);
@@ -25,7 +27,7 @@ export default function QurbaniBookings() {
       const res = await qurbaniModuleService.adminListBookings();
       setBookings(res.data?.bookings || []);
     } catch (error) {
-      toast.error('Failed to load bookings', { description: formatApiError(error) });
+      toast.error(t('table.statusUpdateFailed'), { description: formatApiError(error) });
       setBookings([]);
     } finally {
       setLoading(false);
@@ -41,10 +43,10 @@ export default function QurbaniBookings() {
     setUpdatingId(id);
     try {
       await qurbaniModuleService.adminUpdateBookingStatus(id, status);
-      toast.success('Booking updated');
+      toast.success(t('table.statusUpdated'));
       load();
     } catch (error) {
-      toast.error('Update failed', { description: formatApiError(error) });
+      toast.error(t('table.statusUpdateFailed'), { description: formatApiError(error) });
     } finally {
       setUpdatingId(null);
     }
@@ -58,8 +60,8 @@ export default function QurbaniBookings() {
         <PageHeader
           icon={ClipboardList}
           accent="qurbani"
-          title="Qurbani Bookings"
-          description="Review hissa bookings and confirm payments."
+          title={t('adminQurbaniBookings.title')}
+          description={t('adminQurbaniBookings.description')}
         />
 
           <Card className="overflow-hidden">
@@ -73,17 +75,17 @@ export default function QurbaniBookings() {
                 <EmptyState
                   icon={ClipboardList}
                   tone="qurbani"
-                  title="No bookings yet"
-                  description="Bookings will appear here as users reserve hissas."
+                  title={t('hissaBookings.noBookingsTitle')}
+                  description={t('hissaBookings.noBookingsDesc')}
                 />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
-                        <Th>#</Th><Th>User</Th><Th>Listing</Th>
-                        <Th>Hissas</Th><Th>Amount</Th><Th>Paid?</Th>
-                        <Th>Pickup</Th><Th>Status</Th><Th>Actions</Th><Th></Th>
+                        <Th>#</Th><Th>{t('common.name')}</Th><Th>{t('hissaBookings.listing')}</Th>
+                        <Th>{t('hissaBookings.hissas')}</Th><Th>{t('common.amount')}</Th><Th>{t('sadqa.paid')}</Th>
+                        <Th>{t('adminQurbani.pickupDate')}</Th><Th>{t('common.status')}</Th><Th>{t('common.actions')}</Th><Th></Th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -118,9 +120,9 @@ export default function QurbaniBookings() {
                               </td>
                               <td className="px-4 py-3 text-sm">
                                 {b.paymentMarked ? (
-                                  <Check className="w-4 h-4 text-success-dark" aria-label="Paid" />
+                                  <Check className="w-4 h-4 text-success-dark" aria-label={t('sadqa.paid')} />
                                 ) : (
-                                  <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label="Unpaid" />
+                                  <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label={t('donation.paymentPending')} />
                                 )}
                               </td>
                               <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
@@ -133,10 +135,10 @@ export default function QurbaniBookings() {
                                 {b.status === 'pending' && (
                                   <div className="flex gap-2">
                                     <Button size="sm" variant="success" leftIcon={Check} onClick={() => handleStatus(b.id, 'confirmed')} disabled={updatingId === b.id}>
-                                      Confirm
+                                      {t('common.confirm')}
                                     </Button>
                                     <Button size="sm" variant="outline" leftIcon={X} onClick={() => handleStatus(b.id, 'rejected')} disabled={updatingId === b.id} className="border-error/40 text-error-dark hover:bg-error-light/60">
-                                      Reject
+                                      {t('common.reject')}
                                     </Button>
                                   </div>
                                 )}
@@ -146,7 +148,7 @@ export default function QurbaniBookings() {
                                   type="button"
                                   onClick={() => toggleExpand(b.id)}
                                   className="rounded-md p-1 text-gray-400 dark:text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors cursor-pointer"
-                                  aria-label={expanded === b.id ? 'Collapse row' : 'Expand row'}
+                                  aria-label={t('common.view')}
                                 >
                                   {expanded === b.id ? (
                                     <ChevronUp className="w-5 h-5" />

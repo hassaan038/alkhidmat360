@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Scissors, Bot, Beef, Mountain, Info, User, Phone, Calendar, RotateCcw, ArrowRight } from 'lucide-react';
 import { createSkinCollection } from '../../services/donationService';
 import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const skinCollectionSchema = z.object({
   animalType: z.string().min(2).max(50),
@@ -23,23 +24,24 @@ const skinCollectionSchema = z.object({
   notes: z.string().optional(),
 });
 
-const skinTypes = [
-  { id: 'goat', name: 'Goat Skin', icon: Bot },
-  { id: 'cow', name: 'Cow Skin', icon: Beef },
-  { id: 'camel', name: 'Camel Skin', icon: Mountain },
-];
-
-const infoPoints = [
-  "You're donating the skin itself — there's no payment either way.",
-  'Please salt and dry the skin before our team arrives.',
-  'Proceeds fund Alkhidmat welfare programs.',
-  'Pickup is free — our team will call before arriving.',
-];
-
 export default function SkinCollection() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedSkin, setSelectedSkin] = useState('');
   const [customMode, setCustomMode] = useState(false);
+
+  const skinTypes = useMemo(() => [
+    { id: 'goat', name: t('skinCollection.goatSkin'), icon: Bot },
+    { id: 'cow', name: t('skinCollection.cowSkin'), icon: Beef },
+    { id: 'camel', name: t('skinCollection.camelSkin'), icon: Mountain },
+  ], [t]);
+
+  const infoPoints = useMemo(() => [
+    t('skinCollection.info1'),
+    t('skinCollection.info2'),
+    t('skinCollection.info3'),
+    t('skinCollection.info4'),
+  ], [t]);
 
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({
     resolver: zodResolver(skinCollectionSchema),
@@ -62,15 +64,15 @@ export default function SkinCollection() {
     setIsSubmitting(true);
     try {
       await createSkinCollection(data);
-      toast.success('Pickup request submitted', {
-        description: 'Our team will contact you to schedule the pickup. Thank you for donating.',
+      toast.success(t('skinCollection.pickupRequestSubmitted'), {
+        description: t('skinCollection.pickupRequestSubmittedDesc'),
       });
       reset();
       setSelectedSkin('');
       setCustomMode(false);
     } catch (error) {
-      toast.error('Submission failed', {
-        description: error.response?.data?.message || 'Please try again later',
+      toast.error(t('common.submissionFailed'), {
+        description: error.response?.data?.message || t('common.tryAgainLater'),
       });
     } finally {
       setIsSubmitting(false);
@@ -83,13 +85,13 @@ export default function SkinCollection() {
         <PageHeader
           icon={Scissors}
           accent="qurbani"
-          title="Skin Collection"
-          description="Donate your Qurbani animal skin — we collect it free of cost."
+          title={t('skinCollection.title')}
+          description={t('skinCollection.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="What are you donating?" icon={Scissors}>
-            <FormField label="Animal type" required error={errors.animalType?.message}>
+          <FormSection title={t('skinCollection.whatAreYouDonating')} icon={Scissors}>
+            <FormField label={t('skinCollection.animalType')} required error={errors.animalType?.message}>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {skinTypes.map((skin) => {
                   const SkinIcon = skin.icon;
@@ -127,57 +129,57 @@ export default function SkinCollection() {
                 onClick={enableCustom}
                 className="mt-3 text-sm font-medium text-qurbani-600 hover:text-qurbani-700 underline-offset-2 hover:underline cursor-pointer"
               >
-                Don't see your animal? Enter a custom type instead.
+                {t('skinCollection.noneFitCustom')}
               </button>
             ) : (
               <div className="mt-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Custom animal type</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('skinCollection.customAnimalType')}</label>
                   <button
                     type="button"
                     onClick={() => { setCustomMode(false); setValue('animalType', '', { shouldValidate: false }); }}
                     className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 cursor-pointer"
                   >
-                    Use a preset instead
+                    {t('skinCollection.usePresetInstead')}
                   </button>
                 </div>
-                <Input {...register('animalType')} placeholder="e.g., Mixed Animal Skins" autoFocus />
+                <Input {...register('animalType')} placeholder={t('skinCollection.customAnimalPlaceholder')} autoFocus />
               </div>
             )}
 
             <FormGrid cols={2} className="mt-5">
-              <FormField label="Number of skins" required htmlFor="ns" error={errors.numberOfSkins?.message}>
+              <FormField label={t('skinCollection.numberOfSkins')} required htmlFor="ns" error={errors.numberOfSkins?.message}>
                 <Input id="ns" type="number" min={1} {...register('numberOfSkins')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Pickup information" icon={User}>
+          <FormSection title={t('skinCollection.pickupInformation')} icon={User}>
             <FormGrid cols={2}>
-              <FormField label="Full name" required htmlFor="dn" error={errors.donorName?.message}>
-                <Input id="dn" leftIcon={User} {...register('donorName')} placeholder="Your full name" />
+              <FormField label={t('form.fullName')} required htmlFor="dn" error={errors.donorName?.message}>
+                <Input id="dn" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="dp" error={errors.donorPhone?.message}>
-                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder="03001234567" />
+              <FormField label={t('form.phoneNumber')} required htmlFor="dp" error={errors.donorPhone?.message}>
+                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField wide label="Collection address" required htmlFor="ca" error={errors.collectionAddress?.message}>
-                <Textarea id="ca" rows={3} {...register('collectionAddress')} placeholder="Complete pickup address with landmarks" />
+              <FormField wide label={t('skinCollection.collectionAddress')} required htmlFor="ca" error={errors.collectionAddress?.message}>
+                <Textarea id="ca" rows={3} {...register('collectionAddress')} placeholder={t('skinCollection.pickupAddressPlaceholder')} />
               </FormField>
-              <FormField label="Preferred pickup date" required htmlFor="pd" error={errors.preferredDate?.message} hint="Ideally within 1–2 days of Qurbani">
+              <FormField label={t('skinCollection.preferredDate')} required htmlFor="pd" error={errors.preferredDate?.message} hint={t('skinCollection.preferredDateHint')}>
                 <Input id="pd" type="date" leftIcon={Calendar} {...register('preferredDate')} />
               </FormField>
-              <FormField wide label="Additional notes" htmlFor="nt">
-                <Textarea id="nt" rows={2} {...register('notes')} placeholder="Special instructions for the pickup team" />
+              <FormField wide label={t('form.additionalNotes')} htmlFor="nt">
+                <Textarea id="nt" rows={2} {...register('notes')} placeholder={t('skinCollection.specialInstructionsPlaceholder')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => { reset(); setSelectedSkin(''); setCustomMode(false); }} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Schedule pickup
+              {t('skinCollection.schedulePickup')}
             </Button>
           </div>
         </form>
@@ -188,7 +190,7 @@ export default function SkinCollection() {
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-qurbani-700 dark:text-qurbani-200">How skin collection works</h4>
+              <h4 className="text-sm font-semibold text-qurbani-700 dark:text-qurbani-200">{t('skinCollection.howItWorks')}</h4>
               <ul className="mt-2 space-y-1 text-xs text-qurbani-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

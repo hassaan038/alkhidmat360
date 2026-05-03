@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import useAuthStore from '../../store/authStore';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -11,6 +12,7 @@ import heroImage from '../../assets/alkhidmat_hero_image.png';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { login, loading, error, clearError } = useAuthStore();
 
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -49,7 +51,7 @@ export default function Login() {
             <img src={logo} alt="" className="h-11 w-11 rounded-xl object-cover ring-2 ring-white/50 shadow-lg" />
             <div>
               <p className="text-lg font-bold leading-tight">Alkhidmat 360</p>
-              <p className="text-xs text-primary-100/90">Social Welfare Platform</p>
+              <p className="text-xs text-primary-100/90">{t('header.tagline')}</p>
             </div>
           </div>
         </div>
@@ -68,17 +70,17 @@ export default function Login() {
           </div>
 
           <h2 className="text-2xl xl:text-3xl font-bold leading-tight tracking-tight">
-            Give with intention.<br />Track every impact.
+            {t('auth.login.heroTitle')}
           </h2>
           <p className="mt-3 text-primary-100 text-sm leading-relaxed">
-            A unified platform for Qurbani, Zakat, Fitrana, disaster relief, and sponsorship — managed end-to-end by Alkhidmat Pakistan.
+            {t('auth.login.heroSubtitle')}
           </p>
 
           <ul className="mt-6 grid grid-cols-1 gap-2.5 w-full text-left">
             {[
-              { icon: ShieldCheck, title: 'Bank-grade payment verification' },
-              { icon: HeartHandshake, title: 'Direct beneficiary impact' },
-              { icon: Coins, title: 'Zakat & Fitrana calculators built-in' },
+              { icon: ShieldCheck, title: t('auth.login.feat1') },
+              { icon: HeartHandshake, title: t('auth.login.feat2') },
+              { icon: Coins, title: t('auth.login.feat3') },
             ].map((feat) => (
               <li key={feat.title} className="flex items-center gap-3 rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur-sm px-3 py-2">
                 <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white/15">
@@ -107,8 +109,8 @@ export default function Login() {
             <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary-50 text-primary-600 ring-8 ring-primary-50/50 mb-4">
               <LogIn className="h-5 w-5" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">Welcome back</h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Sign in to your account to continue</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50 tracking-tight">{t('auth.login.title')}</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t('auth.login.subtitle')}</p>
           </div>
 
           {error && (
@@ -119,7 +121,7 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <Label htmlFor="email" required>Email address</Label>
+              <Label htmlFor="email" required>{t('auth.login.emailLabel')}</Label>
               <Input
                 id="email"
                 name="email"
@@ -136,8 +138,8 @@ export default function Login() {
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" required>Password</Label>
-                <span className="text-xs text-gray-400 dark:text-gray-500">Use a strong, unique password</span>
+                <Label htmlFor="password" required>{t('auth.login.passwordLabel')}</Label>
+                <span className="text-xs text-gray-400 dark:text-gray-500">{t('auth.login.passwordHint')}</span>
               </div>
               <div className="relative">
                 <Input
@@ -165,7 +167,7 @@ export default function Login() {
             </div>
 
             <Button type="submit" size="lg" loading={loading} className="w-full">
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? t('auth.login.signingIn') : t('auth.login.submit')}
             </Button>
           </form>
 
@@ -174,13 +176,13 @@ export default function Login() {
               <div className="w-full border-t border-gray-200 dark:border-gray-800" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white dark:bg-gray-900 px-3 text-gray-400 dark:text-gray-500">New to Alkhidmat 360?</span>
+              <span className="bg-white dark:bg-gray-900 px-3 text-gray-400 dark:text-gray-500">{t('auth.login.noAccount')}</span>
             </div>
           </div>
 
           <Link to="/signup" className="block">
             <Button variant="outline" size="lg" className="w-full">
-              Create new account
+              {t('auth.login.createAccount')}
             </Button>
           </Link>
 

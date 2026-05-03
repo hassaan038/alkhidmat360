@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,6 +15,7 @@ import {
   User, Phone, CreditCard, Info, RotateCcw, ArrowRight, Coins, Users,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const loanApplicationSchema = z.object({
   loanType: z.enum(['BUSINESS', 'EDUCATION', 'MEDICAL', 'HOUSING', 'MARRIAGE', 'OTHER']),
@@ -34,24 +35,25 @@ const loanApplicationSchema = z.object({
   additionalNotes: z.string().optional(),
 });
 
-const loanTypes = [
-  { value: 'BUSINESS', label: 'Business', icon: Briefcase },
-  { value: 'EDUCATION', label: 'Education', icon: GraduationCap },
-  { value: 'MEDICAL', label: 'Medical', icon: Stethoscope },
-  { value: 'HOUSING', label: 'Housing', icon: Home },
-  { value: 'MARRIAGE', label: 'Marriage', icon: Heart },
-  { value: 'OTHER', label: 'Other', icon: FileText },
-];
-
-const infoPoints = [
-  'All loans are interest-free (Qarz-e-Hasna).',
-  'Applications are reviewed within 7–10 business days.',
-  'Document verification is required after initial review.',
-  'Repayment terms are discussed during approval.',
-];
-
 export default function LoanApplication() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const loanTypes = useMemo(() => [
+    { value: 'BUSINESS', label: t('loanApplication.business'), icon: Briefcase },
+    { value: 'EDUCATION', label: t('loanApplication.education'), icon: GraduationCap },
+    { value: 'MEDICAL', label: t('loanApplication.medical'), icon: Stethoscope },
+    { value: 'HOUSING', label: t('loanApplication.housing'), icon: Home },
+    { value: 'MARRIAGE', label: t('loanApplication.marriage'), icon: Heart },
+    { value: 'OTHER', label: t('loanApplication.other'), icon: FileText },
+  ], [t]);
+
+  const infoPoints = useMemo(() => [
+    t('loanApplication.info1'),
+    t('loanApplication.info2'),
+    t('loanApplication.info3'),
+    t('loanApplication.info4'),
+  ], [t]);
 
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
     resolver: zodResolver(loanApplicationSchema),
@@ -63,13 +65,13 @@ export default function LoanApplication() {
     setIsSubmitting(true);
     try {
       await createLoanApplication(data);
-      toast.success('Loan application submitted', {
-        description: 'Your application will be reviewed within 7–10 business days.',
+      toast.success(t('loanApplication.submitted'), {
+        description: t('loanApplication.submittedDesc'),
       });
       reset();
     } catch (error) {
-      toast.error('Submission failed', {
-        description: error.response?.data?.message || 'Please try again later',
+      toast.error(t('common.submissionFailed'), {
+        description: error.response?.data?.message || t('common.tryAgainLater'),
       });
     } finally {
       setIsSubmitting(false);
@@ -82,12 +84,12 @@ export default function LoanApplication() {
         <PageHeader
           icon={DollarSign}
           accent="loan"
-          title="Loan Application"
-          description="Apply for an interest-free loan (Qarz-e-Hasna) — pick a purpose, fill the details, and submit."
+          title={t('loanApplication.title')}
+          description={t('loanApplication.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Loan type" icon={Briefcase} description="What is this loan for?">
+          <FormSection title={t('loanApplication.loanType')} icon={Briefcase}>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {loanTypes.map((type) => {
                 const TypeIcon = type.icon;
@@ -118,77 +120,77 @@ export default function LoanApplication() {
             </div>
           </FormSection>
 
-          <FormSection title="Financial information" icon={Coins}>
+          <FormSection title={t('loanApplication.financialInformation')} icon={Coins}>
             <FormGrid cols={2}>
-              <FormField label="Requested amount (PKR)" required htmlFor="ra" error={errors.requestedAmount?.message}>
-                <Input id="ra" type="number" min={0} {...register('requestedAmount')} placeholder="e.g., 50000" />
+              <FormField label={t('loanApplication.requestedAmount')} required htmlFor="ra" error={errors.requestedAmount?.message}>
+                <Input id="ra" type="number" min={0} {...register('requestedAmount')} placeholder="50000" />
               </FormField>
-              <FormField label="Monthly income (PKR)" required htmlFor="mi" error={errors.monthlyIncome?.message}>
-                <Input id="mi" type="number" min={0} {...register('monthlyIncome')} placeholder="e.g., 30000" />
+              <FormField label={t('loanApplication.monthlyIncome')} required htmlFor="mi" error={errors.monthlyIncome?.message}>
+                <Input id="mi" type="number" min={0} {...register('monthlyIncome')} placeholder="30000" />
               </FormField>
-              <FormField label="Family members" required htmlFor="fm" error={errors.familyMembers?.message}>
-                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="e.g., 5" />
+              <FormField label={t('loanApplication.familyMembers')} required htmlFor="fm" error={errors.familyMembers?.message}>
+                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="5" />
               </FormField>
-              <FormField label="Employment status" required htmlFor="es" error={errors.employmentStatus?.message}>
+              <FormField label={t('loanApplication.employmentStatus')} required htmlFor="es" error={errors.employmentStatus?.message}>
                 <Select id="es" {...register('employmentStatus')}>
-                  <option value="">Select status</option>
-                  <option value="Employed">Employed</option>
-                  <option value="Self-Employed">Self-Employed</option>
-                  <option value="Unemployed">Unemployed</option>
-                  <option value="Daily Wage">Daily Wage</option>
-                  <option value="Retired">Retired</option>
-                  <option value="Student">Student</option>
+                  <option value="">{t('loanApplication.selectStatus')}</option>
+                  <option value="Employed">{t('loanApplication.employed')}</option>
+                  <option value="Self-Employed">{t('loanApplication.selfEmployed')}</option>
+                  <option value="Unemployed">{t('loanApplication.unemployed')}</option>
+                  <option value="Daily Wage">{t('loanApplication.dailyWage')}</option>
+                  <option value="Retired">{t('loanApplication.retired')}</option>
+                  <option value="Student">{t('loanApplication.student')}</option>
                 </Select>
               </FormField>
-              <FormField wide label="Purpose description" required htmlFor="pd" error={errors.purposeDescription?.message}>
-                <Textarea id="pd" rows={4} {...register('purposeDescription')} placeholder="Explain in detail why you need this loan and how it will be used" />
+              <FormField wide label={t('loanApplication.purposeDescription')} required htmlFor="pd" error={errors.purposeDescription?.message}>
+                <Textarea id="pd" rows={4} {...register('purposeDescription')} placeholder={t('loanApplication.purposePlaceholder')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Applicant information" icon={User}>
+          <FormSection title={t('loanApplication.applicantInformation')} icon={User}>
             <FormGrid cols={2}>
-              <FormField wide label="Full name" required htmlFor="an" error={errors.applicantName?.message}>
-                <Input id="an" leftIcon={User} {...register('applicantName')} placeholder="Your full name" />
+              <FormField wide label={t('loanApplication.applicantName')} required htmlFor="an" error={errors.applicantName?.message}>
+                <Input id="an" leftIcon={User} {...register('applicantName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="ap" error={errors.applicantPhone?.message}>
-                <Input id="ap" type="tel" leftIcon={Phone} {...register('applicantPhone')} placeholder="03001234567" />
+              <FormField label={t('loanApplication.applicantPhone')} required htmlFor="ap" error={errors.applicantPhone?.message}>
+                <Input id="ap" type="tel" leftIcon={Phone} {...register('applicantPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField label="CNIC (13 digits)" required htmlFor="ac" error={errors.applicantCNIC?.message}>
+              <FormField label={t('loanApplication.applicantCNIC')} required htmlFor="ac" error={errors.applicantCNIC?.message}>
                 <Input id="ac" leftIcon={CreditCard} maxLength={13} {...register('applicantCNIC')} placeholder="1234567890123" />
               </FormField>
-              <FormField wide label="Address" required htmlFor="aa" error={errors.applicantAddress?.message}>
-                <Textarea id="aa" rows={3} {...register('applicantAddress')} placeholder="Complete residential address" />
+              <FormField wide label={t('loanApplication.applicantAddress')} required htmlFor="aa" error={errors.applicantAddress?.message}>
+                <Textarea id="aa" rows={3} {...register('applicantAddress')} placeholder={t('form.completeAddress')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Guarantor information" icon={Users} description="Optional — providing a guarantor improves your application.">
+          <FormSection title={t('loanApplication.guarantorInformation')} icon={Users}>
             <FormGrid cols={2}>
-              <FormField wide label="Guarantor name" htmlFor="gn">
-                <Input id="gn" leftIcon={User} {...register('guarantorName')} placeholder="Full name" />
+              <FormField wide label={t('loanApplication.guarantorName')} htmlFor="gn">
+                <Input id="gn" leftIcon={User} {...register('guarantorName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Guarantor phone" htmlFor="gp">
-                <Input id="gp" type="tel" leftIcon={Phone} {...register('guarantorPhone')} placeholder="03001234567" />
+              <FormField label={t('loanApplication.guarantorPhone')} htmlFor="gp">
+                <Input id="gp" type="tel" leftIcon={Phone} {...register('guarantorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField label="Guarantor CNIC" htmlFor="gc">
+              <FormField label={t('loanApplication.guarantorCNIC')} htmlFor="gc">
                 <Input id="gc" leftIcon={CreditCard} maxLength={13} {...register('guarantorCNIC')} placeholder="1234567890123" />
               </FormField>
-              <FormField wide label="Guarantor address" htmlFor="ga">
-                <Textarea id="ga" rows={2} {...register('guarantorAddress')} placeholder="Complete residential address" />
+              <FormField wide label={t('loanApplication.guarantorAddress')} htmlFor="ga">
+                <Textarea id="ga" rows={2} {...register('guarantorAddress')} placeholder={t('form.completeAddress')} />
               </FormField>
-              <FormField wide label="Additional notes" htmlFor="add">
-                <Textarea id="add" rows={2} {...register('additionalNotes')} placeholder="Anything else you'd like to share" />
+              <FormField wide label={t('loanApplication.additionalNotes')} htmlFor="add">
+                <Textarea id="add" rows={2} {...register('additionalNotes')} placeholder={t('form.specialInstructions')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset()} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Submit application
+              {t('common.submitApplication')}
             </Button>
           </div>
         </form>
@@ -199,7 +201,7 @@ export default function LoanApplication() {
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-loan-700 dark:text-loan-200">Important information</h4>
+              <h4 className="text-sm font-semibold text-loan-700 dark:text-loan-200">{t('common.importantInformation')}</h4>
               <ul className="mt-2 space-y-1 text-xs text-loan-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

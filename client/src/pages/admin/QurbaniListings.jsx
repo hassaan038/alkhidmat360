@@ -22,6 +22,7 @@ import EmptyState from '../../components/common/EmptyState';
 import * as qurbaniModuleService from '../../services/qurbaniModuleService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
+import { useTranslation } from 'react-i18next';
 
 const STATUSES = ['DRAFT', 'ACTIVE', 'FULL', 'CLOSED'];
 const HISSAS_PER_BULL = 7;
@@ -50,6 +51,7 @@ const listingSchema = z.object({
 });
 
 function ListingForm({ mode, initial, onCancel, onSaved }) {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -84,14 +86,14 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
     try {
       if (mode === 'create') {
         await qurbaniModuleService.adminCreateListing(fd);
-        toast.success('Listing created', { description: 'Auto-named based on listing count.' });
+        toast.success(t('table.statusUpdated'));
       } else {
         await qurbaniModuleService.adminUpdateListing(initial.id, fd);
-        toast.success('Listing updated');
+        toast.success(t('table.statusUpdated'));
       }
       onSaved();
     } catch (error) {
-      toast.error(mode === 'create' ? 'Create failed' : 'Update failed', {
+      toast.error(t('common.submissionFailed'), {
         description: formatApiError(error),
       });
     }
@@ -102,7 +104,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Weight (kg) <span className="text-error">*</span>
+            {t('adminQurbani.weightKg')} <span className="text-error">*</span>
           </label>
           <input
             type="number"
@@ -114,7 +116,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Estimated Bull Price (PKR) <span className="text-error">*</span>
+            {t('adminQurbani.estimatedPrice')} <span className="text-error">*</span>
           </label>
           <input
             type="number"
@@ -137,7 +139,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Pickup Date <span className="text-error">*</span>
+            {t('adminQurbani.pickupDate')} <span className="text-error">*</span>
           </label>
           <input
             type="date"
@@ -150,7 +152,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Pickup Location <span className="text-error">*</span>
+            {t('adminQurbani.pickupLocation')} <span className="text-error">*</span>
           </label>
           <input
             {...register('pickupLocation')}
@@ -163,7 +165,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('common.description')}</label>
         <textarea
           rows={3}
           {...register('description')}
@@ -173,7 +175,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
 
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          Photo {mode === 'edit' && <span className="text-xs text-gray-500 dark:text-gray-400">(leave empty to keep current)</span>}
+          {t('adminQurbani.photo')} {mode === 'edit' && <span className="text-xs text-gray-500 dark:text-gray-400">({t('common.optional')})</span>}
         </label>
         <input
           type="file"
@@ -185,18 +187,18 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
 
       <div className="flex justify-end gap-2 pt-2 border-t border-gray-200 dark:border-gray-800">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button type="submit" disabled={isSubmitting} className="bg-primary-600 hover:bg-primary-700 text-white">
           {isSubmitting ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Saving...
+              {t('common.submitting')}
             </>
           ) : mode === 'create' ? (
-            'Create Listing'
+            t('adminQurbani.createListing')
           ) : (
-            'Save Changes'
+            t('common.save')
           )}
         </Button>
       </div>
@@ -205,6 +207,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
 }
 
 export default function QurbaniListings() {
+  const { t } = useTranslation();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalMode, setModalMode] = useState(null); // 'create' | 'edit' | null
@@ -217,7 +220,7 @@ export default function QurbaniListings() {
       const res = await qurbaniModuleService.adminListListings();
       setListings(res.data?.listings || []);
     } catch (error) {
-      toast.error('Failed to load listings', { description: formatApiError(error) });
+      toast.error(t('table.statusUpdateFailed'), { description: formatApiError(error) });
       setListings([]);
     } finally {
       setLoading(false);
@@ -230,14 +233,14 @@ export default function QurbaniListings() {
   }, []);
 
   const handleDelete = async (listing) => {
-    if (!window.confirm(`Delete listing "${listing.name}"? This cannot be undone.`)) return;
+    if (!window.confirm(`${t('adminQurbani.deleteListing')} "${listing.name}"?`)) return;
     try {
       await qurbaniModuleService.adminDeleteListing(listing.id);
-      toast.success('Listing deleted');
+      toast.success(t('table.statusUpdated'));
       load();
     } catch (error) {
-      toast.error('Delete failed', {
-        description: formatApiError(error) || 'Listings with bookings cannot be deleted.',
+      toast.error(t('common.submissionFailed'), {
+        description: formatApiError(error),
       });
     }
   };
@@ -247,10 +250,10 @@ export default function QurbaniListings() {
     setStatusUpdatingId(listing.id);
     try {
       await qurbaniModuleService.adminUpdateListingStatus(listing.id, status);
-      toast.success('Status updated');
+      toast.success(t('table.statusUpdated'));
       load();
     } catch (error) {
-      toast.error('Status update failed', { description: formatApiError(error) });
+      toast.error(t('table.statusUpdateFailed'), { description: formatApiError(error) });
     } finally {
       setStatusUpdatingId(null);
     }
@@ -277,11 +280,11 @@ export default function QurbaniListings() {
         <PageHeader
           icon={ListChecks}
           accent="qurbani"
-          title="Qurbani Listings"
-          description="Manage animal listings available for hissa booking."
+          title={t('adminQurbani.title')}
+          description={t('adminQurbani.description')}
           actions={
             <Button leftIcon={Plus} onClick={openCreate}>
-              Create listing
+              {t('adminQurbani.createListing')}
             </Button>
           }
         />
@@ -297,23 +300,23 @@ export default function QurbaniListings() {
                 <EmptyState
                   icon={ListChecks}
                   tone="qurbani"
-                  title="No listings yet"
-                  description="Create your first listing to start accepting hissa bookings."
-                  action={{ label: 'Create Listing', onClick: openCreate }}
+                  title={t('qurbaniModule.noActiveListings')}
+                  description={t('qurbaniModule.noActiveListingsDesc')}
+                  action={{ label: t('adminQurbani.createListing'), onClick: openCreate }}
                 />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Photo</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Name</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Weight</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price / Hissa</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Booked</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Pickup</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('adminQurbani.photo')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.name')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('adminQurbani.weightKg')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('adminQurbani.pricePerHissa')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('qurbaniModule.hissaBooked')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('adminQurbani.pickupDate')}</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.status')}</th>
+                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{t('common.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200">
@@ -370,7 +373,7 @@ export default function QurbaniListings() {
                                   onClick={() => openEdit(listing)}
                                   className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
                                 >
-                                  <Edit2 className="w-3 h-3 mr-1" /> Edit
+                                  <Edit2 className="w-3 h-3 mr-1" /> {t('common.edit')}
                                 </Button>
                                 <Button
                                   size="sm"
@@ -378,7 +381,7 @@ export default function QurbaniListings() {
                                   onClick={() => handleDelete(listing)}
                                   className="border-red-300 text-red-600 hover:bg-red-50"
                                 >
-                                  <Trash2 className="w-3 h-3 mr-1" /> Delete
+                                  <Trash2 className="w-3 h-3 mr-1" /> {t('common.delete')}
                                 </Button>
                               </div>
                             </td>
@@ -398,13 +401,13 @@ export default function QurbaniListings() {
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-large w-full max-w-xl max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                {modalMode === 'create' ? 'Create Listing' : 'Edit Listing'}
+                {modalMode === 'create' ? t('adminQurbani.createListing') : t('adminQurbani.updateListing')}
               </h2>
               <button
                 type="button"
                 onClick={closeModal}
                 className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 dark:text-gray-400"
-                aria-label="Close"
+                aria-label={t('common.close')}
               >
                 <X className="w-5 h-5" />
               </button>

@@ -11,6 +11,7 @@ import Button from '../../components/ui/Button';
 import { toast } from 'sonner';
 import { UserPlus, Mail, Lock, User, Phone, CreditCard, ShieldCheck, Info, RotateCcw, ArrowRight } from 'lucide-react';
 import api from '../../services/api';
+import { useTranslation } from 'react-i18next';
 
 const createAdminSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -25,6 +26,7 @@ const createAdminSchema = z.object({
 });
 
 export default function CreateAdmin() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
@@ -36,10 +38,10 @@ export default function CreateAdmin() {
     try {
       const { confirmPassword: _cp, ...adminData } = data;
       await api.post('/admin/create-admin', adminData);
-      toast.success('Admin account created', { description: `Successfully created admin account for ${data.fullName}` });
+      toast.success(t('createAdmin.created'), { description: t('createAdmin.createdDesc') });
       reset();
     } catch (error) {
-      toast.error('Failed to create admin', { description: error.response?.data?.message || 'Please try again' });
+      toast.error(t('common.submissionFailed'), { description: error.response?.data?.message || t('common.tryAgainLater') });
     } finally {
       setIsSubmitting(false);
     }
@@ -51,35 +53,35 @@ export default function CreateAdmin() {
         <PageHeader
           icon={UserPlus}
           accent="primary"
-          title="Create Admin Account"
-          description="Grant administrator privileges to a new team member."
+          title={t('createAdmin.title')}
+          description={t('createAdmin.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Account details" icon={User}>
+          <FormSection title={t('settings.profile')} icon={User}>
             <FormGrid cols={2}>
-              <FormField wide label="Full name" required htmlFor="fn" error={errors.fullName?.message}>
-                <Input id="fn" leftIcon={User} {...register('fullName')} placeholder="John Doe" />
+              <FormField wide label={t('createAdmin.fullName')} required htmlFor="fn" error={errors.fullName?.message}>
+                <Input id="fn" leftIcon={User} {...register('fullName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField wide label="Email address" required htmlFor="em" error={errors.email?.message}>
-                <Input id="em" type="email" leftIcon={Mail} {...register('email')} placeholder="admin@alkhidmat360.com" />
+              <FormField wide label={t('createAdmin.email')} required htmlFor="em" error={errors.email?.message}>
+                <Input id="em" type="email" leftIcon={Mail} {...register('email')} placeholder={t('form.emailPlaceholder')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="ph" error={errors.phoneNumber?.message}>
-                <Input id="ph" type="tel" leftIcon={Phone} {...register('phoneNumber')} placeholder="03001234567" />
+              <FormField label={t('createAdmin.phone')} required htmlFor="ph" error={errors.phoneNumber?.message}>
+                <Input id="ph" type="tel" leftIcon={Phone} {...register('phoneNumber')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField label="CNIC" htmlFor="cn" hint="Optional · 13 digits no dashes" error={errors.cnic?.message}>
+              <FormField label={t('settings.cnic')} htmlFor="cn" hint={t('settings.cnicHint')} error={errors.cnic?.message}>
                 <Input id="cn" leftIcon={CreditCard} maxLength={13} {...register('cnic')} placeholder="1234567890123" />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Password" icon={Lock}>
+          <FormSection title={t('createAdmin.password')} icon={Lock}>
             <FormGrid cols={2}>
-              <FormField label="Password" required htmlFor="pw" error={errors.password?.message}>
-                <Input id="pw" type="password" leftIcon={Lock} {...register('password')} placeholder="At least 6 characters" />
+              <FormField label={t('createAdmin.password')} required htmlFor="pw" error={errors.password?.message}>
+                <Input id="pw" type="password" leftIcon={Lock} {...register('password')} placeholder={t('createAdmin.passwordHint')} />
               </FormField>
-              <FormField label="Confirm password" required htmlFor="cpw" error={errors.confirmPassword?.message}>
-                <Input id="cpw" type="password" leftIcon={Lock} {...register('confirmPassword')} placeholder="Re-enter password" />
+              <FormField label={t('settings.confirmPassword')} required htmlFor="cpw" error={errors.confirmPassword?.message}>
+                <Input id="cpw" type="password" leftIcon={Lock} {...register('confirmPassword')} placeholder={t('settings.confirmPassword')} />
               </FormField>
             </FormGrid>
           </FormSection>
@@ -91,10 +93,10 @@ export default function CreateAdmin() {
               </span>
               <div>
                 <h4 className="text-sm font-semibold text-primary-700 flex items-center gap-1.5">
-                  <ShieldCheck className="h-3.5 w-3.5" /> Admin privileges
+                  <ShieldCheck className="h-3.5 w-3.5" /> {t('roles.ADMIN')}
                 </h4>
                 <p className="mt-1 text-xs text-primary-700/90 leading-relaxed">
-                  This account will have full administrator access including user management, donation oversight, application reviews, and system configuration.
+                  {t('createAdmin.description')}
                 </p>
               </div>
             </div>
@@ -102,10 +104,10 @@ export default function CreateAdmin() {
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset()} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Create admin account
+              {t('createAdmin.submit')}
             </Button>
           </div>
         </form>

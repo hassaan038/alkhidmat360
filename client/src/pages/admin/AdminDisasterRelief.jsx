@@ -11,8 +11,10 @@ import EmptyState from '../../components/common/EmptyState';
 import * as extraDonationService from '../../services/extraDonationService';
 import { formatCurrency, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminDisasterRelief() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +24,7 @@ export default function AdminDisasterRelief() {
       const res = await extraDonationService.adminListDisasterDonations();
       setItems(res.data?.donations || []);
     } catch (err) {
-      toast.error('Failed to load donations', { description: formatApiError(err) });
+      toast.error(t('disasterRelief.failedToLoad'), { description: formatApiError(err) });
       setItems([]);
     } finally {
       setLoading(false);
@@ -40,8 +42,8 @@ export default function AdminDisasterRelief() {
         <PageHeader
           icon={LifeBuoy}
           accent="disaster"
-          title="Disaster Relief Donations"
-          description="Read-only log of donations to disaster relief campaigns (auto-confirmed on payment)."
+          title={t('adminDisaster.title')}
+          description={t('adminDisaster.description')}
         />
 
         <Card className="overflow-hidden">
@@ -55,16 +57,16 @@ export default function AdminDisasterRelief() {
             <EmptyState
               icon={LifeBuoy}
               tone="disaster"
-              title="No disaster donations yet"
-              description="Donor submissions will appear here."
+              title={t('disasterRelief.noDonations')}
+              description={t('disasterRelief.noDonationsDesc')}
             />
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full">
                 <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                   <tr>
-                    <Th>#</Th><Th>Donor</Th><Th>Campaign</Th><Th>Amount</Th>
-                    <Th>Paid?</Th><Th>Screenshot</Th><Th>Status</Th>
+                    <Th>#</Th><Th>{t('roles.DONOR')}</Th><Th>{t('adminDisaster.campaign')}</Th><Th>{t('common.amount')}</Th>
+                    <Th>{t('sadqa.paid')}</Th><Th>{t('payment.screenshotOptional')}</Th><Th>{t('common.status')}</Th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -85,15 +87,15 @@ export default function AdminDisasterRelief() {
                       </td>
                       <td className="px-4 py-3 text-sm">
                         {d.paymentMarked ? (
-                          <Check className="w-4 h-4 text-success-dark" aria-label="Paid" />
+                          <Check className="w-4 h-4 text-success-dark" aria-label={t('sadqa.paid')} />
                         ) : (
-                          <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label="Unpaid" />
+                          <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label={t('donation.paymentPending')} />
                         )}
                       </td>
                       <td className="px-4 py-3">
                         {d.paymentScreenshotUrl ? (
                           <a href={imageUrl(d.paymentScreenshotUrl)} target="_blank" rel="noopener noreferrer" className="inline-block overflow-hidden rounded border border-gray-200 dark:border-gray-800 transition hover:border-primary-300">
-                            <img src={imageUrl(d.paymentScreenshotUrl)} alt="Payment" className="w-12 h-12 object-cover" />
+                            <img src={imageUrl(d.paymentScreenshotUrl)} alt={t('payment.screenshotOptional')} className="w-12 h-12 object-cover" />
                           </a>
                         ) : (
                           <span className="text-xs text-gray-400 dark:text-gray-500">—</span>

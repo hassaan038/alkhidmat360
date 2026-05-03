@@ -11,6 +11,7 @@ import EmptyState from '../../components/common/EmptyState';
 import { Users, Heart, HandHeart, HandCoins, ShieldCheck, Search, UserCog } from 'lucide-react';
 import { getUsers } from '../../services/adminService';
 import { formatDate, cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const USER_TYPE_BADGE = {
   DONOR: 'primary',
@@ -20,6 +21,7 @@ const USER_TYPE_BADGE = {
 };
 
 export default function UserManagement() {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [counts, setCounts] = useState({ total: 0, donors: 0, beneficiaries: 0, volunteers: 0, admins: 0 });
   const [loading, setLoading] = useState(true);
@@ -42,10 +44,10 @@ export default function UserManagement() {
   }, []);
 
   const userStats = [
-    { label: 'Total users', value: counts.total, icon: Users, tone: 'primary' },
-    { label: 'Donors', value: counts.donors, icon: Heart, tone: 'sadqa' },
-    { label: 'Beneficiaries', value: counts.beneficiaries, icon: HandHeart, tone: 'success' },
-    { label: 'Volunteers', value: counts.volunteers, icon: HandCoins, tone: 'volunteer' },
+    { label: t('adminUsers.totalUsers'), value: counts.total, icon: Users, tone: 'primary' },
+    { label: t('roles.DONOR'), value: counts.donors, icon: Heart, tone: 'sadqa' },
+    { label: t('roles.BENEFICIARY'), value: counts.beneficiaries, icon: HandHeart, tone: 'success' },
+    { label: t('roles.VOLUNTEER'), value: counts.volunteers, icon: HandCoins, tone: 'volunteer' },
   ];
 
   const filtered = useMemo(() => {
@@ -71,11 +73,11 @@ export default function UserManagement() {
         <PageHeader
           icon={UserCog}
           accent="primary"
-          title="User Management"
-          description="View and manage all platform users in one place."
+          title={t('adminUsers.title')}
+          description={t('adminUsers.description')}
           meta={
             <Badge variant="primary" size="sm" icon={ShieldCheck}>
-              {counts.total} users total
+              {counts.total} {t('adminUsers.totalUsers')}
             </Badge>
           }
         />
@@ -85,7 +87,7 @@ export default function UserManagement() {
             {Array.from({ length: 4 }).map((_, i) => <SkeletonStatCard key={i} />)}
           </div>
         ) : error ? (
-          <EmptyState icon={Users} tone="warning" title="Couldn't load users" description={error} />
+          <EmptyState icon={Users} tone="warning" title={t('adminUsers.noUsers')} description={error} />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -97,10 +99,10 @@ export default function UserManagement() {
                 <div className="w-full sm:max-w-xs">
                   <Input
                     leftIcon={Search}
-                    placeholder="Search by name, email, or phone…"
+                    placeholder={t('common.search')}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    aria-label="Search users"
+                    aria-label={t('common.search')}
                   />
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -115,7 +117,7 @@ export default function UserManagement() {
                           : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 ring-1 ring-inset ring-gray-200 hover:bg-gray-50 hover:text-gray-900'
                       )}
                     >
-                      {k === 'all' ? 'All' : k.charAt(0) + k.slice(1).toLowerCase()}
+                      {k === 'all' ? t('common.all') : t(`roles.${k}`)}
                     </button>
                   ))}
                 </div>
@@ -124,20 +126,20 @@ export default function UserManagement() {
               {filtered.length === 0 ? (
                 <EmptyState
                   icon={Users}
-                  title={users.length === 0 ? 'No users yet' : 'No matching users'}
-                  description={users.length === 0 ? 'New sign-ups will appear here.' : 'Try adjusting your search or filter.'}
+                  title={users.length === 0 ? t('adminUsers.noUsers') : t('table.noMatchingRecords')}
+                  description={users.length === 0 ? t('empty.description') : t('table.adjustFilters')}
                 />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
-                        <Th>Name</Th>
-                        <Th>Email</Th>
-                        <Th>Phone</Th>
-                        <Th>Role</Th>
-                        <Th>Status</Th>
-                        <Th>Joined</Th>
+                        <Th>{t('common.name')}</Th>
+                        <Th>{t('common.email')}</Th>
+                        <Th>{t('common.phone')}</Th>
+                        <Th>{t('adminUsers.role')}</Th>
+                        <Th>{t('common.status')}</Th>
+                        <Th>{t('adminUsers.joinDate')}</Th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -153,7 +155,7 @@ export default function UserManagement() {
                           </td>
                           <td className="px-4 py-3">
                             <Badge variant={user.isActive ? 'success' : 'neutral'} size="sm" dot>
-                              {user.isActive ? 'Active' : 'Inactive'}
+                              {user.isActive ? t('adminUsers.active') : t('adminUsers.inactive')}
                             </Badge>
                           </td>
                           <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 tabular-nums">{formatDate(user.createdAt)}</td>

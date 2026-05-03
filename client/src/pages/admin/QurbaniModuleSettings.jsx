@@ -11,8 +11,10 @@ import Badge from '../../components/ui/Badge';
 import * as systemConfigService from '../../services/systemConfigService';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import { formatApiError, cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export default function QurbaniModuleSettings() {
+  const { t } = useTranslation();
   const refreshFlag = useQurbaniModuleStore((s) => s.refreshFlag);
 
   const [enabled, setEnabled] = useState(false);
@@ -26,15 +28,15 @@ export default function QurbaniModuleSettings() {
     systemConfigService
       .getQurbaniModuleFlag()
       .then((res) => setEnabled(!!res.data?.enabled))
-      .catch((err) => toast.error('Failed to load booking status', { description: formatApiError(err) }))
+      .catch((err) => toast.error(t('table.statusUpdateFailed'), { description: formatApiError(err) }))
       .finally(() => setLoadingFlag(false));
 
     systemConfigService
       .getBankDetails()
       .then((res) => setBankDetails(res.data?.bankDetails || ''))
-      .catch((err) => toast.error('Failed to load bank details', { description: formatApiError(err) }))
+      .catch((err) => toast.error(t('table.statusUpdateFailed'), { description: formatApiError(err) }))
       .finally(() => setLoadingBank(false));
-  }, []);
+  }, [t]);
 
   const handleToggle = async () => {
     const next = !enabled;
@@ -42,10 +44,10 @@ export default function QurbaniModuleSettings() {
     try {
       await systemConfigService.updateQurbaniModuleFlag(next);
       setEnabled(next);
-      toast.success(`Qurbani booking ${next ? 'activated' : 'deactivated'}`);
+      toast.success(next ? t('qurbaniSettings.moduleEnabled') : t('qurbaniSettings.moduleDisabled'));
       await refreshFlag();
     } catch (error) {
-      toast.error('Update failed', { description: formatApiError(error) });
+      toast.error(t('table.statusUpdateFailed'), { description: formatApiError(error) });
     } finally {
       setSavingFlag(false);
     }
@@ -55,9 +57,9 @@ export default function QurbaniModuleSettings() {
     setSavingBank(true);
     try {
       await systemConfigService.updateBankDetails(bankDetails);
-      toast.success('Bank details saved');
+      toast.success(t('table.statusUpdated'));
     } catch (error) {
-      toast.error('Save failed', { description: formatApiError(error) });
+      toast.error(t('table.statusUpdateFailed'), { description: formatApiError(error) });
     } finally {
       setSavingBank(false);
     }
@@ -69,30 +71,30 @@ export default function QurbaniModuleSettings() {
         <PageHeader
           icon={Settings}
           accent="qurbani"
-          title="Qurbani Booking Settings"
-          description="Control booking visibility and payment instructions."
+          title={t('qurbaniSettings.title')}
+          description={t('qurbaniSettings.description')}
           meta={
             !loadingFlag && (
               <Badge variant={enabled ? 'success' : 'neutral'} size="sm" dot>
-                {enabled ? 'Module active' : 'Module inactive'}
+                {enabled ? t('qurbaniSettings.moduleEnabled') : t('qurbaniSettings.moduleDisabled')}
               </Badge>
             )
           }
         />
 
-        <FormSection title="Booking status" icon={Power} description="When inactive, users will not see the Qurbani Booking links in their sidebar.">
+        <FormSection title={t('qurbaniSettings.moduleStatus')} icon={Power}>
           <div className="flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/60">
             <div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">Booking active</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">{t('qurbaniSettings.moduleStatus')}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                {loadingFlag ? 'Loading…' : enabled ? 'Users can book hissas right now.' : 'The module is hidden from end users.'}
+                {loadingFlag ? t('common.loading') : enabled ? t('qurbaniSettings.moduleEnabled') : t('qurbaniSettings.moduleDisabled')}
               </p>
             </div>
             <button
               type="button"
               onClick={handleToggle}
               disabled={loadingFlag || savingFlag}
-              aria-label="Toggle qurbani booking"
+              aria-label={t('qurbaniSettings.moduleStatus')}
               aria-pressed={enabled}
               className={cn(
                 'relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-qurbani-500 focus-visible:ring-offset-2 cursor-pointer disabled:opacity-50',
@@ -109,12 +111,12 @@ export default function QurbaniModuleSettings() {
           </div>
         </FormSection>
 
-        <FormSection title="Bank details" icon={Banknote} description="Shown to users on the payment screen after they create a booking.">
+        <FormSection title={t('qurbaniSettings.bankDetails')} icon={Banknote}>
           {loadingBank ? (
             <div className="h-32 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
           ) : (
             <>
-              <FormField label="Bank account instructions" htmlFor="bd">
+              <FormField label={t('qurbaniSettings.bankDetails')} htmlFor="bd">
                 <Textarea
                   id="bd"
                   value={bankDetails}
@@ -126,7 +128,7 @@ export default function QurbaniModuleSettings() {
               </FormField>
               <div className="flex justify-end mt-4">
                 <Button type="button" leftIcon={Save} loading={savingBank} onClick={handleSaveBank}>
-                  Save bank details
+                  {t('qurbaniSettings.saveBankDetails')}
                 </Button>
               </div>
             </>

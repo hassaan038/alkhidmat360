@@ -6,41 +6,41 @@ import DataTable from '../../components/admin/DataTable';
 import { Heart } from 'lucide-react';
 import * as adminService from '../../services/adminService';
 import { cn } from '../../lib/utils';
-
-const tabs = [
-  { id: 'qurbani', label: 'Qurbani Donations' },
-  { id: 'ration', label: 'Ration Donations' },
-  { id: 'skin', label: 'Skin Collections' },
-  { id: 'sponsorship', label: 'Orphan Sponsorships' },
-];
-
-const columns = {
-  qurbani: [
-    { key: 'donorName', label: 'Donor' },
-    { key: 'animalType', label: 'Animal' },
-    { key: 'quantity', label: 'Quantity' },
-    { key: 'totalAmount', label: 'Amount', render: (row) => `PKR ${parseFloat(row.totalAmount).toLocaleString()}` },
-  ],
-  ration: [
-    { key: 'donorName', label: 'Donor' },
-    { key: 'donorEmail', label: 'Email' },
-    { key: 'amount', label: 'Amount', render: (row) => `PKR ${parseFloat(row.amount).toLocaleString()}` },
-  ],
-  skin: [
-    { key: 'donorName', label: 'Donor' },
-    { key: 'numberOfSkins', label: 'Skins' },
-    { key: 'animalType', label: 'Animal' },
-    { key: 'preferredDate', label: 'Collection Date', render: (row) => new Date(row.preferredDate).toLocaleDateString() },
-  ],
-  sponsorship: [
-    { key: 'sponsorName', label: 'Sponsor' },
-    { key: 'sponsorEmail', label: 'Email' },
-    { key: 'monthlyAmount', label: 'Monthly', render: (row) => `PKR ${parseFloat(row.monthlyAmount).toLocaleString()}` },
-    { key: 'duration', label: 'Duration (mo)' },
-  ],
-};
+import { useTranslation } from 'react-i18next';
 
 export default function DonationsManagement() {
+  const { t } = useTranslation();
+  const tabs = [
+    { id: 'qurbani', label: t('sidebar.qurbaniDonation') },
+    { id: 'ration', label: t('sidebar.rationDonation') },
+    { id: 'skin', label: t('sidebar.skinCollection') },
+    { id: 'sponsorship', label: t('sidebar.orphanSponsorship') },
+  ];
+  const columns = {
+    qurbani: [
+      { key: 'donorName', label: t('roles.DONOR') },
+      { key: 'animalType', label: t('qurbaniDonation.animalType') },
+      { key: 'quantity', label: t('qurbaniDonation.quantity') },
+      { key: 'totalAmount', label: t('common.amount'), render: (row) => `PKR ${parseFloat(row.totalAmount).toLocaleString()}` },
+    ],
+    ration: [
+      { key: 'donorName', label: t('roles.DONOR') },
+      { key: 'donorEmail', label: t('common.email') },
+      { key: 'amount', label: t('common.amount'), render: (row) => `PKR ${parseFloat(row.amount).toLocaleString()}` },
+    ],
+    skin: [
+      { key: 'donorName', label: t('roles.DONOR') },
+      { key: 'numberOfSkins', label: t('skinCollection.numberOfSkins') },
+      { key: 'animalType', label: t('skinCollection.animalType') },
+      { key: 'preferredDate', label: t('skinCollection.preferredDate'), render: (row) => new Date(row.preferredDate).toLocaleDateString() },
+    ],
+    sponsorship: [
+      { key: 'sponsorName', label: t('orphanSponsorship.sponsorName') },
+      { key: 'sponsorEmail', label: t('common.email') },
+      { key: 'monthlyAmount', label: t('orphanSponsorship.monthlyAmount'), render: (row) => `PKR ${parseFloat(row.monthlyAmount).toLocaleString()}` },
+      { key: 'duration', label: t('orphanSponsorship.duration') },
+    ],
+  };
   const [activeTab, setActiveTab] = useState('qurbani');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -86,8 +86,8 @@ export default function DonationsManagement() {
         <PageHeader
           icon={Heart}
           accent="sadqa"
-          title="Donations Management"
-          description="Review and manage all donation submissions by type."
+          title={t('adminDonations.title')}
+          description={t('adminDonations.description')}
         />
 
         <div className="border-b border-gray-200 dark:border-gray-800">
@@ -116,8 +116,8 @@ export default function DonationsManagement() {
           searchable
           statusFilter={activeTab === 'skin' ? ['pending', 'confirmed', 'completed', 'rejected'] : undefined}
           onStatusUpdate={activeTab === 'skin' ? handleStatusUpdate : undefined}
-          emptyTitle="No donations yet"
-          emptyDescription="Submissions will appear here once users start submitting."
+          emptyTitle={t('table.noData')}
+          emptyDescription={t('empty.description')}
         />
       </PageContainer>
     </DashboardLayout>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,6 +12,7 @@ import { Package, User, Phone, Mail, Calendar, Info, RotateCcw, ArrowRight } fro
 import { createRationDonation } from '../../services/donationService';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const rationSchema = z.object({
   packageType: z.string().min(2).max(50),
@@ -25,25 +26,26 @@ const rationSchema = z.object({
   notes: z.string().optional(),
 });
 
-const packageTypes = [
-  { id: 'basic', name: 'Basic Package', price: 3000, items: 'Rice, flour, oil, sugar, lentils' },
-  { id: 'standard', name: 'Standard Package', price: 5000, items: 'Basic items + tea, milk powder, dates' },
-  { id: 'premium', name: 'Premium Package', price: 8000, items: 'Standard items + ghee, nuts, honey' },
-];
-
-const infoPoints = [
-  'Ration packages are distributed to vetted families.',
-  'You will receive updates about your donation distribution.',
-  'Delivery schedule depends on your date and area.',
-  'Tax exemption certificate available on request.',
-];
-
 export default function RationDonation() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState('');
   const [customMode, setCustomMode] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [pendingPayload, setPendingPayload] = useState(null);
+
+  const packageTypes = useMemo(() => [
+    { id: 'basic', name: t('rationDonation.basicPackage'), price: 3000, items: t('rationDonation.basicItems') },
+    { id: 'standard', name: t('rationDonation.standardPackage'), price: 5000, items: t('rationDonation.standardItems') },
+    { id: 'premium', name: t('rationDonation.premiumPackage'), price: 8000, items: t('rationDonation.premiumItems') },
+  ], [t]);
+
+  const infoPoints = useMemo(() => [
+    t('rationDonation.info1'),
+    t('rationDonation.info2'),
+    t('rationDonation.info3'),
+    t('rationDonation.info4'),
+  ], [t]);
 
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm({
     resolver: zodResolver(rationSchema),
@@ -107,12 +109,12 @@ export default function RationDonation() {
         <PageHeader
           icon={Package}
           accent="ration"
-          title="Ration Donation"
-          description="Donate a ration package to support families through the month."
+          title={t('rationDonation.title')}
+          description={t('rationDonation.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Choose a package" icon={Package}>
+          <FormSection title={t('rationDonation.chooseAPackage')} icon={Package}>
             <div className="grid grid-cols-1 gap-3">
               {packageTypes.map((pkg) => (
                 <label
@@ -143,65 +145,65 @@ export default function RationDonation() {
                 onClick={enableCustom}
                 className="mt-3 text-sm font-medium text-ration-600 hover:text-ration-700 underline-offset-2 hover:underline cursor-pointer"
               >
-                None of these fit? Enter a custom package instead.
+                {t('rationDonation.noneFitCustom')}
               </button>
             ) : (
               <div className="mt-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Custom package type</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('rationDonation.customPackageType')}</label>
                   <button
                     type="button"
                     onClick={() => { setCustomMode(false); setValue('packageType', '', { shouldValidate: false }); }}
                     className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 cursor-pointer"
                   >
-                    Use a preset instead
+                    {t('rationDonation.usePresetInstead')}
                   </button>
                 </div>
-                <Input {...register('packageType')} placeholder="e.g., Ramadan Special Package" autoFocus />
-                <p className="text-xs text-gray-500 dark:text-gray-400">You'll set the amount in the next field.</p>
+                <Input {...register('packageType')} placeholder={t('rationDonation.customPackagePlaceholder')} autoFocus />
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('rationDonation.amountInNextField')}</p>
               </div>
             )}
             {errors.packageType && <p className="mt-2 text-xs text-error-dark">{errors.packageType.message}</p>}
 
             <FormGrid cols={2} className="mt-5">
-              <FormField label="Quantity" required htmlFor="qty" error={errors.quantity?.message}>
+              <FormField label={t('qurbaniDonation.quantity')} required htmlFor="qty" error={errors.quantity?.message}>
                 <Input id="qty" type="number" min={1} {...register('quantity')} />
               </FormField>
-              <FormField label="Total amount (PKR)" required htmlFor="amt" error={errors.amount?.message}>
+              <FormField label={t('qurbaniDonation.totalAmount')} required htmlFor="amt" error={errors.amount?.message}>
                 <Input id="amt" type="number" min={0} {...register('amount')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Donor information" icon={User}>
+          <FormSection title={t('rationDonation.donorInformation')} icon={User}>
             <FormGrid cols={2}>
-              <FormField label="Full name" required htmlFor="dn" error={errors.donorName?.message}>
-                <Input id="dn" leftIcon={User} {...register('donorName')} placeholder="Your full name" />
+              <FormField label={t('form.fullName')} required htmlFor="dn" error={errors.donorName?.message}>
+                <Input id="dn" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Email address" required htmlFor="de" error={errors.donorEmail?.message}>
-                <Input id="de" type="email" leftIcon={Mail} {...register('donorEmail')} placeholder="you@example.com" />
+              <FormField label={t('form.emailAddress')} required htmlFor="de" error={errors.donorEmail?.message}>
+                <Input id="de" type="email" leftIcon={Mail} {...register('donorEmail')} placeholder={t('form.emailPlaceholder')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="dp" error={errors.donorPhone?.message}>
-                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder="03001234567" />
+              <FormField label={t('form.phoneNumber')} required htmlFor="dp" error={errors.donorPhone?.message}>
+                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField label="Preferred delivery date" htmlFor="dd" hint="Optional">
+              <FormField label={t('form.preferredDeliveryDate')} htmlFor="dd" hint={t('form.optional')}>
                 <Input id="dd" type="date" leftIcon={Calendar} {...register('deliveryDate')} />
               </FormField>
-              <FormField wide label="Address" required htmlFor="da" error={errors.donorAddress?.message}>
-                <Textarea id="da" rows={3} {...register('donorAddress')} placeholder="Complete delivery address" />
+              <FormField wide label={t('form.address')} required htmlFor="da" error={errors.donorAddress?.message}>
+                <Textarea id="da" rows={3} {...register('donorAddress')} placeholder={t('form.completeAddress')} />
               </FormField>
-              <FormField wide label="Additional notes" htmlFor="nt">
-                <Textarea id="nt" rows={2} {...register('notes')} placeholder="Any special instructions" />
+              <FormField wide label={t('form.additionalNotes')} htmlFor="nt">
+                <Textarea id="nt" rows={2} {...register('notes')} placeholder={t('form.specialInstructions')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => { reset(); setSelectedPackage(''); setCustomMode(false); }} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Continue to payment
+              {t('common.continueToPayment')}
             </Button>
           </div>
         </form>
@@ -212,7 +214,7 @@ export default function RationDonation() {
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-ration-700 dark:text-ration-200">Distribution information</h4>
+              <h4 className="text-sm font-semibold text-ration-700 dark:text-ration-200">{t('rationDonation.distributionInformation')}</h4>
               <ul className="mt-2 space-y-1 text-xs text-ration-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">
@@ -229,12 +231,12 @@ export default function RationDonation() {
       <PaymentConfirmModal
         open={paymentOpen}
         onClose={() => setPaymentOpen(false)}
-        title="Complete ration donation payment"
+        title={t('rationDonation.completeRationPayment')}
         totalAmount={Number(pendingPayload?.amount) || 0}
-        summaryLabel="Total donation"
+        summaryLabel={t('rationDonation.totalDonation')}
         onConfirmedSubmit={handlePaymentConfirmed}
-        successMessage="Donation recorded"
-        successDescription="Thank you for your generosity. You'll be notified once admin confirms."
+        successMessage={t('rationDonation.donationRecorded')}
+        successDescription={t('rationDonation.donationRecordedDesc')}
       />
     </DashboardLayout>
   );

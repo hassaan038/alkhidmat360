@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useAuthStore from '../../store/authStore';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import PageContainer from '../../components/ui/PageContainer';
@@ -34,54 +35,54 @@ import { Link } from 'react-router-dom';
 import * as userService from '../../services/userService';
 import { cn } from '../../lib/utils';
 
-const roleGreeting = {
-  DONOR: { title: 'Thank you for your generosity', sub: 'Your contributions are making a real difference.' },
-  BENEFICIARY: { title: 'We are here to support you', sub: 'Submit an application and our team will reach out.' },
-  VOLUNTEER: { title: 'Thank you for your service', sub: 'Every hour you volunteer creates lasting impact.' },
-};
-
-function getActions(userType) {
-  if (userType === 'DONOR') {
-    return [
-      { title: 'Qurbani Donation', description: 'Donate animals for Qurbani', path: '/dashboard/user/qurbani', icon: Heart, tone: 'qurbani' },
-      { title: 'Ration Donation', description: 'Donate a ration package', path: '/dashboard/user/ration', icon: Package, tone: 'ration' },
-      { title: 'Orphan Sponsorship', description: 'Sponsor an orphan child', path: '/dashboard/user/orphan-sponsorship', icon: Baby, tone: 'orphan' },
-      { title: 'Pay Zakat', description: 'Calculate & pay zakat', path: '/dashboard/user/zakat-pay', icon: Coins, tone: 'zakat' },
-      { title: 'Sadqa / Donation', description: 'Free-form donation', path: '/dashboard/user/sadqa', icon: Heart, tone: 'sadqa' },
-      { title: 'Disaster Relief', description: 'Floods, earthquake & shelter', path: '/dashboard/user/disaster-relief', icon: LifeBuoy, tone: 'disaster' },
-    ];
-  }
-  if (userType === 'BENEFICIARY') {
-    return [
-      { title: 'Loan Application', description: 'Apply for interest-free loan', path: '/dashboard/user/loan', icon: DollarSign, tone: 'loan' },
-      { title: 'Ramadan Ration', description: 'Apply for Ramadan ration', path: '/dashboard/user/ramadan-ration', icon: Apple, tone: 'ration' },
-      { title: 'Orphan Registration', description: 'Register as a guardian', path: '/dashboard/user/orphan', icon: Baby, tone: 'orphan' },
-      { title: 'Apply for Zakat', description: 'Request zakat assistance', path: '/dashboard/user/zakat-apply', icon: Coins, tone: 'zakat' },
-    ];
-  }
-  if (userType === 'VOLUNTEER') {
-    return [
-      { title: 'Register for Tasks', description: 'Sign up for volunteering', path: '/dashboard/user/volunteer-task', icon: HandHeart, tone: 'volunteer' },
-      { title: 'My Activity', description: 'Track contributions', path: '/dashboard/user', icon: BarChart3, tone: 'primary' },
-    ];
-  }
-  return [];
-}
-
-function qurbaniShortcuts() {
-  return [
-    { title: 'Qurbani Booking', path: '/dashboard/user/qurbani-module', icon: Drumstick, tone: 'qurbani' },
-    { title: 'My Hissas', path: '/dashboard/user/qurbani-bookings', icon: BookOpen, tone: 'qurbani' },
-    { title: 'Skin Pickup', path: '/dashboard/user/qurbani-skin-pickup', icon: Scissors, tone: 'qurbani' },
-    { title: 'Fitrana', path: '/dashboard/user/fitrana', icon: HandCoins, tone: 'zakat' },
-  ];
-}
 
 export default function UserDashboard() {
   const { user } = useAuthStore();
+  const { t } = useTranslation();
   const [stats, setStats] = useState(null);
   const [activities, setActivities] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const roleGreeting = {
+    DONOR: { sub: t('dashboard.greet.donorSub') },
+    BENEFICIARY: { sub: t('dashboard.greet.beneficiarySub') },
+    VOLUNTEER: { sub: t('dashboard.greet.volunteerSub') },
+  };
+
+  function getActions(userType) {
+    if (userType === 'DONOR') {
+      return [
+        { title: t('sidebar.qurbaniDonation'), description: t('dashboard.actions.qurbaniDesc'), path: '/dashboard/user/qurbani', icon: Heart, tone: 'qurbani' },
+        { title: t('sidebar.rationDonation'), description: t('dashboard.actions.rationDesc'), path: '/dashboard/user/ration', icon: Package, tone: 'ration' },
+        { title: t('sidebar.orphanSponsorship'), description: t('dashboard.actions.orphanSponsorshipDesc'), path: '/dashboard/user/orphan-sponsorship', icon: Baby, tone: 'orphan' },
+        { title: t('sidebar.payZakat'), description: t('dashboard.actions.zakatDesc'), path: '/dashboard/user/zakat-pay', icon: Coins, tone: 'zakat' },
+        { title: t('sidebar.sadqa'), description: t('dashboard.actions.sadqaDesc'), path: '/dashboard/user/sadqa', icon: Heart, tone: 'sadqa' },
+        { title: t('sidebar.disasterRelief'), description: t('dashboard.actions.disasterDesc'), path: '/dashboard/user/disaster-relief', icon: LifeBuoy, tone: 'disaster' },
+      ];
+    }
+    if (userType === 'BENEFICIARY') {
+      return [
+        { title: t('sidebar.loanApplication'), description: t('dashboard.actions.loanDesc'), path: '/dashboard/user/loan', icon: DollarSign, tone: 'loan' },
+        { title: t('sidebar.ramadanRation'), description: t('dashboard.actions.ramadanDesc'), path: '/dashboard/user/ramadan-ration', icon: Apple, tone: 'ration' },
+        { title: t('sidebar.orphanRegistration'), description: t('dashboard.actions.orphanRegDesc'), path: '/dashboard/user/orphan', icon: Baby, tone: 'orphan' },
+        { title: t('sidebar.applyForZakat'), description: t('dashboard.actions.zakatApplyDesc'), path: '/dashboard/user/zakat-apply', icon: Coins, tone: 'zakat' },
+      ];
+    }
+    if (userType === 'VOLUNTEER') {
+      return [
+        { title: t('sidebar.registerForTasks'), description: t('dashboard.actions.volunteerDesc'), path: '/dashboard/user/volunteer-task', icon: HandHeart, tone: 'volunteer' },
+        { title: t('dashboard.actions.myActivity'), description: t('dashboard.actions.myActivityDesc'), path: '/dashboard/user', icon: BarChart3, tone: 'primary' },
+      ];
+    }
+    return [];
+  }
+
+  const qurbaniShortcuts = [
+    { title: t('sidebar.qurbaniBooking'), path: '/dashboard/user/qurbani-module', icon: Drumstick, tone: 'qurbani' },
+    { title: t('dashboard.actions.myHissas'), path: '/dashboard/user/qurbani-bookings', icon: BookOpen, tone: 'qurbani' },
+    { title: t('sidebar.skinPickup'), path: '/dashboard/user/qurbani-skin-pickup', icon: Scissors, tone: 'qurbani' },
+    { title: t('sidebar.fitrana'), path: '/dashboard/user/fitrana', icon: HandCoins, tone: 'zakat' },
+  ];
 
   useEffect(() => {
     (async () => {
@@ -105,10 +106,10 @@ export default function UserDashboard() {
 
   const statCards = stats
     ? [
-        { label: 'Total submissions', value: stats.totalSubmissions, icon: Activity, tone: 'primary', hint: 'All time' },
-        { label: 'Pending', value: stats.pending, icon: Clock, tone: 'warning', hint: 'Awaiting review' },
-        { label: 'Approved', value: stats.approved, icon: CheckCircle, tone: 'success', hint: 'Confirmed' },
-        { label: 'Rejected', value: stats.rejected, icon: XCircle, tone: 'error', hint: 'Not approved' },
+        { label: t('dashboard.stats.totalSubmissions'), value: stats.totalSubmissions, icon: Activity, tone: 'primary', hint: t('dashboard.stats.allTime') },
+        { label: t('dashboard.stats.pending'), value: stats.pending, icon: Clock, tone: 'warning', hint: t('dashboard.stats.awaitingReview') },
+        { label: t('dashboard.stats.approved'), value: stats.approved, icon: CheckCircle, tone: 'success', hint: t('dashboard.stats.confirmed') },
+        { label: t('dashboard.stats.rejected'), value: stats.rejected, icon: XCircle, tone: 'error', hint: t('dashboard.stats.notApproved') },
       ]
     : [];
 
@@ -123,10 +124,10 @@ export default function UserDashboard() {
             <div className="min-w-0">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur px-3 py-1 ring-1 ring-white/25">
                 <Sparkles className="h-3.5 w-3.5" />
-                <span className="text-xs font-medium">Welcome back</span>
+                <span className="text-xs font-medium">{t('dashboard.welcome')}</span>
               </div>
               <h1 className="mt-3 text-2xl sm:text-3xl font-bold tracking-tight">
-                Hello, {user?.fullName?.split(' ')[0] || 'friend'} 👋
+                {t('dashboard.welcome')}, {user?.fullName?.split(' ')[0] || ''} 👋
               </h1>
               <p className="mt-1 text-primary-100 text-sm sm:text-base leading-relaxed max-w-xl">
                 {greet.sub}
@@ -151,13 +152,13 @@ export default function UserDashboard() {
         {user?.userType !== 'ADMIN' && (
           <section>
             <SectionHeading
-              title="Qurbani & Fitrana"
-              description="Seasonal religious actions — active when enabled by admin"
+              title={t('dashboard.qurbaniTitle')}
+              description={t('dashboard.qurbaniDesc')}
               icon={Drumstick}
               size="sm"
             />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {qurbaniShortcuts().map((s) => (
+              {qurbaniShortcuts.map((s) => (
                 <Link key={s.path} to={s.path} className="block">
                   <Card className="group h-full cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
                     <CardContent className="flex items-center gap-3 py-4">
@@ -176,8 +177,8 @@ export default function UserDashboard() {
         {/* Quick actions */}
         <section>
           <SectionHeading
-            title={user?.userType === 'DONOR' ? 'Make a donation' : user?.userType === 'BENEFICIARY' ? 'Apply for support' : 'Get started'}
-            description="Jump directly into the most-used flows"
+            title={user?.userType === 'DONOR' ? t('dashboard.makeDonation') : user?.userType === 'BENEFICIARY' ? t('dashboard.applySupport') : t('dashboard.getStarted')}
+            description={t('dashboard.quickActionsDesc')}
             size="md"
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -189,7 +190,7 @@ export default function UserDashboard() {
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-50">{action.title}</h3>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{action.description}</p>
                     <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary-600 transition-all group-hover:gap-2">
-                      <span>Get started</span>
+                      <span>{t('dashboard.getStarted')}</span>
                       <ArrowRight className="w-4 h-4" />
                     </div>
                   </CardContent>
@@ -206,8 +207,8 @@ export default function UserDashboard() {
               <div className="flex items-center gap-3">
                 <IconTile icon={Activity} tone="primary" size="sm" />
                 <div>
-                  <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">Recent activity</h2>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Your latest submissions and updates</p>
+                  <h2 className="text-base font-semibold text-gray-900 dark:text-gray-50">{t('dashboard.recentActivity')}</h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('dashboard.recentActivityDesc')}</p>
                 </div>
               </div>
             </div>
@@ -221,8 +222,8 @@ export default function UserDashboard() {
               ) : !activities || activities.length === 0 ? (
                 <EmptyState
                   icon={Activity}
-                  title="No activity yet"
-                  description="Your submissions will show up here once you start interacting with the platform."
+                  title={t('dashboard.noActivityTitle')}
+                  description={t('dashboard.noActivityDesc')}
                 />
               ) : (
                 <ul className="divide-y divide-gray-100">

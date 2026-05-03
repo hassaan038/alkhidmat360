@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import useAuthStore from '../../store/authStore';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import { cn } from '../../lib/utils';
@@ -27,109 +28,6 @@ import {
 } from 'lucide-react';
 
 // `Settings` is imported only so the admin "Qurbani Settings" entry keeps its icon.
-
-// ───────────────────────── Menu definitions ─────────────────────────
-// Each item: { label, icon, path, description?, tone? }
-// Tone keys map to module accent colors; falls back to primary if omitted.
-
-const qurbaniUserItems = [
-  { label: 'Qurbani Booking', icon: Drumstick, path: '/dashboard/user/qurbani-module', tone: 'qurbani' },
-  { label: 'My Hissa Bookings', icon: BookOpen, path: '/dashboard/user/qurbani-bookings', tone: 'qurbani' },
-  { label: 'Skin Pickup', icon: Scissors, path: '/dashboard/user/qurbani-skin-pickup', tone: 'qurbani' },
-  { label: 'Fitrana', icon: HandCoins, path: '/dashboard/user/fitrana', tone: 'zakat' },
-];
-
-const qurbaniAdminItems = [
-  { label: 'Qurbani Listings', icon: ListChecks, path: '/dashboard/admin/qurbani-listings', tone: 'qurbani' },
-  { label: 'Qurbani Bookings', icon: ClipboardList, path: '/dashboard/admin/qurbani-bookings', tone: 'qurbani' },
-  { label: 'Skin Pickups', icon: Scissors, path: '/dashboard/admin/qurbani-skin-pickups', tone: 'qurbani' },
-  { label: 'Fitrana', icon: HandCoins, path: '/dashboard/admin/fitrana', tone: 'zakat' },
-  { label: 'Qurbani Settings', icon: Settings, path: '/dashboard/admin/qurbani-settings', tone: 'neutral' },
-];
-
-const menuSections = {
-  DONOR: [
-    {
-      heading: null,
-      items: [{ label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/user' }],
-    },
-    {
-      heading: 'Donate',
-      items: [
-        { label: 'Qurbani Donation', icon: Heart, path: '/dashboard/user/qurbani', tone: 'qurbani' },
-        { label: 'Ration Donation', icon: Package, path: '/dashboard/user/ration', tone: 'ration' },
-        { label: 'Orphan Sponsorship', icon: Baby, path: '/dashboard/user/orphan-sponsorship', tone: 'orphan' },
-        { label: 'Skin Collection', icon: Scissors, path: '/dashboard/user/skin-collection', tone: 'qurbani' },
-        { label: 'Sadqa / Donation', icon: Heart, path: '/dashboard/user/sadqa', tone: 'sadqa' },
-        { label: 'Disaster Relief', icon: LifeBuoy, path: '/dashboard/user/disaster-relief', tone: 'disaster' },
-      ],
-    },
-    {
-      heading: 'Religious',
-      items: [
-        { label: 'Pay Zakat', icon: Coins, path: '/dashboard/user/zakat-pay', tone: 'zakat' },
-      ],
-    },
-  ],
-  BENEFICIARY: [
-    {
-      heading: null,
-      items: [{ label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/user' }],
-    },
-    {
-      heading: 'Apply for support',
-      items: [
-        { label: 'Loan Application', icon: DollarSign, path: '/dashboard/user/loan', tone: 'loan' },
-        { label: 'Ramadan Ration', icon: Apple, path: '/dashboard/user/ramadan-ration', tone: 'ration' },
-        { label: 'Orphan Registration', icon: Baby, path: '/dashboard/user/orphan', tone: 'orphan' },
-        { label: 'Apply for Zakat', icon: Coins, path: '/dashboard/user/zakat-apply', tone: 'zakat' },
-      ],
-    },
-  ],
-  VOLUNTEER: [
-    {
-      heading: null,
-      items: [{ label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/user' }],
-    },
-    {
-      heading: 'Volunteer',
-      items: [
-        { label: 'Register for tasks', icon: HandHeart, path: '/dashboard/user/volunteer-task', tone: 'volunteer' },
-      ],
-    },
-  ],
-  ADMIN: [
-    {
-      heading: null,
-      items: [{ label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/admin' }],
-    },
-    {
-      heading: 'Manage',
-      items: [
-        { label: 'Users', icon: Users, path: '/dashboard/admin/users' },
-        { label: 'Donations', icon: Heart, path: '/dashboard/admin/donations', tone: 'primary' },
-        { label: 'Applications', icon: Package, path: '/dashboard/admin/applications', tone: 'loan' },
-        { label: 'Volunteers', icon: HandHeart, path: '/dashboard/admin/volunteers', tone: 'volunteer' },
-      ],
-    },
-    {
-      heading: 'Religious & campaigns',
-      items: [
-        { label: 'Zakat Payments', icon: Coins, path: '/dashboard/admin/zakat-payments', tone: 'zakat' },
-        { label: 'Zakat Applications', icon: Coins, path: '/dashboard/admin/zakat-applications', tone: 'zakat' },
-        { label: 'Sadqa Donations', icon: Heart, path: '/dashboard/admin/sadqa', tone: 'sadqa' },
-        { label: 'Disaster Relief', icon: LifeBuoy, path: '/dashboard/admin/disaster-relief', tone: 'disaster' },
-      ],
-    },
-    {
-      heading: 'Admin tools',
-      items: [
-        { label: 'Create Admin', icon: UserPlus, path: '/dashboard/admin/create-admin' },
-      ],
-    },
-  ],
-};
-
 // Settings lives in the header user menu; we no longer duplicate it in the sidebar.
 
 // Tone → Tailwind class mapping for active state left-bar + hover tint.
@@ -149,6 +47,7 @@ const toneAccent = {
 export default function Sidebar({ isOpen, onClose }) {
   const { user } = useAuthStore();
   const location = useLocation();
+  const { t } = useTranslation();
   const moduleEnabled = useQurbaniModuleStore((s) => s.moduleEnabled);
   const fetchFlag = useQurbaniModuleStore((s) => s.fetchFlag);
 
@@ -158,26 +57,123 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const sections = useMemo(() => {
     const role = user?.userType;
+    if (!role) return [];
+
+    const qurbaniUserItems = [
+      { label: t('sidebar.qurbaniBooking'), icon: Drumstick, path: '/dashboard/user/qurbani-module', tone: 'qurbani' },
+      { label: t('sidebar.myHissaBookings'), icon: BookOpen, path: '/dashboard/user/qurbani-bookings', tone: 'qurbani' },
+      { label: t('sidebar.skinPickup'), icon: Scissors, path: '/dashboard/user/qurbani-skin-pickup', tone: 'qurbani' },
+      { label: t('sidebar.fitrana'), icon: HandCoins, path: '/dashboard/user/fitrana', tone: 'zakat' },
+    ];
+
+    const qurbaniAdminItems = [
+      { label: t('sidebar.qurbaniListings'), icon: ListChecks, path: '/dashboard/admin/qurbani-listings', tone: 'qurbani' },
+      { label: t('sidebar.qurbaniBookings'), icon: ClipboardList, path: '/dashboard/admin/qurbani-bookings', tone: 'qurbani' },
+      { label: t('sidebar.skinPickups'), icon: Scissors, path: '/dashboard/admin/qurbani-skin-pickups', tone: 'qurbani' },
+      { label: t('sidebar.fitrana'), icon: HandCoins, path: '/dashboard/admin/fitrana', tone: 'zakat' },
+      { label: t('sidebar.qurbaniSettings'), icon: Settings, path: '/dashboard/admin/qurbani-settings', tone: 'neutral' },
+    ];
+
+    const menuSections = {
+      DONOR: [
+        {
+          heading: null,
+          items: [{ label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/dashboard/user' }],
+        },
+        {
+          heading: t('sidebar.donate'),
+          items: [
+            { label: t('sidebar.qurbaniDonation'), icon: Heart, path: '/dashboard/user/qurbani', tone: 'qurbani' },
+            { label: t('sidebar.rationDonation'), icon: Package, path: '/dashboard/user/ration', tone: 'ration' },
+            { label: t('sidebar.orphanSponsorship'), icon: Baby, path: '/dashboard/user/orphan-sponsorship', tone: 'orphan' },
+            { label: t('sidebar.skinCollection'), icon: Scissors, path: '/dashboard/user/skin-collection', tone: 'qurbani' },
+            { label: t('sidebar.sadqa'), icon: Heart, path: '/dashboard/user/sadqa', tone: 'sadqa' },
+            { label: t('sidebar.disasterRelief'), icon: LifeBuoy, path: '/dashboard/user/disaster-relief', tone: 'disaster' },
+          ],
+        },
+        {
+          heading: t('sidebar.religious'),
+          items: [
+            { label: t('sidebar.payZakat'), icon: Coins, path: '/dashboard/user/zakat-pay', tone: 'zakat' },
+          ],
+        },
+      ],
+      BENEFICIARY: [
+        {
+          heading: null,
+          items: [{ label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/dashboard/user' }],
+        },
+        {
+          heading: t('sidebar.applyForSupport'),
+          items: [
+            { label: t('sidebar.loanApplication'), icon: DollarSign, path: '/dashboard/user/loan', tone: 'loan' },
+            { label: t('sidebar.ramadanRation'), icon: Apple, path: '/dashboard/user/ramadan-ration', tone: 'ration' },
+            { label: t('sidebar.orphanRegistration'), icon: Baby, path: '/dashboard/user/orphan', tone: 'orphan' },
+            { label: t('sidebar.applyForZakat'), icon: Coins, path: '/dashboard/user/zakat-apply', tone: 'zakat' },
+          ],
+        },
+      ],
+      VOLUNTEER: [
+        {
+          heading: null,
+          items: [{ label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/dashboard/user' }],
+        },
+        {
+          heading: t('sidebar.volunteer'),
+          items: [
+            { label: t('sidebar.registerForTasks'), icon: HandHeart, path: '/dashboard/user/volunteer-task', tone: 'volunteer' },
+          ],
+        },
+      ],
+      ADMIN: [
+        {
+          heading: null,
+          items: [{ label: t('sidebar.dashboard'), icon: LayoutDashboard, path: '/dashboard/admin' }],
+        },
+        {
+          heading: t('sidebar.manage'),
+          items: [
+            { label: t('sidebar.users'), icon: Users, path: '/dashboard/admin/users' },
+            { label: t('sidebar.donations'), icon: Heart, path: '/dashboard/admin/donations', tone: 'primary' },
+            { label: t('sidebar.applications'), icon: Package, path: '/dashboard/admin/applications', tone: 'loan' },
+            { label: t('sidebar.volunteers'), icon: HandHeart, path: '/dashboard/admin/volunteers', tone: 'volunteer' },
+          ],
+        },
+        {
+          heading: t('sidebar.religiousAndCampaigns'),
+          items: [
+            { label: t('sidebar.zakatPayments'), icon: Coins, path: '/dashboard/admin/zakat-payments', tone: 'zakat' },
+            { label: t('sidebar.zakatApplications'), icon: Coins, path: '/dashboard/admin/zakat-applications', tone: 'zakat' },
+            { label: t('sidebar.sadqaDonations'), icon: Heart, path: '/dashboard/admin/sadqa', tone: 'sadqa' },
+            { label: t('sidebar.disasterRelief'), icon: LifeBuoy, path: '/dashboard/admin/disaster-relief', tone: 'disaster' },
+          ],
+        },
+        {
+          heading: t('sidebar.adminTools'),
+          items: [
+            { label: t('sidebar.createAdmin'), icon: UserPlus, path: '/dashboard/admin/create-admin' },
+          ],
+        },
+      ],
+    };
+
     const base = menuSections[role] || [];
-    if (!role) return base;
 
     if (role === 'ADMIN') {
-      // Admin always has qurbani tools group
       return [
         ...base,
-        { heading: 'Qurbani module', items: qurbaniAdminItems },
+        { heading: t('sidebar.qurbaniModule'), items: qurbaniAdminItems },
       ];
     }
 
-    // User-side: only show qurbani nav when the module is enabled
     if (moduleEnabled === true) {
       return [
         ...base,
-        { heading: 'Qurbani (seasonal)', items: qurbaniUserItems },
+        { heading: t('sidebar.qurbaniSeasonal'), items: qurbaniUserItems },
       ];
     }
     return base;
-  }, [user?.userType, moduleEnabled]);
+  }, [user?.userType, moduleEnabled, t]);
 
   const isActive = (path) => location.pathname === path;
 
@@ -265,9 +261,9 @@ export default function Sidebar({ isOpen, onClose }) {
                 <HelpCircle className="w-4 h-4" />
               </span>
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-primary-900 dark:text-primary-100">Need help?</p>
+                <p className="text-sm font-semibold text-primary-900 dark:text-primary-100">{t('sidebar.needHelp')}</p>
                 <p className="text-xs text-primary-700/80 dark:text-primary-300/80 leading-relaxed">
-                  Contact our support team for assistance.
+                  {t('sidebar.contactSupport')}
                 </p>
               </div>
             </div>

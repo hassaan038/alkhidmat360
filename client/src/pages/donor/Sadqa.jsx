@@ -18,6 +18,7 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import * as extraDonationService from '../../services/extraDonationService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const sadqaSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -29,21 +30,21 @@ const sadqaSchema = z.object({
 });
 
 const QUICK_AMOUNTS = [500, 1000, 2500, 5000, 10000, 25000];
-const SUGGESTED_PURPOSES = ['General Sadqa', 'Education', 'Healthcare', 'Orphan Care', 'Mosque', 'Water Supply'];
 
 function SadqaCard({ sadqa }) {
+  const { t } = useTranslation();
   return (
     <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div className="min-w-0">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Donation #{sadqa.id}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t('sadqa.donationNo')}{sadqa.id}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-gray-50 tabular-nums">{formatCurrency(sadqa.amount)}</p>
             {sadqa.purpose && <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{sadqa.purpose}</p>}
           </div>
           <div className="flex items-center gap-1.5 flex-wrap">
             {sadqa.paymentMarked && (
-              <Badge variant="info" size="sm" icon={CheckCircle2}>Paid</Badge>
+              <Badge variant="info" size="sm" icon={CheckCircle2}>{t('sadqa.paid')}</Badge>
             )}
             <StatusBadge status={sadqa.status} size="sm" />
           </div>
@@ -60,6 +61,15 @@ function SadqaCard({ sadqa }) {
 }
 
 export default function Sadqa() {
+  const { t } = useTranslation();
+  const SUGGESTED_PURPOSES = [
+    t('sadqa.purposeGeneral'),
+    t('sadqa.purposeEducation'),
+    t('sadqa.purposeHealthcare'),
+    t('sadqa.purposeOrphan'),
+    t('sadqa.purposeMosque'),
+    t('sadqa.purposeWater'),
+  ];
   const [past, setPast] = useState([]);
   const [loadingPast, setLoadingPast] = useState(true);
   const [paymentOpen, setPaymentOpen] = useState(false);
@@ -81,7 +91,7 @@ export default function Sadqa() {
       const res = await extraDonationService.getMySadqas();
       setPast(res.data?.sadqas || []);
     } catch (err) {
-      toast.error('Failed to load past donations', { description: formatApiError(err) });
+      toast.error(t('sadqa.failedToLoad'), { description: formatApiError(err) });
       setPast([]);
     } finally {
       setLoadingPast(false);
@@ -113,14 +123,14 @@ export default function Sadqa() {
         <PageHeader
           icon={Heart}
           accent="sadqa"
-          title="Sadqa / Donation"
-          description="Give any amount for any cause. 100% supports Alkhidmat's welfare programs."
+          title={t('sadqa.title')}
+          description={t('sadqa.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Amount" icon={Coins}>
-            <FormField label="Amount (PKR)" required htmlFor="amt" error={errors.amount?.message}>
-              <Input id="amt" type="number" min={1} {...register('amount')} placeholder="Enter amount" />
+          <FormSection title={t('sadqa.amount')} icon={Coins}>
+            <FormField label={t('sadqa.amountPkr')} required htmlFor="amt" error={errors.amount?.message}>
+              <Input id="amt" type="number" min={1} {...register('amount')} placeholder={t('qurbaniDonation.enterAmount')} />
             </FormField>
             <div className="flex flex-wrap gap-2 mt-3">
               {QUICK_AMOUNTS.map((amt) => (
@@ -141,9 +151,9 @@ export default function Sadqa() {
             </div>
           </FormSection>
 
-          <FormSection title="Purpose" icon={Heart} description="Optional — tag what this donation is for.">
-            <FormField label="Purpose" htmlFor="pu">
-              <Input id="pu" {...register('purpose')} placeholder="e.g. for orphan education, in memory of…" />
+          <FormSection title={t('sadqa.purpose')} icon={Heart} description={t('sadqa.purposeHint')}>
+            <FormField label={t('sadqa.purpose')} htmlFor="pu">
+              <Input id="pu" {...register('purpose')} placeholder={t('sadqa.purposePlaceholder')} />
             </FormField>
             <div className="flex flex-wrap gap-2 mt-3">
               {SUGGESTED_PURPOSES.map((p) => (
@@ -164,38 +174,38 @@ export default function Sadqa() {
             </div>
           </FormSection>
 
-          <FormSection title="Your details" icon={User}>
+          <FormSection title={t('sadqa.yourDetails')} icon={User}>
             <FormGrid cols={2}>
-              <FormField label="Full name" required htmlFor="dn" error={errors.donorName?.message}>
-                <Input id="dn" leftIcon={User} {...register('donorName')} placeholder="Your full name" />
+              <FormField label={t('form.fullName')} required htmlFor="dn" error={errors.donorName?.message}>
+                <Input id="dn" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="dp" error={errors.donorPhone?.message}>
-                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder="03001234567" />
+              <FormField label={t('form.phoneNumber')} required htmlFor="dp" error={errors.donorPhone?.message}>
+                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField wide label="Email" htmlFor="de" error={errors.donorEmail?.message} hint="Optional">
-                <Input id="de" type="email" leftIcon={Mail} {...register('donorEmail')} placeholder="you@example.com" />
+              <FormField wide label={t('form.email')} htmlFor="de" error={errors.donorEmail?.message} hint={t('form.optional')}>
+                <Input id="de" type="email" leftIcon={Mail} {...register('donorEmail')} placeholder={t('form.emailPlaceholder')} />
               </FormField>
-              <FormField wide label="Notes" htmlFor="nt">
-                <Textarea id="nt" rows={2} {...register('notes')} placeholder="Anything you'd like us to know" />
+              <FormField wide label={t('form.notes')} htmlFor="nt">
+                <Textarea id="nt" rows={2} {...register('notes')} placeholder={t('form.specialInstructions')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Nothing is recorded until you mark the payment as done.</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t('sadqa.nothingRecorded')}</p>
             <div className="flex gap-2">
               <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset({ amount: '' })} disabled={isSubmitting}>
-                Reset
+                {t('common.reset')}
               </Button>
               <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-                Continue to payment
+                {t('common.continueToPayment')}
               </Button>
             </div>
           </div>
         </form>
 
         <div>
-          <SectionHeading title="My donations" description="Your donation history" size="md" />
+          <SectionHeading title={t('sadqa.myDonations')} description={t('sadqa.yourDonationHistory')} size="md" />
           {loadingPast ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SkeletonStatCard />
@@ -205,8 +215,8 @@ export default function Sadqa() {
             <EmptyState
               icon={Heart}
               tone="sadqa"
-              title="No donations yet"
-              description="Once you complete a donation, it will appear here."
+              title={t('sadqa.noDonations')}
+              description={t('sadqa.noDonationsDesc')}
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -219,13 +229,13 @@ export default function Sadqa() {
       <PaymentConfirmModal
         open={paymentOpen}
         onClose={() => setPaymentOpen(false)}
-        title="Complete Sadqa payment"
+        title={t('sadqa.completePayment')}
         totalAmount={Number(pendingPayload?.amount) || 0}
-        summaryLabel="Donation amount"
-        summaryHint={pendingPayload?.purpose ? `For: ${pendingPayload.purpose}` : undefined}
+        summaryLabel={t('sadqa.totalDonation')}
+        summaryHint={pendingPayload?.purpose ? `${t('sadqa.purpose')}: ${pendingPayload.purpose}` : undefined}
         onConfirmedSubmit={handleConfirmed}
-        successMessage="Donation recorded"
-        successDescription="Thank you for your generosity. You'll be notified once admin confirms."
+        successMessage={t('sadqa.donationRecorded')}
+        successDescription={t('sadqa.donationRecordedDesc')}
       />
     </DashboardLayout>
   );
