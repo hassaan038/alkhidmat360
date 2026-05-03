@@ -14,8 +14,10 @@ import * as qurbaniModuleService from '../../services/qurbaniModuleService';
 import { formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 function BookingRow({ booking, onOpenPayment }) {
+  const { t } = useTranslation();
   const listing = booking.listing || {};
   const img = imageUrl(listing.photoUrl);
   const total = parseFloat(booking.totalAmount ?? 0) || (booking.hissaCount ?? 0) * parseFloat(listing.pricePerHissa ?? 0);
@@ -36,13 +38,13 @@ function BookingRow({ booking, onOpenPayment }) {
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50 truncate">
-                {listing.name || `Booking #${booking.id}`}
+                {listing.name || `${t('hissaBookings.listing')} #${booking.id}`}
               </h3>
               <div className="flex items-center gap-1.5 flex-wrap">
                 {booking.paymentMarked ? (
-                  <Badge variant="info" size="sm" icon={CheckCircle2}>Payment marked</Badge>
+                  <Badge variant="info" size="sm" icon={CheckCircle2}>{t('payment.paymentMarked')}</Badge>
                 ) : (
-                  <Badge variant="neutral" size="sm" icon={Clock}>Unpaid</Badge>
+                  <Badge variant="neutral" size="sm" icon={Clock}>{t('donation.paymentPending')}</Badge>
                 )}
                 <StatusBadge status={booking.status} size="sm" />
               </div>
@@ -50,11 +52,11 @@ function BookingRow({ booking, onOpenPayment }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
               <div>
-                <span className="text-gray-500 dark:text-gray-400">Hissas:</span>{' '}
+                <span className="text-gray-500 dark:text-gray-400">{t('hissaBookings.hissas')}:</span>{' '}
                 <span className="text-gray-900 dark:text-gray-50 font-medium tabular-nums">{booking.hissaCount}</span>
               </div>
               <div>
-                <span className="text-gray-500 dark:text-gray-400">Total:</span>{' '}
+                <span className="text-gray-500 dark:text-gray-400">{t('common.total')}:</span>{' '}
                 <span className="text-gray-900 dark:text-gray-50 font-medium tabular-nums">{formatCurrency(total)}</span>
               </div>
               {listing.pickupDate && (
@@ -73,7 +75,7 @@ function BookingRow({ booking, onOpenPayment }) {
 
             {canMarkPaid && (
               <Button size="sm" variant="success" leftIcon={CheckCircle2} onClick={() => onOpenPayment(booking)}>
-                I&apos;ve paid
+                {t('donation.ivePayd')}
               </Button>
             )}
           </div>
@@ -84,6 +86,7 @@ function BookingRow({ booking, onOpenPayment }) {
 }
 
 export default function MyHissaBookings() {
+  const { t } = useTranslation();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [paymentFor, setPaymentFor] = useState(null);
@@ -94,7 +97,7 @@ export default function MyHissaBookings() {
       const res = await qurbaniModuleService.getMyBookings();
       setBookings(res.data?.bookings || []);
     } catch (error) {
-      toast.error('Could not load bookings', { description: formatApiError(error) });
+      toast.error(t('hissaBookings.noBookings'), { description: formatApiError(error) });
       setBookings([]);
     } finally {
       setLoading(false);
@@ -112,8 +115,8 @@ export default function MyHissaBookings() {
         <PageHeader
           icon={BookOpen}
           accent="qurbani"
-          title="My Hissa Bookings"
-          description="Track your qurbani hissa bookings and complete payments."
+          title={t('hissaBookings.title')}
+          description={t('hissaBookings.description')}
         />
 
         {loading ? (
@@ -124,9 +127,9 @@ export default function MyHissaBookings() {
           <EmptyState
             icon={BookOpen}
             tone="qurbani"
-            title="No bookings yet"
-            description="You haven't booked any hissas yet. Head to Qurbani Booking to book one."
-            action={{ label: 'Browse listings', href: '/dashboard/user/qurbani-module' }}
+            title={t('hissaBookings.noBookingsTitle')}
+            description={t('hissaBookings.noBookingsDesc')}
+            action={{ label: t('common.view'), href: '/dashboard/user/qurbani-module' }}
           />
         ) : (
           <div className="space-y-4">
@@ -137,8 +140,8 @@ export default function MyHissaBookings() {
         <Modal
           open={!!paymentFor}
           onClose={() => setPaymentFor(null)}
-          title="Complete payment"
-          description={paymentFor?.listing?.name || (paymentFor ? `Booking #${paymentFor.id}` : undefined)}
+          title={t('payment.title')}
+          description={paymentFor?.listing?.name || (paymentFor ? `${t('hissaBookings.listing')} #${paymentFor.id}` : undefined)}
           size="md"
         >
           {paymentFor && (

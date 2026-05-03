@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 // Auth Pages
 import Login from './pages/auth/Login';
@@ -55,6 +57,12 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import RoleBasedRoute from './components/auth/RoleBasedRoute';
 
 function App() {
+  const { i18n } = useTranslation();
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === 'ur' ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language === 'ur' ? 'ur' : 'en';
+  }, [i18n.language]);
+
   return (
     <>
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

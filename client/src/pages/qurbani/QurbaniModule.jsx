@@ -8,8 +8,10 @@ import HissaSelector from '../../components/qurbani/HissaSelector';
 import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
+import { useTranslation } from 'react-i18next';
 
 export default function QurbaniModule() {
+  const { t } = useTranslation();
   const { moduleEnabled, listings, loading, fetchFlag, fetchListings } = useQurbaniModuleStore();
   const [selected, setSelected] = useState(null);
 
@@ -29,8 +31,8 @@ export default function QurbaniModule() {
         <PageHeader
           icon={Drumstick}
           accent="qurbani"
-          title="Qurbani Booking"
-          description="Book your hissas in this Eid's shared qurbani animals. Every hissa feeds multiple families."
+          title={t('qurbaniModule.title')}
+          description={t('qurbaniModule.description')}
         />
 
         {flagLoading || (moduleEnabled === true && loading) ? (
@@ -41,15 +43,15 @@ export default function QurbaniModule() {
           <EmptyState
             icon={Drumstick}
             tone="qurbani"
-            title="Qurbani booking is currently closed"
-            description="Qurbani bookings are not open right now. Please check back closer to Eid-ul-Adha."
+            title={t('skinPickup.moduleClosed')}
+            description={t('skinPickup.moduleClosedDesc')}
           />
         ) : listings.length === 0 ? (
           <EmptyState
             icon={Drumstick}
             tone="qurbani"
-            title="No active qurbanis"
-            description="No qurbanis are open for booking right now. Check back soon."
+            title={t('qurbaniModule.noActiveListings')}
+            description={t('qurbaniModule.noActiveListingsDesc')}
           />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

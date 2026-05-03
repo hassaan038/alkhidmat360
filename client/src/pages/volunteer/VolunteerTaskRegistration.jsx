@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,6 +12,7 @@ import { createVolunteerTask } from '../../services/volunteerService';
 import { toast } from 'sonner';
 import { HandHeart, User, Phone, Mail, Calendar, MapPin, Info, RotateCcw, ArrowRight, Shield, Briefcase } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const volunteerTaskSchema = z.object({
   volunteerName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -26,35 +27,36 @@ const volunteerTaskSchema = z.object({
   emergencyContact: z.string().min(11).max(15),
 });
 
-const DAYS_OF_WEEK = [
-  { value: 'monday', label: 'Mon' },
-  { value: 'tuesday', label: 'Tue' },
-  { value: 'wednesday', label: 'Wed' },
-  { value: 'thursday', label: 'Thu' },
-  { value: 'friday', label: 'Fri' },
-  { value: 'saturday', label: 'Sat' },
-  { value: 'sunday', label: 'Sun' },
-];
-
-const TASK_CATEGORIES = [
-  { value: 'DISTRIBUTION', label: 'Distribution', description: 'Food/aid distribution to beneficiaries' },
-  { value: 'FUNDRAISING', label: 'Fundraising', description: 'Organizing fundraising campaigns' },
-  { value: 'AWARENESS', label: 'Awareness', description: 'Community awareness programs' },
-  { value: 'ADMINISTRATIVE', label: 'Administrative', description: 'Office and documentation work' },
-  { value: 'FIELD_WORK', label: 'Field Work', description: 'On-ground assistance and surveys' },
-  { value: 'EVENT_SUPPORT', label: 'Event Support', description: 'Helping organize events' },
-];
-
-const infoPoints = [
-  'All registrations are reviewed within 2–3 business days.',
-  'You will be contacted via phone if your registration is approved.',
-  'Training sessions are provided for specific task categories.',
-  'Volunteer opportunities are available year-round.',
-];
-
 export default function VolunteerTaskRegistration() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDays, setSelectedDays] = useState([]);
+
+  const DAYS_OF_WEEK = useMemo(() => [
+    { value: 'monday', label: t('volunteer.mon') },
+    { value: 'tuesday', label: t('volunteer.tue') },
+    { value: 'wednesday', label: t('volunteer.wed') },
+    { value: 'thursday', label: t('volunteer.thu') },
+    { value: 'friday', label: t('volunteer.fri') },
+    { value: 'saturday', label: t('volunteer.sat') },
+    { value: 'sunday', label: t('volunteer.sun') },
+  ], [t]);
+
+  const TASK_CATEGORIES = useMemo(() => [
+    { value: 'DISTRIBUTION', label: t('volunteer.distribution'), description: t('volunteer.distributionDesc') },
+    { value: 'FUNDRAISING', label: t('volunteer.fundraising'), description: t('volunteer.fundraisingDesc') },
+    { value: 'AWARENESS', label: t('volunteer.awareness'), description: t('volunteer.awarenessDesc') },
+    { value: 'ADMINISTRATIVE', label: t('volunteer.administrative'), description: t('volunteer.administrativeDesc') },
+    { value: 'FIELD_WORK', label: t('volunteer.fieldWork'), description: t('volunteer.fieldWorkDesc') },
+    { value: 'EVENT_SUPPORT', label: t('volunteer.eventSupport'), description: t('volunteer.eventSupportDesc') },
+  ], [t]);
+
+  const infoPoints = useMemo(() => [
+    t('volunteer.info1'),
+    t('volunteer.info2'),
+    t('volunteer.info3'),
+    t('volunteer.info4'),
+  ], [t]);
 
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({
     resolver: zodResolver(volunteerTaskSchema),
@@ -72,11 +74,11 @@ export default function VolunteerTaskRegistration() {
     try {
       const submitData = { ...data, availability: JSON.stringify(data.availability) };
       await createVolunteerTask(submitData);
-      toast.success('Registration submitted', { description: 'Your volunteer registration will be reviewed shortly.' });
+      toast.success(t('volunteer.submitted'), { description: t('volunteer.submittedDesc') });
       reset();
       setSelectedDays([]);
     } catch (error) {
-      toast.error('Submission failed', { description: error.response?.data?.message || 'Please try again later' });
+      toast.error(t('common.submissionFailed'), { description: error.response?.data?.message || t('common.tryAgainLater') });
     } finally {
       setIsSubmitting(false);
     }
@@ -88,42 +90,42 @@ export default function VolunteerTaskRegistration() {
         <PageHeader
           icon={HandHeart}
           accent="volunteer"
-          title="Volunteer Registration"
-          description="Register to volunteer for distribution, fundraising, awareness, and field work."
+          title={t('volunteer.title')}
+          description={t('volunteer.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Personal information" icon={User}>
+          <FormSection title={t('volunteer.personalInformation')} icon={User}>
             <FormGrid cols={2}>
-              <FormField wide label="Full name" required htmlFor="vn" error={errors.volunteerName?.message}>
-                <Input id="vn" leftIcon={User} {...register('volunteerName')} placeholder="Your full name" />
+              <FormField wide label={t('volunteer.volunteerName')} required htmlFor="vn" error={errors.volunteerName?.message}>
+                <Input id="vn" leftIcon={User} {...register('volunteerName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="vp" error={errors.volunteerPhone?.message}>
-                <Input id="vp" type="tel" leftIcon={Phone} {...register('volunteerPhone')} placeholder="03001234567" />
+              <FormField label={t('volunteer.volunteerPhone')} required htmlFor="vp" error={errors.volunteerPhone?.message}>
+                <Input id="vp" type="tel" leftIcon={Phone} {...register('volunteerPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField label="Email" required htmlFor="ve" error={errors.volunteerEmail?.message}>
-                <Input id="ve" type="email" leftIcon={Mail} {...register('volunteerEmail')} placeholder="you@example.com" />
+              <FormField label={t('volunteer.volunteerEmail')} required htmlFor="ve" error={errors.volunteerEmail?.message}>
+                <Input id="ve" type="email" leftIcon={Mail} {...register('volunteerEmail')} placeholder={t('form.emailPlaceholder')} />
               </FormField>
-              <FormField wide label="Address" required htmlFor="va" error={errors.volunteerAddress?.message}>
-                <Textarea id="va" rows={3} {...register('volunteerAddress')} placeholder="Complete residential address" />
+              <FormField wide label={t('volunteer.volunteerAddress')} required htmlFor="va" error={errors.volunteerAddress?.message}>
+                <Textarea id="va" rows={3} {...register('volunteerAddress')} placeholder={t('form.completeAddress')} />
               </FormField>
-              <FormField wide label="Emergency contact" required htmlFor="ec" error={errors.emergencyContact?.message}>
-                <Input id="ec" type="tel" leftIcon={Shield} {...register('emergencyContact')} placeholder="Next-of-kin phone number" />
+              <FormField wide label={t('volunteer.emergencyContact')} required htmlFor="ec" error={errors.emergencyContact?.message}>
+                <Input id="ec" type="tel" leftIcon={Shield} {...register('emergencyContact')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Task preference & availability" icon={Briefcase}>
-            <FormField label="Preferred task category" required htmlFor="tc" error={errors.taskCategory?.message}>
+          <FormSection title={t('volunteer.taskPreference')} icon={Briefcase}>
+            <FormField label={t('volunteer.taskCategory')} required htmlFor="tc" error={errors.taskCategory?.message}>
               <Select id="tc" {...register('taskCategory')}>
-                <option value="">Select a category</option>
+                <option value="">{t('volunteer.selectCategory')}</option>
                 {TASK_CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>{c.label} — {c.description}</option>
                 ))}
               </Select>
             </FormField>
 
-            <FormField label="Availability (days)" required error={errors.availability?.message} className="mt-4">
+            <FormField label={t('volunteer.availability')} required error={errors.availability?.message} className="mt-4">
               <div className="flex flex-wrap gap-2">
                 {DAYS_OF_WEEK.map((day) => {
                   const on = selectedDays.includes(day.value);
@@ -147,28 +149,28 @@ export default function VolunteerTaskRegistration() {
               </div>
             </FormField>
 
-            <FormField label="Preferred location" hint="Optional" htmlFor="pl" className="mt-4">
-              <Input id="pl" leftIcon={MapPin} {...register('preferredLocation')} placeholder="e.g., Karachi, Lahore, Islamabad" />
+            <FormField label={t('volunteer.preferredLocation')} hint={t('form.optional')} htmlFor="pl" className="mt-4">
+              <Input id="pl" leftIcon={MapPin} {...register('preferredLocation')} placeholder={t('volunteer.preferredLocation')} />
             </FormField>
           </FormSection>
 
-          <FormSection title="Skills & experience" icon={Briefcase} description="Optional — helps us match you with the right tasks.">
+          <FormSection title={t('volunteer.skillsExperience')} icon={Briefcase}>
             <FormGrid cols={1}>
-              <FormField label="Skills" htmlFor="sk">
-                <Textarea id="sk" rows={3} {...register('skills')} placeholder="e.g., first aid, public speaking, event management" />
+              <FormField label={t('volunteer.skills')} htmlFor="sk">
+                <Textarea id="sk" rows={3} {...register('skills')} placeholder={t('volunteer.skills')} />
               </FormField>
-              <FormField label="Previous volunteer experience" htmlFor="ex">
-                <Textarea id="ex" rows={3} {...register('experience')} placeholder="Describe any previous volunteer or community work" />
+              <FormField label={t('volunteer.experience')} htmlFor="ex">
+                <Textarea id="ex" rows={3} {...register('experience')} placeholder={t('volunteer.experience')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => { reset(); setSelectedDays([]); }} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Submit registration
+              {t('common.submitRegistration')}
             </Button>
           </div>
         </form>
@@ -179,7 +181,7 @@ export default function VolunteerTaskRegistration() {
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-volunteer-700 dark:text-volunteer-200">Volunteer information</h4>
+              <h4 className="text-sm font-semibold text-volunteer-700 dark:text-volunteer-200">{t('volunteer.volunteerInformation')}</h4>
               <ul className="mt-2 space-y-1 text-xs text-volunteer-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,6 +12,7 @@ import { createOrphanSponsorship } from '../../services/donationService';
 import { Baby, Heart, User, Phone, Mail, RotateCcw, ArrowRight } from 'lucide-react';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const orphanSponsorshipSchema = z.object({
   sponsorshipType: z.string().min(2).max(50),
@@ -28,26 +29,27 @@ const orphanSponsorshipSchema = z.object({
   notes: z.string().optional(),
 });
 
-const sponsorshipTypes = [
-  { id: 'basic', name: 'Basic Education Support', monthlyAmount: 5000, description: 'School fees, books, and basic supplies' },
-  { id: 'standard', name: 'Standard Care Package', monthlyAmount: 8000, description: 'Education + clothing + monthly stipend' },
-  { id: 'premium', name: 'Complete Care Support', monthlyAmount: 12000, description: 'Full support including healthcare and extras' },
-];
-
-const benefits = [
-  'Monthly progress reports and updates about the child',
-  'Annual comprehensive report with photos',
-  'Opportunity to write letters to the sponsored child',
-  'Full transparency on fund utilization',
-  'Tax exemption certificate provided',
-];
-
 export default function OrphanSponsorship() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedType, setSelectedType] = useState('');
   const [customMode, setCustomMode] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [pendingPayload, setPendingPayload] = useState(null);
+
+  const sponsorshipTypes = useMemo(() => [
+    { id: 'basic', name: t('orphanSponsorship.basicTier'), monthlyAmount: 5000, description: t('orphanSponsorship.basicDesc') },
+    { id: 'standard', name: t('orphanSponsorship.standardTier'), monthlyAmount: 8000, description: t('orphanSponsorship.standardDesc') },
+    { id: 'premium', name: t('orphanSponsorship.premiumTier'), monthlyAmount: 12000, description: t('orphanSponsorship.premiumDesc') },
+  ], [t]);
+
+  const benefits = useMemo(() => [
+    t('orphanSponsorship.info1'),
+    t('orphanSponsorship.info2'),
+    t('orphanSponsorship.info3'),
+    t('orphanSponsorship.info4'),
+    t('orphanSponsorship.info5'),
+  ], [t]);
 
   const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm({
     resolver: zodResolver(orphanSponsorshipSchema),
@@ -108,12 +110,12 @@ export default function OrphanSponsorship() {
         <PageHeader
           icon={Baby}
           accent="orphan"
-          title="Orphan Sponsorship"
-          description="Sponsor an orphan child monthly and receive progress updates."
+          title={t('orphanSponsorship.title')}
+          description={t('orphanSponsorship.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Pick a sponsorship tier" icon={Heart}>
+          <FormSection title={t('orphanSponsorship.pickTier')} icon={Heart}>
             <div className="grid grid-cols-1 gap-3">
               {sponsorshipTypes.map((type) => (
                 <label
@@ -132,7 +134,7 @@ export default function OrphanSponsorship() {
                     <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{type.description}</p>
                   </div>
                   <p className="flex-shrink-0 text-base font-bold text-orphan-600 tabular-nums">
-                    PKR {type.monthlyAmount.toLocaleString()}<span className="text-xs font-medium text-gray-500 dark:text-gray-400">/mo</span>
+                    PKR {type.monthlyAmount.toLocaleString()}<span className="text-xs font-medium text-gray-500 dark:text-gray-400">{t('common.perMonth')}</span>
                   </p>
                 </label>
               ))}
@@ -144,89 +146,89 @@ export default function OrphanSponsorship() {
                 onClick={enableCustom}
                 className="mt-3 text-sm font-medium text-orphan-600 hover:text-orphan-700 underline-offset-2 hover:underline cursor-pointer"
               >
-                None of these fit? Enter a custom tier instead.
+                {t('orphanSponsorship.noneFitCustom')}
               </button>
             ) : (
               <div className="mt-4 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Custom sponsorship type</label>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('orphanSponsorship.customTier')}</label>
                   <button
                     type="button"
                     onClick={() => { setCustomMode(false); setValue('sponsorshipType', '', { shouldValidate: false }); }}
                     className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 cursor-pointer"
                   >
-                    Use a preset instead
+                    {t('orphanSponsorship.usePresetInstead')}
                   </button>
                 </div>
-                <Input {...register('sponsorshipType')} placeholder="e.g., Specialized Educational Support" autoFocus />
-                <p className="text-xs text-gray-500 dark:text-gray-400">Set the monthly amount manually in the next field.</p>
+                <Input {...register('sponsorshipType')} placeholder={t('orphanSponsorship.customPlaceholder')} autoFocus />
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('orphanSponsorship.customAmountHint')}</p>
               </div>
             )}
             {errors.sponsorshipType && <p className="mt-2 text-xs text-error-dark">{errors.sponsorshipType.message}</p>}
 
             <FormGrid cols={3} className="mt-5">
-              <FormField label="Monthly (PKR)" required htmlFor="ma" error={errors.monthlyAmount?.message}>
+              <FormField label={t('orphanSponsorship.monthlyAmount')} required htmlFor="ma" error={errors.monthlyAmount?.message}>
                 <Input id="ma" type="number" min={0} {...register('monthlyAmount')} />
               </FormField>
-              <FormField label="Duration (months)" required htmlFor="du" error={errors.duration?.message}>
+              <FormField label={t('orphanSponsorship.duration')} required htmlFor="du" error={errors.duration?.message}>
                 <Input id="du" type="number" min={1} {...register('duration', { onChange: handleDurationChange })} />
               </FormField>
-              <FormField label="Total (PKR)" required htmlFor="ta" error={errors.totalAmount?.message} hint="Auto-calculated">
+              <FormField label={t('orphanSponsorship.totalCol')} required htmlFor="ta" error={errors.totalAmount?.message} hint={t('orphanSponsorship.autoCalculated')}>
                 <Input id="ta" type="number" readOnly {...register('totalAmount')} className="bg-gray-50 dark:bg-gray-900" />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Sponsor information" icon={User}>
+          <FormSection title={t('orphanSponsorship.sponsorInformation')} icon={User}>
             <FormGrid cols={2}>
-              <FormField wide label="Full name" required htmlFor="sn" error={errors.sponsorName?.message}>
-                <Input id="sn" leftIcon={User} {...register('sponsorName')} placeholder="Your full name" />
+              <FormField wide label={t('form.fullName')} required htmlFor="sn" error={errors.sponsorName?.message}>
+                <Input id="sn" leftIcon={User} {...register('sponsorName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="sp" error={errors.sponsorPhone?.message}>
-                <Input id="sp" type="tel" leftIcon={Phone} {...register('sponsorPhone')} placeholder="03001234567" />
+              <FormField label={t('form.phoneNumber')} required htmlFor="sp" error={errors.sponsorPhone?.message}>
+                <Input id="sp" type="tel" leftIcon={Phone} {...register('sponsorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField label="Email address" required htmlFor="se" error={errors.sponsorEmail?.message}>
-                <Input id="se" type="email" leftIcon={Mail} {...register('sponsorEmail')} placeholder="you@example.com" />
+              <FormField label={t('form.emailAddress')} required htmlFor="se" error={errors.sponsorEmail?.message}>
+                <Input id="se" type="email" leftIcon={Mail} {...register('sponsorEmail')} placeholder={t('form.emailPlaceholder')} />
               </FormField>
-              <FormField wide label="Address" required htmlFor="sa" error={errors.sponsorAddress?.message}>
-                <Textarea id="sa" rows={3} {...register('sponsorAddress')} placeholder="Complete mailing address" />
+              <FormField wide label={t('form.address')} required htmlFor="sa" error={errors.sponsorAddress?.message}>
+                <Textarea id="sa" rows={3} {...register('sponsorAddress')} placeholder={t('orphanSponsorship.completeMailingAddress')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Orphan preferences (optional)" icon={Baby} description="Help us match you with a child.">
+          <FormSection title={t('orphanSponsorship.orphanPreferences')} icon={Baby} description={t('orphanSponsorship.orphanPreferencesDesc')}>
             <FormGrid cols={3}>
-              <FormField label="Preferred age" htmlFor="oa">
+              <FormField label={t('orphanSponsorship.orphanAge')} htmlFor="oa">
                 <Select id="oa" {...register('orphanAge')}>
-                  <option value="">Any age</option>
-                  <option value="0-5">0–5 years</option>
-                  <option value="6-10">6–10 years</option>
-                  <option value="11-15">11–15 years</option>
-                  <option value="16-18">16–18 years</option>
+                  <option value="">{t('orphanSponsorship.anyAge')}</option>
+                  <option value="0-5">{t('orphanSponsorship.age0_5')}</option>
+                  <option value="6-10">{t('orphanSponsorship.age6_10')}</option>
+                  <option value="11-15">{t('orphanSponsorship.age11_15')}</option>
+                  <option value="16-18">{t('orphanSponsorship.age16_18')}</option>
                 </Select>
               </FormField>
-              <FormField label="Preferred gender" htmlFor="og">
+              <FormField label={t('orphanSponsorship.orphanGender')} htmlFor="og">
                 <Select id="og" {...register('orphanGender')}>
-                  <option value="">Any gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="">{t('orphanSponsorship.anyGender')}</option>
+                  <option value="male">{t('common.male')}</option>
+                  <option value="female">{t('common.female')}</option>
                 </Select>
               </FormField>
-              <FormField label="Start date" htmlFor="sd">
+              <FormField label={t('orphanSponsorship.startDate')} htmlFor="sd">
                 <Input id="sd" type="date" {...register('startDate')} />
               </FormField>
-              <FormField wide label="Additional notes" htmlFor="nt">
-                <Textarea id="nt" rows={2} {...register('notes')} placeholder="Any special message or requirement" />
+              <FormField wide label={t('form.additionalNotes')} htmlFor="nt">
+                <Textarea id="nt" rows={2} {...register('notes')} placeholder={t('orphanSponsorship.specialMessagePlaceholder')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => { reset(); setSelectedType(''); setCustomMode(false); }} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Continue to first payment
+              {t('orphanSponsorship.continueToFirstPayment')}
             </Button>
           </div>
         </form>
@@ -237,7 +239,7 @@ export default function OrphanSponsorship() {
               <Heart className="h-4 w-4 fill-orphan-600" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-orphan-700 dark:text-orphan-200">What your sponsorship includes</h4>
+              <h4 className="text-sm font-semibold text-orphan-700 dark:text-orphan-200">{t('orphanSponsorship.whatIncludes')}</h4>
               <ul className="mt-2 space-y-1 text-xs text-orphan-700/90">
                 {benefits.map((b) => (
                   <li key={b} className="flex gap-2">
@@ -254,17 +256,17 @@ export default function OrphanSponsorship() {
       <PaymentConfirmModal
         open={paymentOpen}
         onClose={() => setPaymentOpen(false)}
-        title="Complete first month's sponsorship"
+        title={t('orphanSponsorship.completeFirstPayment')}
         totalAmount={Number(pendingPayload?.monthlyAmount) || 0}
-        summaryLabel="First month's payment"
+        summaryLabel={t('orphanSponsorship.firstMonthPayment')}
         summaryHint={
           pendingPayload
-            ? `${pendingPayload.duration}-month commitment · total PKR ${Number(pendingPayload._totalCommitment || 0).toLocaleString()}`
+            ? `${pendingPayload.duration}-${t('orphanSponsorship.monthCommitment')} ${Number(pendingPayload._totalCommitment || 0).toLocaleString()}`
             : undefined
         }
         onConfirmedSubmit={handlePaymentConfirmed}
-        successMessage="Sponsorship recorded"
-        successDescription="Thank you for changing a life. We'll reach out shortly with next steps."
+        successMessage={t('orphanSponsorship.sponsorshipRecorded')}
+        successDescription={t('orphanSponsorship.sponsorshipRecordedDesc')}
       />
     </DashboardLayout>
   );

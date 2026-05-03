@@ -6,37 +6,37 @@ import DataTable from '../../components/admin/DataTable';
 import { FileText } from 'lucide-react';
 import * as adminService from '../../services/adminService';
 import { cn } from '../../lib/utils';
-
-const tabs = [
-  { id: 'loan', label: 'Loan Applications' },
-  { id: 'ration', label: 'Ramadan Ration' },
-  { id: 'orphan', label: 'Orphan Registrations' },
-];
-
-const columns = {
-  loan: [
-    { key: 'applicantName', label: 'Applicant' },
-    { key: 'loanType', label: 'Loan Type' },
-    { key: 'requestedAmount', label: 'Amount', render: (row) => `PKR ${parseFloat(row.requestedAmount).toLocaleString()}` },
-    { key: 'familyMembers', label: 'Family' },
-    { key: 'employmentStatus', label: 'Employment' },
-  ],
-  ration: [
-    { key: 'applicantName', label: 'Applicant' },
-    { key: 'familyMembers', label: 'Family' },
-    { key: 'monthlyIncome', label: 'Income', render: (row) => `PKR ${parseFloat(row.monthlyIncome).toLocaleString()}` },
-    { key: 'hasDisabledMembers', label: 'Disabled Members', render: (row) => (row.hasDisabledMembers ? 'Yes' : 'No') },
-  ],
-  orphan: [
-    { key: 'orphanName', label: 'Orphan' },
-    { key: 'orphanAge', label: 'Age' },
-    { key: 'orphanGender', label: 'Gender' },
-    { key: 'guardianName', label: 'Guardian' },
-    { key: 'educationLevel', label: 'Education' },
-  ],
-};
+import { useTranslation } from 'react-i18next';
 
 export default function ApplicationsManagement() {
+  const { t } = useTranslation();
+  const tabs = [
+    { id: 'loan', label: t('sidebar.loanApplication') },
+    { id: 'ration', label: t('sidebar.ramadanRation') },
+    { id: 'orphan', label: t('sidebar.orphanRegistration') },
+  ];
+  const columns = {
+    loan: [
+      { key: 'applicantName', label: t('loanApplication.applicantName') },
+      { key: 'loanType', label: t('loanApplication.loanType') },
+      { key: 'requestedAmount', label: t('common.amount'), render: (row) => `PKR ${parseFloat(row.requestedAmount).toLocaleString()}` },
+      { key: 'familyMembers', label: t('loanApplication.familyMembers') },
+      { key: 'employmentStatus', label: t('loanApplication.employmentStatus') },
+    ],
+    ration: [
+      { key: 'applicantName', label: t('loanApplication.applicantName') },
+      { key: 'familyMembers', label: t('ramadanRation.familyMembers') },
+      { key: 'monthlyIncome', label: t('ramadanRation.monthlyIncome'), render: (row) => `PKR ${parseFloat(row.monthlyIncome).toLocaleString()}` },
+      { key: 'hasDisabledMembers', label: t('ramadanRation.hasDisabledMembers'), render: (row) => (row.hasDisabledMembers ? t('common.yes') : t('common.no')) },
+    ],
+    orphan: [
+      { key: 'orphanName', label: t('orphanReg.orphanName') },
+      { key: 'orphanAge', label: t('orphanReg.orphanAge') },
+      { key: 'orphanGender', label: t('orphanReg.orphanGender') },
+      { key: 'guardianName', label: t('orphanReg.guardianName') },
+      { key: 'educationLevel', label: t('orphanReg.educationLevel') },
+    ],
+  };
   const [activeTab, setActiveTab] = useState('loan');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -80,8 +80,8 @@ export default function ApplicationsManagement() {
         <PageHeader
           icon={FileText}
           accent="loan"
-          title="Applications Management"
-          description="Review and manage all beneficiary applications."
+          title={t('adminApplications.title')}
+          description={t('adminApplications.description')}
         />
 
         <div className="border-b border-gray-200 dark:border-gray-800">
@@ -110,9 +110,9 @@ export default function ApplicationsManagement() {
           searchable
           statusFilter={['pending', 'under_review', 'approved', 'rejected']}
           onStatusUpdate={handleStatusUpdate}
-          actionLabels={{ approve: 'Approve', reject: 'Reject', approveStatus: 'approved', rejectStatus: 'rejected' }}
-          emptyTitle="No applications yet"
-          emptyDescription="Submissions will appear here once users start submitting."
+          actionLabels={{ approve: t('common.approve'), reject: t('common.reject'), approveStatus: 'approved', rejectStatus: 'rejected' }}
+          emptyTitle={t('table.noData')}
+          emptyDescription={t('empty.description')}
         />
       </PageContainer>
     </DashboardLayout>

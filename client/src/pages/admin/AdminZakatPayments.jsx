@@ -12,8 +12,10 @@ import EmptyState from '../../components/common/EmptyState';
 import * as zakatService from '../../services/zakatService';
 import { formatCurrency, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
+import { useTranslation } from 'react-i18next';
 
 export default function AdminZakatPayments() {
+  const { t } = useTranslation();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
@@ -24,7 +26,7 @@ export default function AdminZakatPayments() {
       const res = await zakatService.adminListZakatPayments();
       setItems(res.data?.payments || []);
     } catch (err) {
-      toast.error('Failed to load zakat payments', { description: formatApiError(err) });
+      toast.error(t('zakatPayment.failedToLoad'), { description: formatApiError(err) });
       setItems([]);
     } finally {
       setLoading(false);
@@ -40,10 +42,10 @@ export default function AdminZakatPayments() {
     setUpdatingId(id);
     try {
       await zakatService.adminUpdateZakatPaymentStatus(id, status);
-      toast.success('Status updated');
+      toast.success(t('table.statusUpdated'));
       load();
     } catch (err) {
-      toast.error('Update failed', { description: formatApiError(err) });
+      toast.error(t('table.statusUpdateFailed'), { description: formatApiError(err) });
     } finally {
       setUpdatingId(null);
     }
@@ -55,8 +57,8 @@ export default function AdminZakatPayments() {
         <PageHeader
           icon={Coins}
           accent="zakat"
-          title="Zakat Payments"
-          description="Verify the bank transfer (use the screenshot if attached) and Confirm or Reject."
+          title={t('adminZakat.paymentsTitle')}
+          description={t('adminZakat.paymentsDesc')}
         />
 
           <Card className="overflow-hidden">
@@ -70,16 +72,16 @@ export default function AdminZakatPayments() {
                 <EmptyState
                   icon={Coins}
                   tone="zakat"
-                  title="No zakat payments yet"
-                  description="Donor submissions will appear here."
+                  title={t('zakatPayment.noPayments')}
+                  description={t('zakatPayment.noPaymentsDesc')}
                 />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full">
                     <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
-                        <Th>#</Th><Th>Donor</Th><Th>Wealth</Th><Th>Nisab</Th>
-                        <Th>Zakat</Th><Th>Paid?</Th><Th>Screenshot</Th><Th>Status</Th><Th>Actions</Th>
+                        <Th>#</Th><Th>{t('roles.DONOR')}</Th><Th>{t('zakatPayment.totalWealth')}</Th><Th>{t('zakatPayment.nisabBasis')}</Th>
+                        <Th>{t('zakatPayment.zakatAmount')}</Th><Th>{t('sadqa.paid')}</Th><Th>{t('payment.screenshotOptional')}</Th><Th>{t('common.status')}</Th><Th>{t('common.actions')}</Th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -104,9 +106,9 @@ export default function AdminZakatPayments() {
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {p.paymentMarked ? (
-                              <Check className="w-4 h-4 text-success-dark" aria-label="Paid" />
+                              <Check className="w-4 h-4 text-success-dark" aria-label={t('sadqa.paid')} />
                             ) : (
-                              <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label="Unpaid" />
+                              <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label={t('donation.paymentPending')} />
                             )}
                           </td>
                           <td className="px-4 py-3">
@@ -118,7 +120,7 @@ export default function AdminZakatPayments() {
                               >
                                 <img
                                   src={imageUrl(p.paymentScreenshotUrl)}
-                                  alt="Payment"
+                                  alt={t('payment.screenshotOptional')}
                                   className="w-12 h-12 object-cover rounded border border-gray-200 dark:border-gray-800 hover:opacity-80 transition"
                                 />
                               </a>
@@ -133,10 +135,10 @@ export default function AdminZakatPayments() {
                             {p.status === 'pending' && (
                               <div className="flex gap-2">
                                 <Button size="sm" variant="success" leftIcon={Check} onClick={() => handleStatus(p.id, 'confirmed')} disabled={updatingId === p.id}>
-                                  Confirm
+                                  {t('common.confirm')}
                                 </Button>
                                 <Button size="sm" variant="outline" leftIcon={X} onClick={() => handleStatus(p.id, 'rejected')} disabled={updatingId === p.id} className="border-error/40 text-error-dark hover:bg-error-light/60">
-                                  Reject
+                                  {t('common.reject')}
                                 </Button>
                               </div>
                             )}

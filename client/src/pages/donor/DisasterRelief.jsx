@@ -22,13 +22,14 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import * as extraDonationService from '../../services/extraDonationService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
-const CAMPAIGNS = [
-  { key: 'floods', label: 'Pakistan Floods Relief', icon: Waves, description: 'Rescue boats, tent cities, food, water and medical care for monsoon-flood affected families.' },
-  { key: 'earthquake', label: 'Earthquake Emergency', icon: AlertTriangle, description: 'Shelter, food, clean water and medical aid for earthquake-affected regions.' },
-  { key: 'shelter', label: 'Tent Villages & Shelter', icon: Home, description: 'Temporary housing for displaced families — schooling, play areas, mosques, libraries.' },
-  { key: 'medical', label: 'Mobile Health Units', icon: HeartPulse, description: 'Ambulances, medical camps and mobile health units serving disaster zones.' },
-  { key: 'general', label: 'General Disaster Fund', icon: Shield, description: 'Goes wherever the need is greatest right now — flexible emergency response.' },
+const CAMPAIGN_KEYS = [
+  { key: 'floods', icon: Waves },
+  { key: 'earthquake', icon: AlertTriangle },
+  { key: 'shelter', icon: Home },
+  { key: 'medical', icon: HeartPulse },
+  { key: 'general', icon: Shield },
 ];
 
 const QUICK_AMOUNTS = [1000, 2500, 5000, 10000, 25000, 50000];
@@ -42,7 +43,8 @@ const schema = z.object({
 });
 
 function DonationCard({ donation }) {
-  const campaign = CAMPAIGNS.find((c) => c.key === donation.campaignKey);
+  const { t } = useTranslation();
+  const campaign = CAMPAIGN_KEYS.find((c) => c.key === donation.campaignKey);
   const Icon = campaign?.icon || LifeBuoy;
   return (
     <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
@@ -51,13 +53,13 @@ function DonationCard({ donation }) {
           <div className="flex items-start gap-3 min-w-0">
             <IconTile icon={Icon} tone="disaster" size="md" />
             <div className="min-w-0">
-              <p className="text-xs text-gray-500 dark:text-gray-400">Donation #{donation.id}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t('sadqa.donationNo')}{donation.id}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-50 tabular-nums">{formatCurrency(donation.amount)}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{donation.campaignLabel}</p>
             </div>
           </div>
           <div className="flex items-center gap-1.5 flex-wrap">
-            {donation.paymentMarked && <Badge variant="info" size="sm" icon={CheckCircle2}>Paid</Badge>}
+            {donation.paymentMarked && <Badge variant="info" size="sm" icon={CheckCircle2}>{t('sadqa.paid')}</Badge>}
             <StatusBadge status={donation.status} size="sm" />
           </div>
         </div>
@@ -73,6 +75,12 @@ function DonationCard({ donation }) {
 }
 
 export default function DisasterRelief() {
+  const { t } = useTranslation();
+  const CAMPAIGNS = useMemo(() => CAMPAIGN_KEYS.map((c) => ({
+    ...c,
+    label: t(`disasterRelief.${c.key}`),
+    description: t(`disasterRelief.${c.key}Desc`),
+  })), [t]);
   const [past, setPast] = useState([]);
   const [loadingPast, setLoadingPast] = useState(true);
   const [campaignKey, setCampaignKey] = useState('floods');
@@ -84,7 +92,7 @@ export default function DisasterRelief() {
     defaultValues: { amount: '' },
   });
   const watchAmount = watch('amount');
-  const selected = useMemo(() => CAMPAIGNS.find((c) => c.key === campaignKey), [campaignKey]);
+  const selected = useMemo(() => CAMPAIGNS.find((c) => c.key === campaignKey), [CAMPAIGNS, campaignKey]);
 
   const loadPast = async () => {
     setLoadingPast(true);
@@ -92,7 +100,7 @@ export default function DisasterRelief() {
       const res = await extraDonationService.getMyDisasterDonations();
       setPast(res.data?.donations || []);
     } catch (err) {
-      toast.error('Failed to load past donations', { description: formatApiError(err) });
+      toast.error(t('disasterRelief.failedToLoad'), { description: formatApiError(err) });
       setPast([]);
     } finally {
       setLoadingPast(false);
@@ -124,12 +132,12 @@ export default function DisasterRelief() {
         <PageHeader
           icon={LifeBuoy}
           accent="disaster"
-          title="Disaster Relief"
-          description="Support Alkhidmat's emergency response — rescue ops, tent villages, mobile health units, and food distribution."
+          title={t('disasterRelief.title')}
+          description={t('disasterRelief.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Choose a campaign" icon={LifeBuoy}>
+          <FormSection title={t('disasterRelief.chooseACampaign')} icon={LifeBuoy}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {CAMPAIGNS.map((c) => {
                 const CIcon = c.icon;
@@ -161,9 +169,9 @@ export default function DisasterRelief() {
             </div>
           </FormSection>
 
-          <FormSection title="Amount" icon={Coins}>
-            <FormField label="Amount (PKR)" required htmlFor="amt" error={errors.amount?.message}>
-              <Input id="amt" type="number" min={1} {...register('amount')} placeholder="Enter amount" />
+          <FormSection title={t('disasterRelief.amount')} icon={Coins}>
+            <FormField label={t('disasterRelief.amountPkr')} required htmlFor="amt" error={errors.amount?.message}>
+              <Input id="amt" type="number" min={1} {...register('amount')} placeholder={t('qurbaniDonation.enterAmount')} />
             </FormField>
             <div className="flex flex-wrap gap-2 mt-3">
               {QUICK_AMOUNTS.map((amt) => (
@@ -184,35 +192,35 @@ export default function DisasterRelief() {
             </div>
           </FormSection>
 
-          <FormSection title="Your details" icon={User}>
+          <FormSection title={t('disasterRelief.yourDetails')} icon={User}>
             <FormGrid cols={2}>
-              <FormField label="Full name" required htmlFor="dn" error={errors.donorName?.message}>
-                <Input id="dn" leftIcon={User} {...register('donorName')} placeholder="Your full name" />
+              <FormField label={t('form.fullName')} required htmlFor="dn" error={errors.donorName?.message}>
+                <Input id="dn" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="dp" error={errors.donorPhone?.message}>
-                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder="03001234567" />
+              <FormField label={t('form.phoneNumber')} required htmlFor="dp" error={errors.donorPhone?.message}>
+                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField wide label="Email" htmlFor="de" hint="Optional" error={errors.donorEmail?.message}>
-                <Input id="de" type="email" leftIcon={Mail} {...register('donorEmail')} placeholder="you@example.com" />
+              <FormField wide label={t('form.email')} htmlFor="de" hint={t('form.optional')} error={errors.donorEmail?.message}>
+                <Input id="de" type="email" leftIcon={Mail} {...register('donorEmail')} placeholder={t('form.emailPlaceholder')} />
               </FormField>
-              <FormField wide label="Notes" htmlFor="nt">
-                <Textarea id="nt" rows={2} {...register('notes')} placeholder="Anything you'd like us to know" />
+              <FormField wide label={t('form.notes')} htmlFor="nt">
+                <Textarea id="nt" rows={2} {...register('notes')} placeholder={t('form.specialInstructions')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset({ amount: '' })} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Continue to payment
+              {t('common.continueToPayment')}
             </Button>
           </div>
         </form>
 
         <div>
-          <SectionHeading title="My disaster donations" description="Your campaign contribution history" size="md" />
+          <SectionHeading title={t('disasterRelief.myDonations')} description={t('disasterRelief.yourCampaignHistory')} size="md" />
           {loadingPast ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SkeletonStatCard />
@@ -222,8 +230,8 @@ export default function DisasterRelief() {
             <EmptyState
               icon={LifeBuoy}
               tone="disaster"
-              title="No disaster donations yet"
-              description="Once you complete one, it will appear here."
+              title={t('disasterRelief.noDonations')}
+              description={t('disasterRelief.noDonationsDesc')}
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -236,13 +244,13 @@ export default function DisasterRelief() {
       <PaymentConfirmModal
         open={paymentOpen}
         onClose={() => setPaymentOpen(false)}
-        title="Complete disaster relief donation"
+        title={t('disasterRelief.completePayment')}
         totalAmount={Number(pendingPayload?.amount) || 0}
-        summaryLabel="Donation amount"
-        summaryHint={pendingPayload?.campaignLabel ? `For: ${pendingPayload.campaignLabel}` : undefined}
+        summaryLabel={t('disasterRelief.totalContribution')}
+        summaryHint={pendingPayload?.campaignLabel ? `${t('sadqa.purpose')}: ${pendingPayload.campaignLabel}` : undefined}
         onConfirmedSubmit={handleConfirmed}
-        successMessage="Donation recorded"
-        successDescription="Thank you for supporting relief efforts. You'll be notified once admin confirms."
+        successMessage={t('disasterRelief.donationRecorded')}
+        successDescription={t('disasterRelief.donationRecordedDesc')}
       />
     </DashboardLayout>
   );

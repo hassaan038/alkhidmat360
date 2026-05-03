@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+html[lang="ur"] body {
+  font-family: 'Noto Nastaliq Urdu', serif;
+  line-height: 2;
+}
+
 @layer base {
   html {
     color-scheme: light;

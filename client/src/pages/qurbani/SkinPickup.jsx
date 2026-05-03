@@ -27,6 +27,7 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import * as qurbaniSkinPickupService from '../../services/qurbaniSkinPickupService';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import { formatDate, formatApiError } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const skinPickupSchema = z.object({
   contactPhone: z
@@ -50,6 +51,7 @@ function osmLink(lat, lng) {
 }
 
 function PickupCard({ pickup }) {
+  const { t } = useTranslation();
   const lat = pickup.latitude != null ? Number(pickup.latitude) : null;
   const lng = pickup.longitude != null ? Number(pickup.longitude) : null;
   const hasCoords = lat != null && lng != null;
@@ -60,9 +62,9 @@ function PickupCard({ pickup }) {
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Request #{pickup.id}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('skinPickup.requestNo')}{pickup.id}</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-              {pickup.numberOfSkins} skin{pickup.numberOfSkins > 1 ? 's' : ''}
+              {pickup.numberOfSkins} {pickup.numberOfSkins > 1 ? t('skinPickup.skins') : t('skinPickup.skin')}
             </p>
           </div>
           <StatusBadge status={pickup.status} size="sm" />
@@ -81,7 +83,7 @@ function PickupCard({ pickup }) {
                   className="text-xs text-primary-600 hover:text-primary-700 underline mt-0.5 inline-block"
                 >
                   <MapPin className="inline w-3 h-3 mr-0.5 -mt-0.5" />
-                  {lat.toFixed(5)}, {lng.toFixed(5)} — view on map
+                  {lat.toFixed(5)}, {lng.toFixed(5)} — {t('skinPickup.viewOnMap')}
                 </a>
               )}
             </div>
@@ -95,7 +97,7 @@ function PickupCard({ pickup }) {
           {pickup.preferredDate && (
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-              <span>Preferred: {formatDate(pickup.preferredDate)}</span>
+              <span>{t('skinPickup.preferredDateLabel')} {formatDate(pickup.preferredDate)}</span>
             </div>
           )}
 
@@ -123,6 +125,7 @@ function PickupCard({ pickup }) {
 }
 
 export default function SkinPickup() {
+  const { t } = useTranslation();
   const { moduleEnabled, fetchFlag } = useQurbaniModuleStore();
   const [pickups, setPickups] = useState([]);
   const [loadingPickups, setLoadingPickups] = useState(true);
@@ -155,7 +158,7 @@ export default function SkinPickup() {
       const res = await qurbaniSkinPickupService.getMySkinPickups();
       setPickups(res.data?.pickups || []);
     } catch (err) {
-      toast.error('Failed to load your requests', { description: formatApiError(err) });
+      toast.error(t('skinPickup.failedToLoad'), { description: formatApiError(err) });
       setPickups([]);
     } finally {
       setLoadingPickups(false);
@@ -173,8 +176,8 @@ export default function SkinPickup() {
 
   const handleUseMyLocation = () => {
     if (!navigator.geolocation) {
-      toast.error('Location not supported', {
-        description: 'Your browser does not support geolocation.',
+      toast.error(t('skinPickup.locationNotSupported'), {
+        description: t('skinPickup.locationNotSupportedDesc'),
       });
       return;
     }
@@ -183,16 +186,14 @@ export default function SkinPickup() {
       (pos) => {
         setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setLocating(false);
-        toast.success('Location captured', {
-          description: 'Your coordinates will be sent with the request.',
+        toast.success(t('skinPickup.locationCaptured'), {
+          description: t('skinPickup.locationCapturedDesc'),
         });
       },
       (err) => {
         setLocating(false);
-        toast.error('Could not get location', {
-          description:
-            err?.message ||
-            'Please allow location access in your browser, or skip this step.',
+        toast.error(t('skinPickup.couldNotGetLocation'), {
+          description: err?.message || t('skinPickup.couldNotGetLocationDesc'),
         });
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
@@ -250,15 +251,15 @@ export default function SkinPickup() {
 
     try {
       await qurbaniSkinPickupService.createSkinPickup(fd);
-      toast.success('Request submitted', {
-        description: 'Our team will reach out to schedule the pickup.',
+      toast.success(t('skinPickup.requestSubmitted'), {
+        description: t('skinPickup.requestSubmittedDesc'),
       });
       reset({ numberOfSkins: 1 });
       setCoords(null);
       clearPhoto();
       loadPickups();
     } catch (err) {
-      toast.error('Submission failed', { description: formatApiError(err) });
+      toast.error(t('common.submissionFailed'), { description: formatApiError(err) });
     }
   };
 
@@ -270,8 +271,8 @@ export default function SkinPickup() {
         <PageHeader
           icon={Scissors}
           accent="qurbani"
-          title="Qurbani Skin Pickup"
-          description="Request a free pickup of your Qurbani animal skin — proceeds support Alkhidmat's relief work."
+          title={t('skinPickup.title')}
+          description={t('skinPickup.description')}
         />
 
         {flagLoading ? (
@@ -280,22 +281,22 @@ export default function SkinPickup() {
           <EmptyState
             icon={Scissors}
             tone="qurbani"
-            title="Skin collection is currently closed"
-            description="Skin collection requests open during Eid-ul-Adha season. Please check back closer to the date."
+            title={t('skinPickup.moduleClosed')}
+            description={t('skinPickup.moduleClosedDesc')}
           />
         ) : (
           <>
             {/* Form */}
               <Card className="shadow-card">
                 <CardHeader>
-                  <CardTitle>New Pickup Request</CardTitle>
+                  <CardTitle>{t('skinPickup.newPickupRequest')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Contact Phone <span className="text-error">*</span>
+                          {t('skinPickup.contactPhone')} <span className="text-error">*</span>
                         </label>
                         <input
                           type="tel"
@@ -311,7 +312,7 @@ export default function SkinPickup() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Number of Skins <span className="text-error">*</span>
+                          {t('skinPickup.numberOfSkins')} <span className="text-error">*</span>
                         </label>
                         <input
                           type="number"
@@ -331,10 +332,10 @@ export default function SkinPickup() {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Pickup Address{' '}
+                          {t('skinPickup.address')}{' '}
                           {coords ? (
                             <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">
-                              (optional — location captured)
+                              {t('skinPickup.addressOptional')}
                             </span>
                           ) : (
                             <span className="text-error">*</span>
@@ -351,12 +352,12 @@ export default function SkinPickup() {
                           {locating ? (
                             <>
                               <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-                              Locating…
+                              {t('skinPickup.locating')}
                             </>
                           ) : (
                             <>
                               <Crosshair className="w-3 h-3 mr-1.5" />
-                              Use My Location
+                              {t('skinPickup.useLocation')}
                             </>
                           )}
                         </Button>
@@ -381,7 +382,7 @@ export default function SkinPickup() {
                         <div className="flex items-center justify-between px-3 py-2 text-xs">
                           <span className="text-primary-900 font-medium inline-flex items-center gap-1">
                             <MapPin className="w-3.5 h-3.5" />
-                            Captured: {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
+                            {t('skinPickup.captured')} {coords.lat.toFixed(5)}, {coords.lng.toFixed(5)}
                           </span>
                           <button
                             type="button"
@@ -403,7 +404,7 @@ export default function SkinPickup() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Preferred Pickup Date (Optional)
+                        {t('skinPickup.preferredDate')}
                       </label>
                       <input
                         type="date"
@@ -414,22 +415,22 @@ export default function SkinPickup() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Landmark / Additional Details (Optional)
+                        {t('skinPickup.additionalDetails')}
                       </label>
                       <textarea
                         rows={2}
                         {...register('additionalDetails')}
-                        placeholder="e.g. Near central mosque, ground-floor flat, ring the bell twice"
+                        placeholder={t('form.specialInstructions')}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Photo of House (Optional)
+                        {t('skinPickup.housePhoto')}
                       </label>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                        Helps our pickup team find your address quickly.
+                        {t('skinPickup.housePhotoHint')}
                       </p>
                       {housePhotoPreview ? (
                         <div className="relative">
@@ -454,10 +455,10 @@ export default function SkinPickup() {
                         >
                           <Camera className="w-6 h-6 text-gray-400 dark:text-gray-500 mb-1" />
                           <span className="text-sm text-gray-600 dark:text-gray-400">
-                            Tap to take or choose a photo
+                            {t('skinPickup.tapToTakePhoto')}
                           </span>
                           <span className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                            JPG / PNG, up to 5 MB
+                            {t('skinPickup.photoSizeLimit')}
                           </span>
                           <input
                             id="house-photo"
@@ -482,7 +483,7 @@ export default function SkinPickup() {
                         }}
                         disabled={isSubmitting}
                       >
-                        Reset
+                        {t('common.reset')}
                       </Button>
                       <Button
                         type="submit"
@@ -492,10 +493,10 @@ export default function SkinPickup() {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Submitting…
+                            {t('common.submitting')}
                           </>
                         ) : (
-                          'Submit Request'
+                          t('skinPickup.submitRequest')
                         )}
                       </Button>
                     </div>
@@ -504,7 +505,7 @@ export default function SkinPickup() {
               </Card>
 
             <div>
-              <SectionHeading title="My pickup requests" description="Your pickup history" size="md" />
+              <SectionHeading title={t('skinPickup.myPickups')} description={t('skinPickup.yourPickupHistory')} size="md" />
               {loadingPickups ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <SkeletonStatCard />
@@ -514,8 +515,8 @@ export default function SkinPickup() {
                 <EmptyState
                   icon={Scissors}
                   tone="qurbani"
-                  title="No pickup requests yet"
-                  description="Once you submit a request, it will appear here."
+                  title={t('skinPickup.noPickups')}
+                  description={t('skinPickup.noPickupsDesc')}
                 />
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -12,17 +12,18 @@ import EmptyState from '../../components/common/EmptyState';
 import * as fitranaService from '../../services/fitranaService';
 import { formatCurrency, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
-
-const BASIS_LABEL = {
-  wheat: 'Wheat',
-  barley: 'Barley',
-  dates: 'Dates',
-  raisins: 'Raisins',
-  alkhidmat: 'Alkhidmat',
-  custom: 'Custom',
-};
+import { useTranslation } from 'react-i18next';
 
 export default function AdminFitrana() {
+  const { t } = useTranslation();
+  const BASIS_LABEL = {
+    wheat: t('fitrana.wheat'),
+    barley: t('fitrana.barley'),
+    dates: t('fitrana.dates'),
+    raisins: t('fitrana.raisins'),
+    alkhidmat: t('fitrana.alkhidmat'),
+    custom: t('fitrana.custom'),
+  };
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
@@ -33,7 +34,7 @@ export default function AdminFitrana() {
       const res = await fitranaService.adminListFitranas();
       setItems(res.data?.fitranas || []);
     } catch (err) {
-      toast.error('Failed to load fitrana submissions', { description: formatApiError(err) });
+      toast.error(t('fitrana.failedToLoad'), { description: formatApiError(err) });
       setItems([]);
     } finally {
       setLoading(false);
@@ -49,10 +50,10 @@ export default function AdminFitrana() {
     setUpdatingId(id);
     try {
       await fitranaService.adminUpdateFitranaStatus(id, status);
-      toast.success('Status updated');
+      toast.success(t('table.statusUpdated'));
       load();
     } catch (err) {
-      toast.error('Update failed', { description: formatApiError(err) });
+      toast.error(t('table.statusUpdateFailed'), { description: formatApiError(err) });
     } finally {
       setUpdatingId(null);
     }
@@ -64,8 +65,8 @@ export default function AdminFitrana() {
         <PageHeader
           icon={HandCoins}
           accent="zakat"
-          title="Fitrana Submissions"
-          description="Verify the bank transfer (use the screenshot if attached) and Confirm or Reject."
+          title={t('adminFitrana.title')}
+          description={t('adminFitrana.description')}
         />
 
           <Card className="overflow-hidden">
@@ -79,17 +80,17 @@ export default function AdminFitrana() {
                 <EmptyState
                   icon={HandCoins}
                   tone="zakat"
-                  title="No fitrana submissions yet"
-                  description="Submissions from users will appear here."
+                  title={t('fitrana.noSubmissions')}
+                  description={t('fitrana.noSubmissionsDesc')}
                 />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full">
                     <thead className="sticky top-0 z-10 bg-gray-50/90 backdrop-blur border-b border-gray-200 dark:border-gray-800">
                       <tr>
-                        <Th>#</Th><Th>User</Th><Th>People</Th><Th>Basis</Th>
-                        <Th>Per Person</Th><Th>Total</Th><Th>Paid?</Th>
-                        <Th>Screenshot</Th><Th>Status</Th><Th>Actions</Th>
+                        <Th>#</Th><Th>{t('common.name')}</Th><Th>{t('fitrana.people')}</Th><Th>{t('fitrana.calculationBasis')}</Th>
+                        <Th>{t('fitrana.amountPerPerson')}</Th><Th>{t('common.total')}</Th><Th>{t('sadqa.paid')}</Th>
+                        <Th>{t('payment.screenshotOptional')}</Th><Th>{t('common.status')}</Th><Th>{t('common.actions')}</Th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -117,9 +118,9 @@ export default function AdminFitrana() {
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {f.paymentMarked ? (
-                              <Check className="w-4 h-4 text-success-dark" aria-label="Paid" />
+                              <Check className="w-4 h-4 text-success-dark" aria-label={t('sadqa.paid')} />
                             ) : (
-                              <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label="Unpaid" />
+                              <X className="w-4 h-4 text-gray-400 dark:text-gray-500" aria-label={t('donation.paymentPending')} />
                             )}
                           </td>
                           <td className="px-4 py-3">
@@ -128,11 +129,11 @@ export default function AdminFitrana() {
                                 href={imageUrl(f.paymentScreenshotUrl)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                title="Click to view full size"
+                                title={t('common.view')}
                               >
                                 <img
                                   src={imageUrl(f.paymentScreenshotUrl)}
-                                  alt="Payment"
+                                  alt={t('payment.screenshotOptional')}
                                   className="w-12 h-12 object-cover rounded border border-gray-200 dark:border-gray-800 hover:opacity-80 transition"
                                 />
                               </a>
@@ -147,10 +148,10 @@ export default function AdminFitrana() {
                             {f.status === 'pending' && (
                               <div className="flex gap-2">
                                 <Button size="sm" variant="success" leftIcon={Check} onClick={() => handleStatus(f.id, 'confirmed')} disabled={updatingId === f.id}>
-                                  Confirm
+                                  {t('common.confirm')}
                                 </Button>
                                 <Button size="sm" variant="outline" leftIcon={X} onClick={() => handleStatus(f.id, 'rejected')} disabled={updatingId === f.id} className="border-error/40 text-error-dark hover:bg-error-light/60">
-                                  Reject
+                                  {t('common.reject')}
                                 </Button>
                               </div>
                             )}

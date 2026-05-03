@@ -32,74 +32,41 @@ import * as systemConfigService from '../../services/systemConfigService';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import PaymentScreenshotPicker from '../../components/qurbani/PaymentScreenshotPicker';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 // Pakistan 2026 fitrana rates per person (PKR). Sourced from religious
 // councils + Alkhidmat Foundation. Update these annually.
-const FITRANA_BASES = [
-  {
-    key: 'wheat',
-    label: 'Wheat (½ ṣāʿ)',
-    description: 'Hanafi minimum — based on wheat flour',
-    amount: 300,
-    icon: Wheat,
-  },
-  {
-    key: 'barley',
-    label: 'Barley (1 ṣāʿ)',
-    description: 'Based on barley grain',
-    amount: 1100,
-    icon: Sprout,
-  },
-  {
-    key: 'dates',
-    label: 'Dates (1 ṣāʿ)',
-    description: 'Based on dates',
-    amount: 1600,
-    icon: Apple,
-  },
-  {
-    key: 'raisins',
-    label: 'Raisins (1 ṣāʿ)',
-    description: 'Based on raisins (kishmish)',
-    amount: 3800,
-    icon: Grape,
-  },
-  {
-    key: 'alkhidmat',
-    label: 'Alkhidmat Recommended',
-    description: "Foundation's published 2026 rate",
-    amount: 600,
-    icon: Heart,
-  },
-  {
-    key: 'custom',
-    label: 'Custom Amount',
-    description: 'Enter your own per-person amount',
-    amount: null,
-    icon: Pencil,
-  },
+const FITRANA_BASE_KEYS = [
+  { key: 'wheat', amount: 300, icon: Wheat },
+  { key: 'barley', amount: 1100, icon: Sprout },
+  { key: 'dates', amount: 1600, icon: Apple },
+  { key: 'raisins', amount: 3800, icon: Grape },
+  { key: 'alkhidmat', amount: 600, icon: Heart },
+  { key: 'custom', amount: null, icon: Pencil },
 ];
 
 function FitranaRow({ fitrana }) {
+  const { t } = useTranslation();
   const total = parseFloat(fitrana.totalAmount) || 0;
   const perPerson = parseFloat(fitrana.amountPerPerson) || 0;
   const basisLabel =
-    FITRANA_BASES.find((b) => b.key === fitrana.calculationBasis)?.label ||
-    fitrana.calculationBasis;
+    FITRANA_BASE_KEYS.find((b) => b.key === fitrana.calculationBasis)
+      ? t(`fitrana.${fitrana.calculationBasis}`)
+      : fitrana.calculationBasis;
 
   return (
     <Card className="shadow-soft hover:shadow-medium transition-shadow duration-300">
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Submission #{fitrana.id}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t('sadqa.donationNo')}{fitrana.id}</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">{formatCurrency(total)}</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {fitrana.numberOfPeople} people × {formatCurrency(perPerson)}
+              {fitrana.numberOfPeople} {t('fitrana.people')} × {formatCurrency(perPerson)}
             </p>
           </div>
           <div className="flex items-center gap-1.5 flex-wrap">
-            {fitrana.paymentMarked && <Badge variant="info" size="sm" icon={CheckCircle2}>Paid</Badge>}
+            {fitrana.paymentMarked && <Badge variant="info" size="sm" icon={CheckCircle2}>{t('sadqa.paid')}</Badge>}
             <StatusBadge status={fitrana.status} size="sm" />
           </div>
         </div>
@@ -127,6 +94,7 @@ function FitranaRow({ fitrana }) {
 }
 
 function PaymentModal({ open, onClose, calculation, onConfirmed }) {
+  const { t } = useTranslation();
   const [bankDetails, setBankDetails] = useState('');
   const [loadingBank, setLoadingBank] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -185,15 +153,15 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
       if (screenshot) fd.append('paymentScreenshot', screenshot);
 
       const res = await fitranaService.createFitrana(fd);
-      toast.success('Payment marked', {
-        description: 'Your fitrana is recorded. You will be notified once admin confirms.',
+      toast.success(t('fitrana.paymentMarked'), {
+        description: t('fitrana.paymentMarkedDesc'),
       });
       onConfirmed?.(res.data?.fitrana);
       onClose();
     } catch (err) {
-      const msg = formatApiError(err) || 'Could not save your fitrana.';
+      const msg = formatApiError(err) || t('fitrana.submissionFailedDesc');
       setErrorMsg(msg);
-      toast.error('Submission failed', { description: msg });
+      toast.error(t('common.submissionFailed'), { description: msg });
     } finally {
       setSubmitting(false);
     }
@@ -203,12 +171,12 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-large w-full max-w-lg max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Complete Fitrana Payment</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">{t('fitrana.completePayment')}</h2>
           <button
             type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 dark:text-gray-400"
-            aria-label="Close"
+            aria-label={t('common.close')}
           >
             <XIcon className="w-5 h-5" />
           </button>
@@ -217,20 +185,20 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
           <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
             <p className="text-xs uppercase tracking-wide text-primary-700 font-semibold mb-1">
-              Total Fitrana
+              {t('fitrana.totalFitrana')}
             </p>
             <p className="text-3xl font-bold text-primary-900">
               {formatCurrency(calculation.totalAmount)}
             </p>
             <p className="text-xs text-primary-700 mt-1">
-              {calculation.numberOfPeople} people × {formatCurrency(calculation.amountPerPerson)}
+              {calculation.numberOfPeople} {t('fitrana.people')} × {formatCurrency(calculation.amountPerPerson)}
             </p>
           </div>
 
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Banknote className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-50">Bank Details</h4>
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-50">{t('fitrana.bankDetails')}</h4>
             </div>
             {loadingBank ? (
               <div className="h-24 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
@@ -239,7 +207,7 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
                 {bankDetails}
               </pre>
             ) : (
-              <Alert variant="warning">Bank details are not configured yet. Please contact support.</Alert>
+              <Alert variant="warning">{t('fitrana.bankNotConfigured')}</Alert>
             )}
           </div>
 
@@ -254,11 +222,7 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
           <Alert variant="warning">
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <p className="text-xs">
-                Your fitrana is <strong>not yet recorded</strong>. Click <strong>I've Paid</strong>{' '}
-                only after you have transferred the amount. Cancel or close this window if you
-                change your mind — nothing is saved until you confirm.
-              </p>
+              <p className="text-xs">{t('fitrana.notRecorded')}</p>
             </div>
           </Alert>
 
@@ -267,7 +231,7 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
 
         <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-end gap-3">
           <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             type="button"
@@ -278,12 +242,12 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
             {submitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Recording…
+                {t('fitrana.recording')}
               </>
             ) : (
               <>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                I&apos;ve Paid
+                {t('fitrana.iHavePaid')}
               </>
             )}
           </Button>
@@ -294,6 +258,12 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
 }
 
 export default function Fitrana() {
+  const { t } = useTranslation();
+  const FITRANA_BASES = useMemo(() => FITRANA_BASE_KEYS.map((b) => ({
+    ...b,
+    label: t(`fitrana.${b.key}`),
+    description: t(`fitrana.${b.key}Desc`),
+  })), [t]);
   const { moduleEnabled, fetchFlag } = useQurbaniModuleStore();
   const [submissions, setSubmissions] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
@@ -319,7 +289,7 @@ export default function Fitrana() {
       const res = await fitranaService.getMyFitranas();
       setSubmissions(res.data?.fitranas || []);
     } catch (err) {
-      toast.error('Failed to load your submissions', { description: formatApiError(err) });
+      toast.error(t('fitrana.failedToLoad'), { description: formatApiError(err) });
       setSubmissions([]);
     } finally {
       setLoadingList(false);
@@ -337,7 +307,7 @@ export default function Fitrana() {
 
   const selectedBasis = useMemo(
     () => FITRANA_BASES.find((b) => b.key === basisKey),
-    [basisKey]
+    [FITRANA_BASES, basisKey]
   );
 
   const amountPerPerson = useMemo(() => {
@@ -357,8 +327,8 @@ export default function Fitrana() {
 
   const handleProceedToPayment = () => {
     if (!canProceed) {
-      toast.error('Cannot proceed', {
-        description: 'Please enter at least 1 person and a per-person amount greater than 0.',
+      toast.error(t('common.submissionFailed'), {
+        description: t('common.tryAgainLater'),
       });
       return;
     }
@@ -373,8 +343,8 @@ export default function Fitrana() {
         <PageHeader
           icon={HandCoins}
           accent="zakat"
-          title="Fitrana"
-          description="Calculate and pay Sadaqat al-Fitr for every member of your household."
+          title={t('fitrana.title')}
+          description={t('fitrana.description')}
         />
 
         {flagLoading ? (
@@ -383,20 +353,20 @@ export default function Fitrana() {
           <EmptyState
             icon={HandCoins}
             tone="zakat"
-            title="Fitrana collection is currently closed"
-            description="Fitrana submissions open during the Eid season. Please check back closer to Eid."
+            title={t('fitrana.moduleClosed')}
+            description={t('fitrana.moduleClosedDesc')}
           />
         ) : (
           <>
               <Card className="shadow-card">
                 <CardHeader>
-                  <CardTitle>Calculate your fitrana</CardTitle>
+                  <CardTitle>{t('fitrana.calculatorTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* People */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Number of People in Family <span className="text-error">*</span>
+                      {t('fitrana.numberOfPeople')} <span className="text-error">*</span>
                     </label>
                     <input
                       type="number"
@@ -410,15 +380,14 @@ export default function Fitrana() {
                       className="w-full sm:w-48 px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      Include every member of the household — adults, children, infants, and any
-                      household help. Fitrana is obligatory for each one.
+                      {t('fitrana.numberOfPeople')}
                     </p>
                   </div>
 
                   {/* Basis */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Calculation Basis <span className="text-error">*</span>
+                      {t('fitrana.calculationBasis')} <span className="text-error">*</span>
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {FITRANA_BASES.map((b) => {
@@ -460,14 +429,14 @@ export default function Fitrana() {
                   {basisKey === 'custom' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Per-Person Amount (PKR) <span className="text-error">*</span>
+                        {t('fitrana.amountPerPerson')} <span className="text-error">*</span>
                       </label>
                       <input
                         type="number"
                         min={1}
                         value={customAmount}
                         onChange={(e) => setCustomAmount(e.target.value)}
-                        placeholder="e.g. 500"
+                        placeholder="500"
                         className="w-full sm:w-48 px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
@@ -477,25 +446,25 @@ export default function Fitrana() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Contact Phone (Optional)
+                        {t('skinPickup.contactPhone')} ({t('common.optional')})
                       </label>
                       <input
                         type="tel"
                         value={contactPhone}
                         onChange={(e) => setContactPhone(e.target.value)}
-                        placeholder="03001234567"
+                        placeholder={t('form.phonePlaceholder')}
                         className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Notes (Optional)
+                        {t('common.notes')} ({t('common.optional')})
                       </label>
                       <input
                         type="text"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        placeholder="On behalf of…"
+                        placeholder={t('form.specialInstructions')}
                         className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
@@ -505,13 +474,13 @@ export default function Fitrana() {
                   <div className="bg-zakat-50 dark:bg-zakat-500/10 border border-zakat-200 dark:border-zakat-700/40 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <p className="text-xs uppercase tracking-wider text-zakat-700 dark:text-zakat-200 font-semibold">
-                        Total fitrana
+                        {t('fitrana.totalLabel')}
                       </p>
                       <p className="text-3xl font-bold text-zakat-700 dark:text-zakat-200 tabular-nums">
                         {formatCurrency(totalAmount)}
                       </p>
                       <p className="text-xs text-zakat-700/80 mt-0.5">
-                        {numberOfPeople} people × {formatCurrency(amountPerPerson)}
+                        {numberOfPeople} {t('fitrana.people')} × {formatCurrency(amountPerPerson)}
                       </p>
                     </div>
                     <Button
@@ -520,19 +489,18 @@ export default function Fitrana() {
                       disabled={!canProceed}
                       size="lg"
                     >
-                      Continue to payment
+                      {t('common.continueToPayment')}
                     </Button>
                   </div>
 
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Nothing is recorded until you mark the payment as done on the next step. You
-                    can cancel or close anytime.
+                    {t('fitrana.nothingRecorded')}
                   </p>
                 </CardContent>
               </Card>
 
             <div>
-              <SectionHeading title="My fitrana submissions" description="Your fitrana history" size="md" />
+              <SectionHeading title={t('fitrana.myFitranas')} description={t('fitrana.yourFitranaHistory')} size="md" />
               {loadingList ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <SkeletonStatCard />
@@ -542,8 +510,8 @@ export default function Fitrana() {
                 <EmptyState
                   icon={HandCoins}
                   tone="zakat"
-                  title="No submissions yet"
-                  description="Once you complete a fitrana payment, it will appear here."
+                  title={t('fitrana.noSubmissions')}
+                  description={t('fitrana.noSubmissionsDesc')}
                 />
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

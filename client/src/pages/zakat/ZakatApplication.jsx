@@ -25,6 +25,7 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import * as zakatService from '../../services/zakatService';
 import { formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
+import { useTranslation } from 'react-i18next';
 
 const applicationSchema = z.object({
   applicantName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -56,30 +57,18 @@ const applicationSchema = z.object({
   additionalNotes: z.string().optional(),
 });
 
-const EMPLOYMENT_OPTIONS = [
-  { value: 'employed', label: 'Employed' },
-  { value: 'self-employed', label: 'Self-employed' },
-  { value: 'unemployed', label: 'Unemployed' },
-  { value: 'student', label: 'Student' },
-  { value: 'retired', label: 'Retired' },
-  { value: 'other', label: 'Other' },
-];
-
-const HOUSING_OPTIONS = [
-  { value: 'own', label: 'Owned' },
-  { value: 'rent', label: 'Rented' },
-  { value: 'family', label: 'Family-owned' },
-  { value: 'other', label: 'Other' },
-];
+const EMPLOYMENT_KEYS = ['employed', 'self-employed', 'unemployed', 'student', 'retired', 'other'];
+const HOUSING_KEYS = ['own', 'rent', 'family', 'other'];
 
 function ApplicationCard({ application }) {
+  const { t } = useTranslation();
   const cnicDoc = imageUrl(application.cnicDocumentUrl);
   return (
     <Card className="shadow-soft hover:shadow-medium transition-shadow duration-300">
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Application #{application.id}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t('sadqa.donationNo')}{application.id}</p>
             <p className="text-lg font-semibold text-gray-900 dark:text-gray-50">{application.applicantName}</p>
           </div>
           <StatusBadge status={application.status} size="sm" />
@@ -96,11 +85,11 @@ function ApplicationCard({ application }) {
           </div>
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-            <span>{application.familyMembers} members · monthly income {formatCurrency(application.monthlyIncome)}</span>
+            <span>{application.familyMembers} · {formatCurrency(application.monthlyIncome)}</span>
           </div>
           {application.amountRequested && (
             <div className="text-xs text-gray-500 dark:text-gray-400">
-              Requested: {formatCurrency(application.amountRequested)}
+              {t('zakatApplication.amountRequested')}: {formatCurrency(application.amountRequested)}
             </div>
           )}
           {application.createdAt && (
@@ -127,6 +116,15 @@ function ApplicationCard({ application }) {
 }
 
 export default function ZakatApplication() {
+  const { t } = useTranslation();
+  const EMPLOYMENT_OPTIONS = EMPLOYMENT_KEYS.map((value) => ({
+    value,
+    label: t(`zakatApplication.${value === 'self-employed' ? 'selfEmployed' : value}`),
+  }));
+  const HOUSING_OPTIONS = HOUSING_KEYS.map((value) => ({
+    value,
+    label: t(`zakatApplication.${value}`),
+  }));
   const [past, setPast] = useState([]);
   const [loadingPast, setLoadingPast] = useState(true);
   const [doc, setDoc] = useState(null);
@@ -157,7 +155,7 @@ export default function ZakatApplication() {
       const res = await zakatService.getMyZakatApplications();
       setPast(res.data?.applications || []);
     } catch (err) {
-      toast.error('Failed to load applications', { description: formatApiError(err) });
+      toast.error(t('zakatApplication.failedToLoad'), { description: formatApiError(err) });
       setPast([]);
     } finally {
       setLoadingPast(false);
@@ -194,8 +192,8 @@ export default function ZakatApplication() {
 
     try {
       await zakatService.createZakatApplication(fd);
-      toast.success('Application submitted', {
-        description: 'Our team will review your application and reach out soon.',
+      toast.success(t('zakatApplication.submitted'), {
+        description: t('zakatApplication.submittedDesc'),
       });
       reset({
         familyMembers: 1,
@@ -207,7 +205,7 @@ export default function ZakatApplication() {
       clearDoc();
       loadPast();
     } catch (err) {
-      toast.error('Submission failed', { description: formatApiError(err) });
+      toast.error(t('common.submissionFailed'), { description: formatApiError(err) });
     }
   };
 
@@ -220,13 +218,13 @@ export default function ZakatApplication() {
         <PageHeader
           icon={Coins}
           accent="zakat"
-          title="Apply for Zakat"
-          description="Submit your application for zakat assistance. All information stays confidential."
+          title={t('zakatApplication.title')}
+          description={t('zakatApplication.description')}
         />
 
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>New application</CardTitle>
+              <CardTitle>{t('zakatApplication.applicantInformation')}</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -234,7 +232,7 @@ export default function ZakatApplication() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Full Name <span className="text-error">*</span>
+                      {t('zakatApplication.applicantName')} <span className="text-error">*</span>
                     </label>
                     <input {...register('applicantName')} className={inputClass} />
                     {errors.applicantName && (
@@ -243,11 +241,11 @@ export default function ZakatApplication() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Phone Number <span className="text-error">*</span>
+                      {t('zakatApplication.applicantPhone')} <span className="text-error">*</span>
                     </label>
                     <input
                       type="tel"
-                      placeholder="03001234567"
+                      placeholder={t('form.phonePlaceholder')}
                       {...register('applicantPhone')}
                       className={inputClass}
                     />
@@ -257,7 +255,7 @@ export default function ZakatApplication() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      CNIC (13 digits, no dashes) <span className="text-error">*</span>
+                      {t('zakatApplication.applicantCNIC')} <span className="text-error">*</span>
                     </label>
                     <input
                       placeholder="4210112345671"
@@ -270,7 +268,7 @@ export default function ZakatApplication() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Family Members <span className="text-error">*</span>
+                      {t('zakatApplication.familyMembers')} <span className="text-error">*</span>
                     </label>
                     <input
                       type="number"
@@ -286,11 +284,11 @@ export default function ZakatApplication() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Address <span className="text-error">*</span>
+                    {t('zakatApplication.applicantAddress')} <span className="text-error">*</span>
                   </label>
                   <textarea
                     rows={2}
-                    placeholder="House, street, area, city"
+                    placeholder={t('form.completeAddress')}
                     {...register('applicantAddress')}
                     className={inputClass}
                   />
@@ -303,7 +301,7 @@ export default function ZakatApplication() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Monthly Income (PKR) <span className="text-error">*</span>
+                      {t('zakatApplication.monthlyIncome')} <span className="text-error">*</span>
                     </label>
                     <input
                       type="number"
@@ -317,7 +315,7 @@ export default function ZakatApplication() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Employment Status <span className="text-error">*</span>
+                      {t('zakatApplication.employmentStatus')} <span className="text-error">*</span>
                     </label>
                     <select {...register('employmentStatus')} className={inputClass}>
                       {EMPLOYMENT_OPTIONS.map((o) => (
@@ -329,7 +327,7 @@ export default function ZakatApplication() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Housing Status <span className="text-error">*</span>
+                      {t('zakatApplication.housingStatus')} <span className="text-error">*</span>
                     </label>
                     <select {...register('housingStatus')} className={inputClass}>
                       {HOUSING_OPTIONS.map((o) => (
@@ -341,12 +339,12 @@ export default function ZakatApplication() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Amount Requested (Optional, PKR)
+                      {t('zakatApplication.amountRequested')} ({t('common.optional')})
                     </label>
                     <input
                       type="number"
                       min={0}
-                      placeholder="If you have a specific amount in mind"
+                      placeholder={t('zakatApplication.amountRequested')}
                       {...register('amountRequested')}
                       className={inputClass}
                     />
@@ -361,12 +359,12 @@ export default function ZakatApplication() {
                       {...register('hasDisabledMembers')}
                       className="rounded border-gray-300 dark:border-gray-700 text-primary-600 focus:ring-primary-500"
                     />
-                    Anyone in the household has a disability or chronic illness
+                    {t('zakatApplication.hasDisabledMembers')}
                   </label>
                   {hasDisabled && (
                     <textarea
                       rows={2}
-                      placeholder="Please describe briefly"
+                      placeholder={t('zakatApplication.disabilityDetails')}
                       {...register('disabilityDetails')}
                       className={`${inputClass} mt-2`}
                     />
@@ -376,11 +374,11 @@ export default function ZakatApplication() {
                 {/* Reason */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Reason for Application <span className="text-error">*</span>
+                    {t('zakatApplication.reasonForApplication')} <span className="text-error">*</span>
                   </label>
                   <textarea
                     rows={4}
-                    placeholder="Briefly describe your circumstances and why you are seeking zakat assistance"
+                    placeholder={t('zakatApplication.reasonForApplication')}
                     {...register('reasonForApplication')}
                     className={inputClass}
                   />
@@ -393,11 +391,11 @@ export default function ZakatApplication() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Additional Notes (Optional)
+                    {t('form.additionalNotes')} ({t('common.optional')})
                   </label>
                   <textarea
                     rows={2}
-                    placeholder="Anything else our team should know"
+                    placeholder={t('form.specialInstructions')}
                     {...register('additionalNotes')}
                     className={inputClass}
                   />
@@ -406,10 +404,10 @@ export default function ZakatApplication() {
                 {/* CNIC photo */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    CNIC Photo (Optional)
+                    {t('zakatApplication.cnicDocument')}
                   </label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                    Attach a clear photo of your CNIC to help us verify your application faster.
+                    {t('skinPickup.housePhotoHint')}
                   </p>
                   {docPreview ? (
                     <div className="relative">
@@ -433,8 +431,8 @@ export default function ZakatApplication() {
                       className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-900 hover:bg-gray-100 transition"
                     >
                       <Camera className="w-6 h-6 text-gray-400 dark:text-gray-500 mb-1" />
-                      <span className="text-sm text-gray-600 dark:text-gray-400">Tap to attach CNIC photo</span>
-                      <span className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">JPG / PNG, up to 5 MB</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{t('skinPickup.tapToTakePhoto')}</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{t('skinPickup.photoSizeLimit')}</span>
                       <input
                         id="cnic-doc"
                         type="file"
@@ -457,7 +455,7 @@ export default function ZakatApplication() {
                     }}
                     disabled={isSubmitting}
                   >
-                    Reset
+                    {t('common.reset')}
                   </Button>
                   <Button
                     type="submit"
@@ -467,10 +465,10 @@ export default function ZakatApplication() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Submitting…
+                        {t('common.submitting')}
                       </>
                     ) : (
-                      'Submit Application'
+                      t('common.submitApplication')
                     )}
                   </Button>
                 </div>
@@ -480,7 +478,7 @@ export default function ZakatApplication() {
 
         {/* Past applications */}
         <div>
-          <SectionHeading title="My applications" description="Track the status of your requests" size="md" />
+          <SectionHeading title={t('zakatApplication.myApplications')} description={t('zakatApplication.yourApplicationHistory')} size="md" />
           {loadingPast ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SkeletonStatCard />
@@ -490,8 +488,8 @@ export default function ZakatApplication() {
             <EmptyState
               icon={Coins}
               tone="zakat"
-              title="No applications yet"
-              description="Once you submit one, it will appear here with its current status."
+              title={t('zakatApplication.noApplications')}
+              description={t('zakatApplication.noApplicationsDesc')}
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

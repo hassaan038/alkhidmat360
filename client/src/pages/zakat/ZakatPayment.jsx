@@ -24,6 +24,7 @@ import PaymentScreenshotPicker from '../../components/qurbani/PaymentScreenshotP
 import * as zakatService from '../../services/zakatService';
 import * as systemConfigService from '../../services/systemConfigService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 // Pakistan 2026 reference rates — UPDATE ANNUALLY (or expose to admin
 // settings). Donors can override the per-gram rate inline if their
@@ -43,22 +44,23 @@ const NUM = (v) => {
 };
 
 function PastPaymentCard({ payment }) {
+  const { t } = useTranslation();
   return (
     <Card className="shadow-soft hover:shadow-medium transition-shadow duration-300">
       <CardContent className="p-5">
         <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
           <div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Payment #{payment.id}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t('sadqa.donationNo')}{payment.id}</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">
               {formatCurrency(payment.zakatAmount)}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              On wealth of {formatCurrency(payment.totalWealth)} ·{' '}
-              {payment.nisabBasis === 'gold' ? 'Gold nisab' : 'Silver nisab'}
+              {formatCurrency(payment.totalWealth)} ·{' '}
+              {payment.nisabBasis === 'gold' ? t('zakatPayment.nisabGold') : t('zakatPayment.nisabSilver')}
             </p>
           </div>
           <div className="flex items-center gap-1.5 flex-wrap">
-            {payment.paymentMarked && <Badge variant="info" size="sm" icon={CheckCircle2}>Paid</Badge>}
+            {payment.paymentMarked && <Badge variant="info" size="sm" icon={CheckCircle2}>{t('sadqa.paid')}</Badge>}
             <StatusBadge status={payment.status} size="sm" />
           </div>
         </div>
@@ -74,6 +76,7 @@ function PastPaymentCard({ payment }) {
 }
 
 function PaymentModal({ open, onClose, calculation, onConfirmed }) {
+  const { t } = useTranslation();
   const [bankDetails, setBankDetails] = useState('');
   const [loadingBank, setLoadingBank] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -130,15 +133,15 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
       if (screenshot) fd.append('paymentScreenshot', screenshot);
 
       const res = await zakatService.createZakatPayment(fd);
-      toast.success('Payment marked', {
-        description: 'Your zakat is recorded. You will be notified once admin confirms.',
+      toast.success(t('zakatPayment.paymentRecorded'), {
+        description: t('zakatPayment.paymentRecordedDesc'),
       });
       onConfirmed?.(res.data?.payment);
       onClose();
     } catch (err) {
-      const msg = formatApiError(err) || 'Could not save your zakat.';
+      const msg = formatApiError(err) || t('payment.couldNotSave');
       setErrorMsg(msg);
-      toast.error('Submission failed', { description: msg });
+      toast.error(t('common.submissionFailed'), { description: msg });
     } finally {
       setSubmitting(false);
     }
@@ -148,12 +151,12 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-large w-full max-w-lg max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">Complete Zakat Payment</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-50">{t('zakatPayment.completePayment')}</h2>
           <button
             type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 dark:text-gray-400"
-            aria-label="Close"
+            aria-label={t('common.close')}
           >
             <XIcon className="w-5 h-5" />
           </button>
@@ -162,20 +165,20 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
           <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
             <p className="text-xs uppercase tracking-wide text-primary-700 font-semibold mb-1">
-              Total Zakat
+              {t('zakatPayment.totalZakat')}
             </p>
             <p className="text-3xl font-bold text-primary-900">
               {formatCurrency(calculation.zakatAmount)}
             </p>
             <p className="text-xs text-primary-700 mt-1">
-              2.5% of {formatCurrency(calculation.totalWealth)} zakatable wealth
+              2.5% · {formatCurrency(calculation.totalWealth)}
             </p>
           </div>
 
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Banknote className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-50">Bank Details</h4>
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-50">{t('fitrana.bankDetails')}</h4>
             </div>
             {loadingBank ? (
               <div className="h-24 bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
@@ -184,9 +187,7 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
                 {bankDetails}
               </pre>
             ) : (
-              <Alert variant="warning">
-                Bank details are not configured yet. Please contact support.
-              </Alert>
+              <Alert variant="warning">{t('fitrana.bankNotConfigured')}</Alert>
             )}
           </div>
 
@@ -201,10 +202,7 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
           <Alert variant="warning">
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <p className="text-xs">
-                Your zakat is <strong>not yet recorded</strong>. Click <strong>I've Paid</strong>{' '}
-                only after you have transferred the amount. Cancel or close to discard.
-              </p>
+              <p className="text-xs">{t('payment.notYetRecorded')}</p>
             </div>
           </Alert>
 
@@ -213,7 +211,7 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
 
         <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-end gap-3">
           <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             type="button"
@@ -224,12 +222,12 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
             {submitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Recording…
+                {t('fitrana.recording')}
               </>
             ) : (
               <>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                I&apos;ve Paid
+                {t('fitrana.iHavePaid')}
               </>
             )}
           </Button>
@@ -240,6 +238,7 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
 }
 
 export default function ZakatPayment() {
+  const { t } = useTranslation();
   const [past, setPast] = useState([]);
   const [loadingPast, setLoadingPast] = useState(true);
 
@@ -268,7 +267,7 @@ export default function ZakatPayment() {
       const res = await zakatService.getMyZakatPayments();
       setPast(res.data?.payments || []);
     } catch (err) {
-      toast.error('Failed to load past payments', { description: formatApiError(err) });
+      toast.error(t('zakatPayment.failedToLoad'), { description: formatApiError(err) });
       setPast([]);
     } finally {
       setLoadingPast(false);
@@ -317,10 +316,10 @@ export default function ZakatPayment() {
 
   const handleProceed = () => {
     if (!canProceed) {
-      toast.error('Cannot proceed', {
+      toast.error(t('common.submissionFailed'), {
         description: isAboveNisab
-          ? 'Calculated zakat is zero — please review your inputs.'
-          : 'Your zakatable wealth is below the nisab threshold. Zakat is not obligatory.',
+          ? t('common.tryAgainLater')
+          : t('zakatPayment.belowNisab'),
       });
       return;
     }
@@ -360,8 +359,8 @@ export default function ZakatPayment() {
         <PageHeader
           icon={Coins}
           accent="zakat"
-          title="Pay Zakat"
-          description="Calculate the 2.5% zakat on wealth held above nisab for one lunar year."
+          title={t('zakatPayment.title')}
+          description={t('zakatPayment.description')}
         />
 
         {/* Reference rates */}
@@ -405,13 +404,13 @@ export default function ZakatPayment() {
         {/* Calculator */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Your zakatable wealth</CardTitle>
+              <CardTitle>{t('zakatPayment.calculator')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Cash & Savings (PKR)
+                    {t('zakatPayment.cashSavings')}
                   </label>
                   <input
                     type="number"
@@ -424,7 +423,7 @@ export default function ZakatPayment() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Investments (PKR)
+                    {t('zakatPayment.investments')}
                   </label>
                   <input
                     type="number"
@@ -437,7 +436,7 @@ export default function ZakatPayment() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Gold (grams)
+                    {t('zakatPayment.goldGrams')}
                   </label>
                   <input
                     type="number"
@@ -456,7 +455,7 @@ export default function ZakatPayment() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Silver (grams)
+                    {t('zakatPayment.silverGrams')}
                   </label>
                   <input
                     type="number"
@@ -475,7 +474,7 @@ export default function ZakatPayment() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Business Assets (PKR)
+                    {t('zakatPayment.businessAssets')}
                   </label>
                   <input
                     type="number"
@@ -488,7 +487,7 @@ export default function ZakatPayment() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Other Zakatable Assets (PKR)
+                    {t('zakatPayment.otherAssets')}
                   </label>
                   <input
                     type="number"
@@ -503,7 +502,7 @@ export default function ZakatPayment() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Liabilities / Debts due within 12 months (PKR)
+                  {t('zakatPayment.liabilitiesField')}
                 </label>
                 <input
                   type="number"
@@ -518,18 +517,18 @@ export default function ZakatPayment() {
               {/* Nisab basis */}
               <div>
                 <p className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Nisab Basis
+                  {t('zakatPayment.nisabBasis')}
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     {
                       key: 'silver',
-                      label: 'Silver (lower threshold)',
+                      label: t('zakatPayment.nisabSilver'),
                       grams: NISAB_SILVER_GRAMS,
                     },
                     {
                       key: 'gold',
-                      label: 'Gold',
+                      label: t('zakatPayment.nisabGold'),
                       grams: NISAB_GOLD_GRAMS,
                     },
                   ].map((b) => {
@@ -568,19 +567,19 @@ export default function ZakatPayment() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Contact Phone (Optional)
+                    {t('skinPickup.contactPhone')} ({t('common.optional')})
                   </label>
                   <input
                     type="tel"
                     value={contactPhone}
                     onChange={(e) => setContactPhone(e.target.value)}
-                    placeholder="03001234567"
+                    placeholder={t('form.phonePlaceholder')}
                     className={inputClass}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Notes (Optional)
+                    {t('common.notes')} ({t('common.optional')})
                   </label>
                   <input
                     type="text"
@@ -603,19 +602,19 @@ export default function ZakatPayment() {
               >
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                   <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-semibold">Total wealth</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-semibold">{t('zakatPayment.totalWealth')}</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-gray-50 tabular-nums">
                       {formatCurrency(totalWealth)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-semibold">Nisab threshold</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-semibold">{t('zakatPayment.nisabBasis')}</p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-gray-50 tabular-nums">
                       {formatCurrency(nisabThreshold)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-semibold">Zakat due</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wider font-semibold">{t('zakatPayment.zakatAmount')}</p>
                     <p className={cn('text-2xl font-bold tabular-nums', isAboveNisab ? 'text-zakat-700 dark:text-zakat-200' : 'text-gray-500 dark:text-gray-400')}>
                       {formatCurrency(zakatAmount)}
                     </p>
@@ -624,29 +623,26 @@ export default function ZakatPayment() {
 
                 {!isAboveNisab && totalWealth > 0 && (
                   <Alert variant="default" className="mt-3">
-                    <p className="text-xs">
-                      Your zakatable wealth is below the {nisabBasis} nisab threshold. Zakat is not obligatory on you for this period.
-                    </p>
+                    <p className="text-xs">{t('zakatPayment.belowNisab')}</p>
                   </Alert>
                 )}
 
                 <div className="mt-4 flex justify-end">
                   <Button type="button" onClick={handleProceed} disabled={!canProceed} size="lg">
-                    Continue to payment
+                    {t('common.continueToPayment')}
                   </Button>
                 </div>
               </div>
 
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Nothing is recorded until you mark the payment as done on the next step. Cancel
-                or close the popup to discard.
+                {t('fitrana.nothingRecorded')}
               </p>
             </CardContent>
           </Card>
 
         {/* Past payments */}
         <div>
-          <SectionHeading title="My zakat payments" description="Your payment history" size="md" />
+          <SectionHeading title={t('zakatPayment.myPayments')} description={t('zakatPayment.yourPaymentHistory')} size="md" />
           {loadingPast ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SkeletonStatCard />
@@ -656,8 +652,8 @@ export default function ZakatPayment() {
             <EmptyState
               icon={Coins}
               tone="zakat"
-              title="No zakat payments yet"
-              description="Once you complete a payment, it will appear here."
+              title={t('zakatPayment.noPayments')}
+              description={t('zakatPayment.noPaymentsDesc')}
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

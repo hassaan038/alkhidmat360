@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,6 +12,7 @@ import { Heart, Bot, Mountain, Info, RotateCcw, ArrowRight, User, Phone, Calenda
 import { createQurbaniDonation } from '../../services/donationService';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const qurbaniSchema = z.object({
   animalType: z.enum(['GOAT', 'CAMEL'], { required_error: 'Please select an animal type' }),
@@ -24,22 +25,23 @@ const qurbaniSchema = z.object({
   notes: z.string().optional(),
 });
 
-const animals = [
-  { value: 'GOAT', label: 'Goat', icon: Bot, hint: 'PKR 30,000 per head' },
-  { value: 'CAMEL', label: 'Camel', icon: Mountain, hint: 'PKR 300,000 per head' },
-];
-
-const infoPoints = [
-  'Your donation will be processed within 24–48 hours.',
-  'A confirmation call will be made on your registered number.',
-  'Payment details are shared after verification.',
-  'Delivery dates are subject to availability.',
-];
-
 export default function QurbaniDonation() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [pendingPayload, setPendingPayload] = useState(null);
+
+  const animals = useMemo(() => [
+    { value: 'GOAT', label: t('qurbaniDonation.goat'), icon: Bot, hint: t('qurbaniDonation.goatHint') },
+    { value: 'CAMEL', label: t('qurbaniDonation.camel'), icon: Mountain, hint: t('qurbaniDonation.camelHint') },
+  ], [t]);
+
+  const infoPoints = useMemo(() => [
+    t('qurbaniDonation.info1'),
+    t('qurbaniDonation.info2'),
+    t('qurbaniDonation.info3'),
+    t('qurbaniDonation.info4'),
+  ], [t]);
 
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
     resolver: zodResolver(qurbaniSchema),
@@ -78,13 +80,13 @@ export default function QurbaniDonation() {
         <PageHeader
           icon={Heart}
           accent="qurbani"
-          title="Qurbani Donation"
-          description="Donate a goat or camel for Qurbani — we handle distribution to families in need."
+          title={t('qurbaniDonation.title')}
+          description={t('qurbaniDonation.description')}
         />
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <FormSection title="Donation details" icon={Heart}>
-            <FormField label="Animal type" required error={errors.animalType?.message}>
+          <FormSection title={t('qurbaniDonation.donationDetails')} icon={Heart}>
+            <FormField label={t('qurbaniDonation.animalType')} required error={errors.animalType?.message}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {animals.map((a) => {
                   const AIcon = a.icon;
@@ -119,47 +121,47 @@ export default function QurbaniDonation() {
             </FormField>
 
             <FormGrid cols={2} className="mt-5">
-              <FormField label="Quantity" required htmlFor="qty" error={errors.quantity?.message}>
-                <Input id="qty" type="number" min={1} {...register('quantity')} placeholder="Enter quantity" />
+              <FormField label={t('qurbaniDonation.quantity')} required htmlFor="qty" error={errors.quantity?.message}>
+                <Input id="qty" type="number" min={1} {...register('quantity')} placeholder={t('qurbaniDonation.enterQuantity')} />
               </FormField>
               <FormField
-                label="Total amount (PKR)"
+                label={t('qurbaniDonation.totalAmount')}
                 required
                 htmlFor="total"
                 error={errors.totalAmount?.message}
-                hint={suggested > 0 ? `Suggested: PKR ${suggested.toLocaleString()}` : undefined}
+                hint={suggested > 0 ? `${t('qurbaniDonation.suggested')} ${suggested.toLocaleString()}` : undefined}
               >
-                <Input id="total" type="number" min={0} {...register('totalAmount')} placeholder="Enter amount" />
+                <Input id="total" type="number" min={0} {...register('totalAmount')} placeholder={t('qurbaniDonation.enterAmount')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
-          <FormSection title="Donor information" icon={User} description="We'll use this to coordinate delivery.">
+          <FormSection title={t('qurbaniDonation.donorInformation')} icon={User} description={t('qurbaniDonation.donorInformationDesc')}>
             <FormGrid cols={2}>
-              <FormField label="Full name" required htmlFor="donorName" error={errors.donorName?.message}>
-                <Input id="donorName" leftIcon={User} {...register('donorName')} placeholder="Your full name" />
+              <FormField label={t('form.fullName')} required htmlFor="donorName" error={errors.donorName?.message}>
+                <Input id="donorName" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
               </FormField>
-              <FormField label="Phone number" required htmlFor="donorPhone" error={errors.donorPhone?.message}>
-                <Input id="donorPhone" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder="03001234567" />
+              <FormField label={t('form.phoneNumber')} required htmlFor="donorPhone" error={errors.donorPhone?.message}>
+                <Input id="donorPhone" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
-              <FormField wide label="Address" required htmlFor="donorAddress" error={errors.donorAddress?.message}>
-                <Textarea id="donorAddress" rows={3} {...register('donorAddress')} placeholder="Complete delivery address" />
+              <FormField wide label={t('form.address')} required htmlFor="donorAddress" error={errors.donorAddress?.message}>
+                <Textarea id="donorAddress" rows={3} {...register('donorAddress')} placeholder={t('form.completeAddress')} />
               </FormField>
-              <FormField label="Preferred delivery date" htmlFor="deliveryDate" hint="Optional — subject to availability">
+              <FormField label={t('form.preferredDeliveryDate')} htmlFor="deliveryDate" hint={t('form.optionalSubject')}>
                 <Input id="deliveryDate" type="date" leftIcon={Calendar} {...register('deliveryDate')} />
               </FormField>
-              <FormField label="Notes" htmlFor="notes" hint="Any special instructions">
-                <Input id="notes" leftIcon={FileText} {...register('notes')} placeholder="Optional notes" />
+              <FormField label={t('form.notes')} htmlFor="notes" hint={t('form.specialInstructions')}>
+                <Input id="notes" leftIcon={FileText} {...register('notes')} placeholder={t('form.optionalNotes')} />
               </FormField>
             </FormGrid>
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset()} disabled={isSubmitting}>
-              Reset
+              {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
-              Continue to payment
+              {t('common.continueToPayment')}
             </Button>
           </div>
         </form>
@@ -171,7 +173,7 @@ export default function QurbaniDonation() {
               <Info className="h-4 w-4" />
             </span>
             <div>
-              <h4 className="text-sm font-semibold text-qurbani-700 dark:text-qurbani-200">Important information</h4>
+              <h4 className="text-sm font-semibold text-qurbani-700 dark:text-qurbani-200">{t('common.importantInformation')}</h4>
               <ul className="mt-2 space-y-1 text-xs text-qurbani-700/90">
                 {infoPoints.map((p) => (
                   <li key={p} className="flex gap-2">
@@ -188,13 +190,13 @@ export default function QurbaniDonation() {
       <PaymentConfirmModal
         open={paymentOpen}
         onClose={() => setPaymentOpen(false)}
-        title="Complete Qurbani payment"
+        title={t('qurbaniDonation.completeQurbaniPayment')}
         totalAmount={Number(pendingPayload?.totalAmount) || 0}
-        summaryLabel="Total donation"
+        summaryLabel={t('qurbaniDonation.totalDonation')}
         summaryHint={pendingPayload ? `${pendingPayload.quantity} × ${pendingPayload.animalType?.toLowerCase()}` : undefined}
         onConfirmedSubmit={handlePaymentConfirmed}
-        successMessage="Donation recorded"
-        successDescription="May Allah accept it. You'll be notified once admin confirms."
+        successMessage={t('qurbaniDonation.donationRecorded')}
+        successDescription={t('qurbaniDonation.donationRecordedDesc')}
       />
     </DashboardLayout>
   );
