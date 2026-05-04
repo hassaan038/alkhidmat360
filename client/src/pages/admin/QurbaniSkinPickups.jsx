@@ -48,7 +48,11 @@ export default function QurbaniSkinPickups() {
     setUpdatingId(id);
     try {
       await qurbaniSkinPickupService.adminUpdateSkinPickupStatus(id, status);
-      toast.success('Status updated');
+      const email = pickups.find((r) => r.id === id)?.user?.email;
+      toast.success(
+        'Status updated',
+        email ? { description: `Notification email sent to ${email}` } : undefined,
+      );
       load();
     } catch (err) {
       toast.error('Update failed', { description: formatApiError(err) });

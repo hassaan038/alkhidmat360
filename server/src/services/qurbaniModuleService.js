@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
 
@@ -401,7 +402,18 @@ export async function updateBookingStatus(id, status) {
   const updated = await prisma.qurbaniHissaBooking.update({
     where: { id: bookingId },
     data: { status },
+    include: { user: { select: { id: true, email: true, fullName: true } } },
   });
+
+  if (updated.user?.email) {
+    await sendStatusEmail({
+      to: updated.user.email,
+      fullName: updated.user.fullName,
+      recordType: 'qurbaniBooking',
+      status,
+    });
+  }
+
   return parseDedications(updated);
 }
 

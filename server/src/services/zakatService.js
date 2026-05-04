@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
 
@@ -82,10 +83,22 @@ export async function updateZakatPaymentStatus(id, status) {
   const existing = await prisma.zakatPayment.findUnique({ where: { id: paymentId } });
   if (!existing) throw new ApiError(404, 'Zakat payment not found');
 
-  return prisma.zakatPayment.update({
+  const record = await prisma.zakatPayment.update({
     where: { id: paymentId },
     data: { status },
+    include: userInclude,
   });
+
+  if (record.user?.email) {
+    await sendStatusEmail({
+      to: record.user.email,
+      fullName: record.user.fullName,
+      recordType: 'zakatPayment',
+      status,
+    });
+  }
+
+  return record;
 }
 
 // ============================================
@@ -150,10 +163,22 @@ export async function updateZakatApplicationStatus(id, status) {
   const existing = await prisma.zakatApplication.findUnique({ where: { id: appId } });
   if (!existing) throw new ApiError(404, 'Zakat application not found');
 
-  return prisma.zakatApplication.update({
+  const record = await prisma.zakatApplication.update({
     where: { id: appId },
     data: { status },
+    include: userInclude,
   });
+
+  if (record.user?.email) {
+    await sendStatusEmail({
+      to: record.user.email,
+      fullName: record.user.fullName,
+      recordType: 'zakatApplication',
+      status,
+    });
+  }
+
+  return record;
 }
 
 export default {

@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
 
@@ -61,7 +62,22 @@ export async function updateSadqaStatus(id, status) {
   const existing = await prisma.sadqa.findUnique({ where: { id: sadqaId } });
   if (!existing) throw new ApiError(404, 'Sadqa donation not found');
 
-  return prisma.sadqa.update({ where: { id: sadqaId }, data: { status } });
+  const record = await prisma.sadqa.update({
+    where: { id: sadqaId },
+    data: { status },
+    include: userInclude,
+  });
+
+  if (record.user?.email) {
+    await sendStatusEmail({
+      to: record.user.email,
+      fullName: record.user.fullName,
+      recordType: 'sadqa',
+      status,
+    });
+  }
+
+  return record;
 }
 
 // ============================================
@@ -123,10 +139,22 @@ export async function updateDisasterDonationStatus(id, status) {
   });
   if (!existing) throw new ApiError(404, 'Disaster donation not found');
 
-  return prisma.disasterDonation.update({
+  const record = await prisma.disasterDonation.update({
     where: { id: donationId },
     data: { status },
+    include: userInclude,
   });
+
+  if (record.user?.email) {
+    await sendStatusEmail({
+      to: record.user.email,
+      fullName: record.user.fullName,
+      recordType: 'disasterDonation',
+      status,
+    });
+  }
+
+  return record;
 }
 
 export default {

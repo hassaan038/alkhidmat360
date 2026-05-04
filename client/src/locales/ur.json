@@ -958,6 +958,7 @@
     "viewDetails": "تفصیلات دیکھیں",
     "statusUpdated": "حیثیت اپڈیٹ ہو گئی",
     "statusUpdateFailed": "حیثیت اپڈیٹ ناکام",
+    "emailSentTo": "اطلاعی ای میل {{email}} پر بھیجی گئی",
     "noMatchingRecords": "کوئی مماثل ریکارڈ نہیں",
     "adjustFilters": "تلاش یا فلٹر تبدیل کر کے دیکھیں۔"
   },

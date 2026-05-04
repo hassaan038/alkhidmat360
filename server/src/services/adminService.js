@@ -1,8 +1,24 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { ApiError } from '../utils/ApiResponse.js';
+import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
+
+const userInclude = {
+  user: { select: { id: true, email: true, fullName: true } },
+};
+
+async function notify(record, recordType, status) {
+  if (record?.user?.email) {
+    await sendStatusEmail({
+      to: record.user.email,
+      fullName: record.user.fullName,
+      recordType,
+      status,
+    });
+  }
+}
 
 // ============================================
 // ADMIN DASHBOARD STATISTICS
@@ -227,59 +243,83 @@ export async function getAllVolunteers() {
 // ============================================
 
 export async function updateQurbaniDonationStatus(id, status) {
-  return await prisma.qurbaniDonation.update({
+  const record = await prisma.qurbaniDonation.update({
     where: { id: parseInt(id) },
     data: { status },
+    include: userInclude,
   });
+  await notify(record, 'qurbaniDonation', status);
+  return record;
 }
 
 export async function updateRationDonationStatus(id, status) {
-  return await prisma.rationDonation.update({
+  const record = await prisma.rationDonation.update({
     where: { id: parseInt(id) },
     data: { status },
+    include: userInclude,
   });
+  await notify(record, 'rationDonation', status);
+  return record;
 }
 
 export async function updateSkinCollectionStatus(id, status) {
-  return await prisma.skinCollection.update({
+  const record = await prisma.skinCollection.update({
     where: { id: parseInt(id) },
     data: { status },
+    include: userInclude,
   });
+  await notify(record, 'skinCollection', status);
+  return record;
 }
 
 export async function updateOrphanSponsorshipStatus(id, status) {
-  return await prisma.orphanSponsorship.update({
+  const record = await prisma.orphanSponsorship.update({
     where: { id: parseInt(id) },
     data: { status },
+    include: userInclude,
   });
+  await notify(record, 'orphanSponsorship', status);
+  return record;
 }
 
 export async function updateLoanApplicationStatus(id, status) {
-  return await prisma.loanApplication.update({
+  const record = await prisma.loanApplication.update({
     where: { id: parseInt(id) },
     data: { status },
+    include: userInclude,
   });
+  await notify(record, 'loanApplication', status);
+  return record;
 }
 
 export async function updateRamadanRationApplicationStatus(id, status) {
-  return await prisma.ramadanRationApplication.update({
+  const record = await prisma.ramadanRationApplication.update({
     where: { id: parseInt(id) },
     data: { status },
+    include: userInclude,
   });
+  await notify(record, 'ramadanRationApplication', status);
+  return record;
 }
 
 export async function updateOrphanRegistrationStatus(id, status) {
-  return await prisma.orphanRegistration.update({
+  const record = await prisma.orphanRegistration.update({
     where: { id: parseInt(id) },
     data: { status },
+    include: userInclude,
   });
+  await notify(record, 'orphanRegistration', status);
+  return record;
 }
 
 export async function updateVolunteerTaskStatus(id, status) {
-  return await prisma.volunteerTask.update({
+  const record = await prisma.volunteerTask.update({
     where: { id: parseInt(id) },
     data: { status },
+    include: userInclude,
   });
+  await notify(record, 'volunteerTask', status);
+  return record;
 }
 
 // ============================================

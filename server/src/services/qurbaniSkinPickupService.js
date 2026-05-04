@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
 
@@ -59,10 +60,22 @@ export async function updatePickupStatus(id, status) {
   });
   if (!existing) throw new ApiError(404, 'Pickup request not found');
 
-  return prisma.qurbaniSkinPickup.update({
+  const record = await prisma.qurbaniSkinPickup.update({
     where: { id: pickupId },
     data: { status },
+    include: userInclude,
   });
+
+  if (record.user?.email) {
+    await sendStatusEmail({
+      to: record.user.email,
+      fullName: record.user.fullName,
+      recordType: 'qurbaniSkinPickup',
+      status,
+    });
+  }
+
+  return record;
 }
 
 export default {
