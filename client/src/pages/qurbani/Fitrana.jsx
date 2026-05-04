@@ -271,7 +271,7 @@ export default function Fitrana() {
   // Calculator state
   const [numberOfPeople, setNumberOfPeople] = useState(1);
   const [basisKey, setBasisKey] = useState('alkhidmat');
-  const [customAmount, setCustomAmount] = useState('');
+  const [amountPerPersonInput, setAmountPerPersonInput] = useState('600');
   const [contactPhone, setContactPhone] = useState('');
   const [notes, setNotes] = useState('');
 
@@ -305,18 +305,30 @@ export default function Fitrana() {
     }
   }, [moduleEnabled]);
 
-  const selectedBasis = useMemo(
-    () => FITRANA_BASES.find((b) => b.key === basisKey),
-    [FITRANA_BASES, basisKey]
-  );
+  const handleBasisSelect = (key) => {
+    setBasisKey(key);
+    const basis = FITRANA_BASE_KEYS.find((b) => b.key === key);
+    if (basis && basis.amount != null) {
+      setAmountPerPersonInput(String(basis.amount));
+    } else if (key === 'custom') {
+      setAmountPerPersonInput('');
+    }
+  };
+
+  const handleAmountPerPersonChange = (e) => {
+    const raw = e.target.value;
+    setAmountPerPersonInput(raw);
+    const parsed = parseFloat(raw);
+    const matched = FITRANA_BASE_KEYS.find(
+      (b) => b.amount != null && Number.isFinite(parsed) && parsed === b.amount
+    );
+    setBasisKey(matched ? matched.key : 'custom');
+  };
 
   const amountPerPerson = useMemo(() => {
-    if (selectedBasis?.key === 'custom') {
-      const v = parseFloat(customAmount);
-      return Number.isFinite(v) && v > 0 ? v : 0;
-    }
-    return selectedBasis?.amount || 0;
-  }, [selectedBasis, customAmount]);
+    const v = parseFloat(amountPerPersonInput);
+    return Number.isFinite(v) && v > 0 ? v : 0;
+  }, [amountPerPersonInput]);
 
   const totalAmount = useMemo(
     () => Math.max(0, Number(numberOfPeople) || 0) * amountPerPerson,
@@ -397,7 +409,7 @@ export default function Fitrana() {
                           <button
                             key={b.key}
                             type="button"
-                            onClick={() => setBasisKey(b.key)}
+                            onClick={() => handleBasisSelect(b.key)}
                             className={cn(
                               'text-left p-4 border rounded-xl transition-colors duration-200 cursor-pointer',
                               active
@@ -425,22 +437,20 @@ export default function Fitrana() {
                     </div>
                   </div>
 
-                  {/* Custom amount */}
-                  {basisKey === 'custom' && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {t('fitrana.amountPerPerson')} <span className="text-error">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        min={1}
-                        value={customAmount}
-                        onChange={(e) => setCustomAmount(e.target.value)}
-                        placeholder="500"
-                        className="w-full sm:w-48 px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      />
-                    </div>
-                  )}
+                  {/* Amount per person — pre-filled from selected basis, editable */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {t('fitrana.amountPerPerson')} <span className="text-error">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={amountPerPersonInput}
+                      onChange={handleAmountPerPersonChange}
+                      placeholder="600"
+                      className="w-full sm:w-48 px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
 
                   {/* Optional details */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

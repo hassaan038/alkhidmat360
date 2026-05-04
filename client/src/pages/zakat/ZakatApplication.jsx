@@ -53,7 +53,9 @@ const applicationSchema = z.object({
   reasonForApplication: z
     .string()
     .min(20, 'Please describe your situation in at least 20 characters'),
-  amountRequested: z.union([z.string(), z.number()]).optional(),
+  amountRequested: z
+    .union([z.literal(''), z.coerce.number().nonnegative('Must be 0 or more')])
+    .optional(),
   additionalNotes: z.string().optional(),
 });
 

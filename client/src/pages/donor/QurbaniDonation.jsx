@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -43,14 +43,22 @@ export default function QurbaniDonation() {
     t('qurbaniDonation.info4'),
   ], [t]);
 
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
+  const { register, handleSubmit, formState: { errors }, reset, watch, setValue } = useForm({
     resolver: zodResolver(qurbaniSchema),
-    defaultValues: { animalType: 'GOAT', quantity: 1, totalAmount: 0 },
+    defaultValues: { animalType: 'GOAT', quantity: 1, totalAmount: 30000 },
   });
 
   const animalType = watch('animalType');
   const quantity = watch('quantity');
   const suggested = (animalType === 'GOAT' ? 30000 : animalType === 'CAMEL' ? 300000 : 0) * (quantity || 1);
+
+  const amountTouchedRef = useRef(false);
+  useEffect(() => {
+    if (amountTouchedRef.current) return;
+    if (suggested > 0) {
+      setValue('totalAmount', suggested, { shouldDirty: false, shouldValidate: false });
+    }
+  }, [suggested, setValue]);
 
   const onSubmit = (data) => {
     setPendingPayload(data);
@@ -68,6 +76,7 @@ export default function QurbaniDonation() {
       if (paymentScreenshot) fd.append('paymentScreenshot', paymentScreenshot);
       await createQurbaniDonation(fd);
       reset();
+      amountTouchedRef.current = false;
       setPendingPayload(null);
     } finally {
       setIsSubmitting(false);
@@ -129,9 +138,14 @@ export default function QurbaniDonation() {
                 required
                 htmlFor="total"
                 error={errors.totalAmount?.message}
-                hint={suggested > 0 ? `${t('qurbaniDonation.suggested')} ${suggested.toLocaleString()}` : undefined}
               >
-                <Input id="total" type="number" min={0} {...register('totalAmount')} placeholder={t('qurbaniDonation.enterAmount')} />
+                <Input
+                  id="total"
+                  type="number"
+                  min={1}
+                  {...register('totalAmount', { onChange: () => { amountTouchedRef.current = true; } })}
+                  placeholder={t('qurbaniDonation.enterAmount')}
+                />
               </FormField>
             </FormGrid>
           </FormSection>
@@ -157,7 +171,7 @@ export default function QurbaniDonation() {
           </FormSection>
 
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => reset()} disabled={isSubmitting}>
+            <Button type="button" variant="outline" leftIcon={RotateCcw} onClick={() => { reset(); amountTouchedRef.current = false; }} disabled={isSubmitting}>
               {t('common.reset')}
             </Button>
             <Button type="submit" size="lg" loading={isSubmitting} rightIcon={ArrowRight}>
