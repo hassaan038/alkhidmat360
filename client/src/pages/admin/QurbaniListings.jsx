@@ -109,6 +109,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
           <input
             type="number"
             step="0.1"
+            min={1}
             {...register('weightKg')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
@@ -120,6 +121,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
           </label>
           <input
             type="number"
+            min={1}
             {...register('bullPrice')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="e.g. 210000"

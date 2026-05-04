@@ -170,7 +170,7 @@ export default function RationDonation() {
                 <Input id="qty" type="number" min={1} {...register('quantity')} />
               </FormField>
               <FormField label={t('qurbaniDonation.totalAmount')} required htmlFor="amt" error={errors.amount?.message}>
-                <Input id="amt" type="number" min={0} {...register('amount')} />
+                <Input id="amt" type="number" min={1} {...register('amount')} />
               </FormField>
             </FormGrid>
           </FormSection>

@@ -168,7 +168,7 @@ export default function OrphanSponsorship() {
 
             <FormGrid cols={3} className="mt-5">
               <FormField label={t('orphanSponsorship.monthlyAmount')} required htmlFor="ma" error={errors.monthlyAmount?.message}>
-                <Input id="ma" type="number" min={0} {...register('monthlyAmount')} />
+                <Input id="ma" type="number" min={1} {...register('monthlyAmount')} />
               </FormField>
               <FormField label={t('orphanSponsorship.duration')} required htmlFor="du" error={errors.duration?.message}>
                 <Input id="du" type="number" min={1} {...register('duration', { onChange: handleDurationChange })} />

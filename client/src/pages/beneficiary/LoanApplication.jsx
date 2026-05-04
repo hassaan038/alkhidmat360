@@ -123,7 +123,7 @@ export default function LoanApplication() {
           <FormSection title={t('loanApplication.financialInformation')} icon={Coins}>
             <FormGrid cols={2}>
               <FormField label={t('loanApplication.requestedAmount')} required htmlFor="ra" error={errors.requestedAmount?.message}>
-                <Input id="ra" type="number" min={0} {...register('requestedAmount')} placeholder="50000" />
+                <Input id="ra" type="number" min={1} {...register('requestedAmount')} placeholder="50000" />
               </FormField>
               <FormField label={t('loanApplication.monthlyIncome')} required htmlFor="mi" error={errors.monthlyIncome?.message}>
                 <Input id="mi" type="number" min={0} {...register('monthlyIncome')} placeholder="30000" />

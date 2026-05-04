@@ -381,6 +381,7 @@ export default function ZakatPayment() {
                   </label>
                   <input
                     type="number"
+                    min={0}
                     value={goldRate}
                     onChange={(e) => setGoldRate(e.target.value)}
                     className={inputClass}
@@ -392,6 +393,7 @@ export default function ZakatPayment() {
                   </label>
                   <input
                     type="number"
+                    min={0}
                     value={silverRate}
                     onChange={(e) => setSilverRate(e.target.value)}
                     className={inputClass}
