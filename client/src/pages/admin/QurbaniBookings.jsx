@@ -43,7 +43,11 @@ export default function QurbaniBookings() {
     setUpdatingId(id);
     try {
       await qurbaniModuleService.adminUpdateBookingStatus(id, status);
-      toast.success(t('table.statusUpdated'));
+      const email = bookings.find((r) => r.id === id)?.user?.email;
+      toast.success(
+        t('table.statusUpdated'),
+        email ? { description: t('table.emailSentTo', { email }) } : undefined,
+      );
       load();
     } catch (error) {
       toast.error(t('table.statusUpdateFailed'), { description: formatApiError(error) });

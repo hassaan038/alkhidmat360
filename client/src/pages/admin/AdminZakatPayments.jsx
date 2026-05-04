@@ -42,7 +42,11 @@ export default function AdminZakatPayments() {
     setUpdatingId(id);
     try {
       await zakatService.adminUpdateZakatPaymentStatus(id, status);
-      toast.success(t('table.statusUpdated'));
+      const email = items.find((r) => r.id === id)?.user?.email;
+      toast.success(
+        t('table.statusUpdated'),
+        email ? { description: t('table.emailSentTo', { email }) } : undefined,
+      );
       load();
     } catch (err) {
       toast.error(t('table.statusUpdateFailed'), { description: formatApiError(err) });

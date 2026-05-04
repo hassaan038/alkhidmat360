@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
 
@@ -65,10 +66,22 @@ export async function updateFitranaStatus(id, status) {
   const existing = await prisma.fitrana.findUnique({ where: { id: fitranaId } });
   if (!existing) throw new ApiError(404, 'Fitrana record not found');
 
-  return prisma.fitrana.update({
+  const record = await prisma.fitrana.update({
     where: { id: fitranaId },
     data: { status },
+    include: userInclude,
   });
+
+  if (record.user?.email) {
+    await sendStatusEmail({
+      to: record.user.email,
+      fullName: record.user.fullName,
+      recordType: 'fitrana',
+      status,
+    });
+  }
+
+  return record;
 }
 
 export default {

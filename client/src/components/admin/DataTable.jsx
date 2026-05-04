@@ -81,7 +81,11 @@ export default function DataTable({
     setPendingAction(null);
     try {
       await onStatusUpdate(id, newStatus);
-      toast.success(t('table.statusUpdated'));
+      const email = data.find((r) => r.id === id)?.user?.email;
+      toast.success(
+        t('table.statusUpdated'),
+        email ? { description: t('table.emailSentTo', { email }) } : undefined,
+      );
     } catch {
       toast.error(t('table.statusUpdateFailed'));
     } finally {

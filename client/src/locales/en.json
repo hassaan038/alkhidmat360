@@ -958,6 +958,7 @@
     "viewDetails": "View Details",
     "statusUpdated": "Status updated",
     "statusUpdateFailed": "Failed to update status",
+    "emailSentTo": "Notification email sent to {{email}}",
     "noMatchingRecords": "No matching records",
     "adjustFilters": "Try adjusting your search or filters."
   },
