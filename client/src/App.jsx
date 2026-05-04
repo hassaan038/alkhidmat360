@@ -56,6 +56,9 @@ import Settings from './pages/settings/Settings';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import RoleBasedRoute from './components/auth/RoleBasedRoute';
 
+// Chatbot widget — visible on every page
+import ChatbotWidget from './components/chatbot/ChatbotWidget';
+
 function App() {
   const { i18n } = useTranslation();
   useEffect(() => {
@@ -443,6 +446,9 @@ function App() {
             }
           />
         </Routes>
+
+        {/* Chatbot widget — visible on every route, including login/signup */}
+        <ChatbotWidget />
       </BrowserRouter>
 
       {/* Toast Notifications */}

@@ -17,6 +17,7 @@ import fitranaRoutes from './routes/fitranaRoutes.js';
 import zakatRoutes from './routes/zakatRoutes.js';
 import { sadqaRouter, disasterRouter } from './routes/extraDonationRoutes.js';
 import configRoutes from './routes/configRoutes.js';
+import chatbotRoutes from './routes/chatbotRoutes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,6 +100,7 @@ app.use('/api/zakat', zakatRoutes);
 app.use('/api/sadqa', sadqaRouter);
 app.use('/api/disaster-donations', disasterRouter);
 app.use('/api/config', configRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // ============================================
 // ERROR HANDLING

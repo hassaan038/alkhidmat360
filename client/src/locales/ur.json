@@ -1,4 +1,14 @@
 {
+  "chatbot": {
+    "title": "خدمت ہیلپر",
+    "subtitle": "Alkhidmat 360 کے لیے آپ کا رہنما",
+    "open": "چیٹ معاون کھولیں",
+    "close": "چیٹ بند کریں",
+    "clear": "صاف کریں",
+    "thinking": "سوچ رہا ہوں…",
+    "send": "پیغام بھیجیں",
+    "inputPlaceholder": "Alkhidmat 360 کے بارے میں کوئی بھی سوال پوچھیں…"
+  },
   "roles": {
     "ADMIN": "ایڈمن",
     "DONOR": "عطیہ دہندہ",
