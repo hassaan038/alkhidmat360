@@ -1,4 +1,14 @@
 {
+  "chatbot": {
+    "title": "Khidmat Helper",
+    "subtitle": "Your guide to Alkhidmat 360",
+    "open": "Open chat assistant",
+    "close": "Close chat",
+    "clear": "Clear",
+    "thinking": "Thinking…",
+    "send": "Send message",
+    "inputPlaceholder": "Ask me anything about Alkhidmat 360…"
+  },
   "roles": {
     "ADMIN": "Admin",
     "DONOR": "Donor",

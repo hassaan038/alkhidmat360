@@ -392,3 +392,71 @@ volunteer@test.com       / volunteer123
 - No comments unless the WHY is non-obvious
 - No test suite — lint with `cd client && npm run lint` before committing
 - Commit style: Conventional Commits (`feat:`, `fix:`, `refactor:`)
+
+
+<claude-mem-context>
+# Memory Context
+
+# [alkhidmat360] recent context, 2026-04-21 8:52pm GMT+5
+
+Legend: 🎯session 🔴bugfix 🟣feature 🔄refactor ✅change 🔵discovery ⚖️decision
+Format: ID TIME TYPE TITLE
+Fetch details: get_observations([IDs]) | Search: mem-search skill
+
+Stats: 50 obs (21,075t read) | 1,921,316t work | 99% savings
+
+### Apr 19, 2026
+9 1:03a 🟣 alkhidmat360 Tailwind Config Expanded with Per-Module Accent Palette
+10 " 🟣 New Shared UI Primitives: PageContainer, PageHeader, StatCard
+14 1:06a 🟣 Additional UI Primitives Completed: FormSection, IconTile, Badge, SectionHeading, Skeleton
+15 " 🔄 Button.jsx and Input.jsx Significantly Enhanced
+16 " 🔄 DataTable.jsx Completely Rebuilt with Search, Filters, Skeleton, and StatusBadge
+17 " 🔄 Header.jsx and Sidebar.jsx: Accessibility + Cursor Sweep (Task 4 Completed)
+18 " 🔄 UserDashboard Quick Actions: Emoji Replaced with IconTile + Lucide + Module Tones
+27 1:14a 🟣 Phase 2 Task Created: Auth Pages + Shell Redesign
+28 " 🟣 Phase 3 Task Created: UserDashboard + AdminDashboard Redesign
+29 " 🟣 Phase 4 Task Created: 13 Form Pages Full Redesign
+33 " 🟣 Phases 5–7 Tasks Created: Admin Tables, Module Flows, Settings Polish
+34 " 🔵 Auth Pages Already Have Split-Screen Layout Pre-Phase 2
+35 " ⚖️ Incremental Per-Phase Git Commits Policy Saved to Project Memory
+36 1:17a 🔄 Login.jsx Redesigned: Branded Side Panel Replaces Hero Image Layout
+37 " 🔄 Signup.jsx Redesigned: Tone-Based Role Picker and Branded Side Panel
+38 " 🔄 Header.jsx Redesigned: roleMeta Lookup Table, Initials Avatar, Role Chip Badge
+39 " 🔄 Sidebar.jsx Redesigned: Grouped Sections, toneAccent Active Indicators, HelpCircle Footer
+40 " 🔴 Lint Failure: Unused Icon Variable in Login and Signup Feature Bullet Maps
+46 1:18a 🔴 Lint Fix: Unused Icon Variable Resolved via feat.icon Pattern in Auth Pages
+47 " ✅ Phase 2 UI Redesign Committed to Git — commit 990529f
+48 " 🔵 AdminDashboard Already Has Charts, StatCards, Pending Reviews — Phase 3 Is Enhancement
+49 " 🔄 DonationsBarChart Upgraded to Per-Bar Multi-Color Palette
+64 1:54a ⚖️ Phase 4+ UI Expansion — Dark Mode, Navbar Overhaul, Auth Logo Restore, Sidebar Settings Removal
+65 " 🔄 Sidebar Settings Link Removed — Consolidated to Header User Menu Only
+67 1:55a 🔄 Header.jsx Overhauled — Search Bar with ⌘K Shortcut, Mobile Search Button, Platform Detection
+72 1:57a 🟣 Alkhidmat Hero Image Restored on Login and Signup Panels with Floating Glass Frame
+73 " 🔴 ESLint `react-hooks/set-state-in-effect` Lint Error in Header useIsMac Hook — Suppression Attempted
+74 " 🟣 Modal.jsx UI Component Created — Accessible Dialog Shell with Portal, Escape, Focus Trap
+75 " ✅ Git Commit `becf393` — Header Search, Sidebar Settings Removal, Auth Hero Image (Phase 4+)
+76 2:00a 🔄 PaymentScreenshotPicker Redesigned — useId, Replace Affordance, Glassmorphism Preview Card
+77 " 🔄 MyHissaBookings Payment Dialog Migrated to Shared Modal Component
+78 " 🟣 Dark Mode Infrastructure Implemented — Tailwind Class Strategy, Zustand Store, Anti-FOUC Script
+83 2:01a 🔄 Dark Mode Token Sweep — Badge, IconTile, PageHeader, StatCard, FormSection, SectionHeading
+87 2:10a 🔵 Dark Mode Classes Verified Across Layout Components and Index Styles
+88 " 🔵 Malformed Class Joins Audit Passed — No Missing Whitespace in Dark Mode Classes
+89 2:11a 🔵 Dark Mode Styles Compiled into Production Build with Proper CSS Selectors
+91 " 🔵 Dark Mode CSS Uses :is() Selector Wrapping with CSS Variables for Opacity Modulation
+92 2:13a 🔵 Dark Mode Implementation Verified Live — Dev Server Starts with Anti-FOUC Script Active
+93 2:15a ✅ themeStore.js Enhanced with SSR Safety and Theme Initialization
+94 " ✅ Dark Mode Rebuild Verified and Theme Initialization Hardening Committed
+### Apr 21, 2026
+302 8:30p ⚖️ Al-Khidmat 360 SRS/Design Report Completion Task Initiated
+303 " 🔵 Al-Khidmat 360 Codebase Structure Fully Mapped for Report Completion
+304 " 🔵 Al-Khidmat 360 Prisma Schema Reveals Modules Added After Original SRDS
+305 " 🔵 Complete Route Map and Missing Report Chapters Identified for Al-Khidmat 360 SRDS
+306 8:32p 🔵 Google Chrome Headless Confirmed as Screenshot Strategy for SRDS Report
+307 " 🔵 Complete Tech Stack Verified from package.json for Report Development and Tools Chapter
+308 " 🔵 Full API Surface and Validation Rules Catalogued for Use Case and Test Case Generation
+309 8:35p 🟣 SRDS Completion Chapters Written to reports/alkhidmat-360-completion-chapters.md
+310 " 🟣 PDF of Completion Chapters Generated via Node.js HTML Converter + Chrome Headless
+311 8:36p 🟣 Complete 67-Page Al-Khidmat 360 SRDS Report Assembled and Verified
+
+Access 1921k tokens of past work via get_observations([IDs]) or mem-search skill.
+</claude-mem-context>
