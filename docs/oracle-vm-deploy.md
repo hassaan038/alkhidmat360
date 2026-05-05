@@ -51,11 +51,23 @@ Run this once on the VM or you will get a connection timeout on port 80 even
 though the security list, UFW, and the container all look correct:
 
 ```bash
-sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT
-sudo netfilter-persistent save
+sudo apt install -y iptables-persistent
+sudo iptables -L INPUT -n --line-numbers
 ```
 
-(If `netfilter-persistent` is not installed: `sudo apt install -y iptables-persistent` first.)
+Look for a line like `REJECT all -- ... reject-with icmp-host-prohibited`. Note
+its line number (commonly 5 on Oracle's Ubuntu image). Insert the ACCEPT rule
+**at that same number** so it lands BEFORE the REJECT:
+
+```bash
+sudo iptables -I INPUT <REJECT_LINE_NUMBER> -m state --state NEW -p tcp --dport 80 -j ACCEPT
+sudo netfilter-persistent save
+sudo iptables -L INPUT -n --line-numbers
+```
+
+The new ACCEPT for `dpt:80` must appear ABOVE the REJECT row. If you put it
+below, you will get "No route to host" from outside the VM — iptables
+processes top-down and stops at the first match.
 
 ## Add swap (only if you are on a 1 GB Always Free shape)
 
