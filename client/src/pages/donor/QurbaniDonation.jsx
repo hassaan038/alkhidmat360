@@ -8,14 +8,14 @@ import PageHeader from '../../components/ui/PageHeader';
 import FormSection, { FormGrid, FormField } from '../../components/ui/FormSection';
 import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Heart, Bot, Mountain, Info, RotateCcw, ArrowRight, User, Phone, Calendar, FileText } from 'lucide-react';
+import { Heart, Bot, Mountain, Beef, Info, RotateCcw, ArrowRight, User, Phone, Calendar, FileText } from 'lucide-react';
 import { createQurbaniDonation } from '../../services/donationService';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
 
 const qurbaniSchema = z.object({
-  animalType: z.enum(['GOAT', 'CAMEL'], { required_error: 'Please select an animal type' }),
+  animalType: z.enum(['GOAT', 'CAMEL', 'COW'], { required_error: 'Please select an animal type' }),
   quantity: z.coerce.number().int().min(1).max(100),
   totalAmount: z.coerce.number().positive('Amount must be positive'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -33,6 +33,7 @@ export default function QurbaniDonation() {
 
   const animals = useMemo(() => [
     { value: 'GOAT', label: t('qurbaniDonation.goat'), icon: Bot, hint: t('qurbaniDonation.goatHint') },
+    { value: 'COW', label: t('qurbaniDonation.cow'), icon: Beef, hint: t('qurbaniDonation.cowHint') },
     { value: 'CAMEL', label: t('qurbaniDonation.camel'), icon: Mountain, hint: t('qurbaniDonation.camelHint') },
   ], [t]);
 
@@ -50,7 +51,7 @@ export default function QurbaniDonation() {
 
   const animalType = watch('animalType');
   const quantity = watch('quantity');
-  const suggested = (animalType === 'GOAT' ? 30000 : animalType === 'CAMEL' ? 300000 : 0) * (quantity || 1);
+  const suggested = (animalType === 'GOAT' ? 30000 : animalType === 'COW' ? 210000 : animalType === 'CAMEL' ? 300000 : 0) * (quantity || 1);
 
   const amountTouchedRef = useRef(false);
   useEffect(() => {
@@ -96,7 +97,7 @@ export default function QurbaniDonation() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <FormSection title={t('qurbaniDonation.donationDetails')} icon={Heart}>
             <FormField label={t('qurbaniDonation.animalType')} required error={errors.animalType?.message}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {animals.map((a) => {
                   const AIcon = a.icon;
                   const selected = animalType === a.value;

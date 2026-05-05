@@ -11,7 +11,7 @@ const paymentMarkedField = z
 
 // Qurbani Donation Validator
 export const qurbaniDonationSchema = z.object({
-  animalType: z.enum(['GOAT', 'CAMEL'], {
+  animalType: z.enum(['GOAT', 'CAMEL', 'COW'], {
     errorMap: () => ({ message: 'Please select a valid animal type' }),
   }),
   quantity: z.coerce.number().int().min(1, 'Quantity must be at least 1'),
