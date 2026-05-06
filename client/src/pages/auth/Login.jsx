@@ -185,18 +185,6 @@ export default function Login() {
               {t('auth.login.createAccount')}
             </Button>
           </Link>
-
-          <details className="mt-6 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-xs">
-            <summary className="cursor-pointer px-4 py-2.5 font-medium text-gray-700 dark:text-gray-300 select-none hover:text-gray-900">
-              Test credentials
-            </summary>
-            <div className="border-t border-gray-200 dark:border-gray-800 px-4 py-3 space-y-1 text-gray-600 dark:text-gray-400 font-mono text-[11px]">
-              <p>admin@alkhidmat360.com / admin123</p>
-              <p>donor@test.com / donor123</p>
-              <p>beneficiary@test.com / beneficiary123</p>
-              <p>volunteer@test.com / volunteer123</p>
-            </div>
-          </details>
         </div>
       </main>
     </div>
