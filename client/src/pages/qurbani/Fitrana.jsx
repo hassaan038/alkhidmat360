@@ -33,6 +33,7 @@ import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import PaymentScreenshotPicker from '../../components/qurbani/PaymentScreenshotPicker';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { pakistanPhoneOptionalSchema } from '../../lib/validators';
 
 // Pakistan 2026 fitrana rates per person (PKR). Sourced from religious
 // councils + Alkhidmat Foundation. Update these annually.
@@ -341,6 +342,13 @@ export default function Fitrana() {
     if (!canProceed) {
       toast.error(t('common.submissionFailed'), {
         description: t('common.tryAgainLater'),
+      });
+      return;
+    }
+    const phoneCheck = pakistanPhoneOptionalSchema.safeParse(contactPhone);
+    if (!phoneCheck.success) {
+      toast.error(t('common.submissionFailed'), {
+        description: phoneCheck.error.issues[0].message,
       });
       return;
     }

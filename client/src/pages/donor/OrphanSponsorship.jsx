@@ -13,6 +13,7 @@ import { Baby, Heart, User, Phone, Mail, RotateCcw, ArrowRight } from 'lucide-re
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { pakistanPhoneSchema, strictEmailSchema } from '../../lib/validators';
 
 const orphanSponsorshipSchema = z.object({
   sponsorshipType: z.string().min(2).max(50),
@@ -20,8 +21,8 @@ const orphanSponsorshipSchema = z.object({
   duration: z.coerce.number().int().min(1).max(120),
   totalAmount: z.coerce.number().positive('Total amount must be positive'),
   sponsorName: z.string().min(2, 'Name must be at least 2 characters'),
-  sponsorPhone: z.string().min(11).max(15),
-  sponsorEmail: z.string().email('Invalid email address'),
+  sponsorPhone: pakistanPhoneSchema,
+  sponsorEmail: strictEmailSchema,
   sponsorAddress: z.string().min(10, 'Please provide a complete address'),
   orphanAge: z.string().optional(),
   orphanGender: z.string().optional(),

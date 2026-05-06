@@ -13,14 +13,15 @@ import { createRationDonation } from '../../services/donationService';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { pakistanPhoneSchema, strictEmailSchema } from '../../lib/validators';
 
 const rationSchema = z.object({
   packageType: z.string().min(2).max(50),
   quantity: z.coerce.number().int().min(1).max(1000),
   amount: z.coerce.number().positive('Amount must be positive'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorEmail: z.string().email('Please enter a valid email address'),
-  donorPhone: z.string().min(11, 'Phone number must be at least 11 digits').max(15),
+  donorEmail: strictEmailSchema,
+  donorPhone: pakistanPhoneSchema,
   donorAddress: z.string().min(10, 'Please provide a complete address'),
   deliveryDate: z.string().optional(),
   notes: z.string().optional(),

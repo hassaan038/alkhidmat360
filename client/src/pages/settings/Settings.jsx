@@ -21,12 +21,17 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import * as userService from '../../services/userService';
 import useAuthStore from '../../store/authStore';
 import { cn, formatApiError, formatDate } from '../../lib/utils';
+import {
+  cnicOptionalSchema,
+  pakistanPhoneSchema,
+  strictEmailSchema,
+} from '../../lib/validators';
 
 const profileSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email'),
-  phoneNumber: z.string().min(10).max(20),
-  cnic: z.string().min(13).max(15).optional().or(z.literal('')),
+  email: strictEmailSchema,
+  phoneNumber: pakistanPhoneSchema,
+  cnic: cnicOptionalSchema,
 });
 
 const passwordSchema = z

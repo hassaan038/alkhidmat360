@@ -13,6 +13,11 @@ import {
 import logo from '../../assets/logo.jpg';
 import heroImage from '../../assets/alkhidmat_hero_image.png';
 import { cn } from '../../lib/utils';
+import {
+  cnicOptionalSchema,
+  pakistanPhoneSchema,
+  strictEmailSchema,
+} from '../../lib/validators';
 
 const userTypesMeta = [
   { value: 'DONOR', icon: Heart, tone: 'primary' },
@@ -75,9 +80,31 @@ export default function Signup() {
       setValidationError(t('auth.signup.selectRole'));
       return;
     }
+
+    const emailResult = strictEmailSchema.safeParse(formData.email);
+    if (!emailResult.success) {
+      setValidationError(emailResult.error.issues[0].message);
+      return;
+    }
+    const phoneResult = pakistanPhoneSchema.safeParse(formData.phoneNumber);
+    if (!phoneResult.success) {
+      setValidationError(phoneResult.error.issues[0].message);
+      return;
+    }
+    const cnicResult = cnicOptionalSchema.safeParse(formData.cnic);
+    if (!cnicResult.success) {
+      setValidationError(cnicResult.error.issues[0].message);
+      return;
+    }
+
     try {
       const { confirmPassword: _cp, ...signupData } = formData;
-      const user = await signup(signupData);
+      const user = await signup({
+        ...signupData,
+        email: emailResult.data,
+        phoneNumber: phoneResult.data,
+        cnic: cnicResult.data || undefined,
+      });
       navigate(user.userType === 'ADMIN' ? '/dashboard/admin' : '/dashboard/user');
     } catch (err) {
       console.error('Signup error:', err);

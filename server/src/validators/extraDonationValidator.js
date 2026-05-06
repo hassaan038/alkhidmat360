@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+  pakistanPhoneSchema,
+  strictEmailOptionalSchema,
+} from './sharedValidators.js';
 
 const paymentMarkedField = z
   .union([z.boolean(), z.string()])
@@ -12,8 +16,8 @@ const paymentMarkedField = z
 
 export const createSadqaSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: z.string().min(10, 'Please enter a valid phone number').max(20),
-  donorEmail: z.string().email('Invalid email').optional().or(z.literal('')),
+  donorPhone: pakistanPhoneSchema,
+  donorEmail: strictEmailOptionalSchema,
   amount: z.coerce.number().positive('Amount must be greater than 0'),
   purpose: z.string().max(200).optional(),
   notes: z.string().optional(),
@@ -34,8 +38,8 @@ const ALLOWED_CAMPAIGNS = ['floods', 'earthquake', 'shelter', 'medical', 'genera
 
 export const createDisasterDonationSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: z.string().min(10, 'Please enter a valid phone number').max(20),
-  donorEmail: z.string().email('Invalid email').optional().or(z.literal('')),
+  donorPhone: pakistanPhoneSchema,
+  donorEmail: strictEmailOptionalSchema,
   campaignKey: z.enum(ALLOWED_CAMPAIGNS, {
     errorMap: () => ({
       message: `Campaign must be one of: ${ALLOWED_CAMPAIGNS.join(', ')}`,

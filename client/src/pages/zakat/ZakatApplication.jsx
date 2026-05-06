@@ -26,13 +26,12 @@ import * as zakatService from '../../services/zakatService';
 import { formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
 import { useTranslation } from 'react-i18next';
+import { cnicSchema, pakistanPhoneSchema } from '../../lib/validators';
 
 const applicationSchema = z.object({
   applicantName: z.string().min(2, 'Name must be at least 2 characters'),
-  applicantPhone: z.string().min(10, 'Phone must be at least 10 digits').max(20),
-  applicantCNIC: z
-    .string()
-    .regex(/^\d{13}$/, 'CNIC must be exactly 13 digits (no dashes)'),
+  applicantPhone: pakistanPhoneSchema,
+  applicantCNIC: cnicSchema,
   applicantAddress: z.string().min(10, 'Address must be at least 10 characters'),
 
   familyMembers: z.coerce.number().int().min(1, 'At least 1').max(50),

@@ -13,18 +13,19 @@ import { toast } from 'sonner';
 import { HandHeart, User, Phone, Mail, Calendar, MapPin, Info, RotateCcw, ArrowRight, Shield, Briefcase } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { pakistanPhoneSchema, strictEmailSchema } from '../../lib/validators';
 
 const volunteerTaskSchema = z.object({
   volunteerName: z.string().min(2, 'Name must be at least 2 characters'),
-  volunteerPhone: z.string().min(11).max(15),
-  volunteerEmail: z.string().email('Invalid email address'),
+  volunteerPhone: pakistanPhoneSchema,
+  volunteerEmail: strictEmailSchema,
   volunteerAddress: z.string().min(10, 'Please provide a complete address'),
   taskCategory: z.enum(['DISTRIBUTION', 'FUNDRAISING', 'AWARENESS', 'ADMINISTRATIVE', 'FIELD_WORK', 'EVENT_SUPPORT']),
   availability: z.array(z.string()).min(1, 'Select at least one day'),
   skills: z.string().optional(),
   experience: z.string().optional(),
   preferredLocation: z.string().optional(),
-  emergencyContact: z.string().min(11).max(15),
+  emergencyContact: pakistanPhoneSchema,
 });
 
 export default function VolunteerTaskRegistration() {

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { pakistanPhoneOptionalSchema } from './sharedValidators.js';
 
 // Calculation bases we accept. Kept here (not as Prisma enum) so adding a
 // new basis later is a code-only change. Custom is allowed but the client
@@ -19,7 +20,7 @@ export const createFitranaSchema = z.object({
   amountPerPerson: z.coerce
     .number({ invalid_type_error: 'amountPerPerson must be a number' })
     .positive('amountPerPerson must be greater than 0'),
-  contactPhone: z.string().min(10, 'Please enter a valid phone number').max(20).optional(),
+  contactPhone: pakistanPhoneOptionalSchema,
   notes: z.string().optional(),
   paymentMarked: z
     .union([z.boolean(), z.string()])

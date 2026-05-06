@@ -1,21 +1,17 @@
 import { z } from 'zod';
+import {
+  cnicOptionalSchema,
+  pakistanPhoneOptionalSchema,
+  strictEmailSchema,
+} from './sharedValidators.js';
 
 // Update profile — all fields optional, but if provided must be valid.
 // Email uniqueness is checked in the service (DB lookup); CNIC same.
 export const updateProfileSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters').optional(),
-  email: z.string().email('Invalid email').optional(),
-  phoneNumber: z
-    .string()
-    .min(10, 'Phone must be at least 10 digits')
-    .max(20, 'Phone is too long')
-    .optional(),
-  cnic: z
-    .string()
-    .min(13, 'CNIC must be at least 13 digits')
-    .max(15, 'CNIC is too long')
-    .optional()
-    .or(z.literal('')),
+  email: strictEmailSchema.optional(),
+  phoneNumber: pakistanPhoneOptionalSchema,
+  cnic: cnicOptionalSchema,
 });
 
 export const changePasswordSchema = z

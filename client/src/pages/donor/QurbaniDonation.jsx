@@ -13,13 +13,14 @@ import { createQurbaniDonation } from '../../services/donationService';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { pakistanPhoneSchema } from '../../lib/validators';
 
 const qurbaniSchema = z.object({
   animalType: z.enum(['GOAT', 'CAMEL', 'COW'], { required_error: 'Please select an animal type' }),
   quantity: z.coerce.number().int().min(1).max(100),
   totalAmount: z.coerce.number().positive('Amount must be positive'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: z.string().min(11, 'Phone number must be at least 11 digits').max(15, 'Phone number must not exceed 15 digits'),
+  donorPhone: pakistanPhoneSchema,
   donorAddress: z.string().min(10, 'Please provide a complete address'),
   deliveryDate: z.string().optional(),
   notes: z.string().optional(),

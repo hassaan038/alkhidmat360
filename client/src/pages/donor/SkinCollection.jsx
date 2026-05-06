@@ -13,12 +13,13 @@ import { Scissors, Bot, Beef, Mountain, Info, User, Phone, Calendar, RotateCcw, 
 import { createSkinCollection } from '../../services/donationService';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { pakistanPhoneSchema } from '../../lib/validators';
 
 const skinCollectionSchema = z.object({
   animalType: z.string().min(2).max(50),
   numberOfSkins: z.coerce.number().int().min(1).max(100),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: z.string().min(11).max(15),
+  donorPhone: pakistanPhoneSchema,
   collectionAddress: z.string().min(10, 'Please provide a complete address'),
   preferredDate: z.string().min(1, 'Please select a preferred pickup date'),
   notes: z.string().optional(),

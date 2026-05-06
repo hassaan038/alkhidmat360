@@ -16,6 +16,12 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import {
+  cnicOptionalSchema,
+  cnicSchema,
+  pakistanPhoneOptionalSchema,
+  pakistanPhoneSchema,
+} from '../../lib/validators';
 
 const loanApplicationSchema = z.object({
   loanType: z.enum(['BUSINESS', 'EDUCATION', 'MEDICAL', 'HOUSING', 'MARRIAGE', 'OTHER']),
@@ -25,12 +31,12 @@ const loanApplicationSchema = z.object({
   employmentStatus: z.string().min(2).max(50),
   purposeDescription: z.string().min(10, 'Purpose description must be at least 10 characters'),
   applicantName: z.string().min(2),
-  applicantPhone: z.string().min(11).max(15),
-  applicantCNIC: z.string().length(13, 'CNIC must be exactly 13 digits'),
+  applicantPhone: pakistanPhoneSchema,
+  applicantCNIC: cnicSchema,
   applicantAddress: z.string().min(10, 'Please provide a complete address'),
   guarantorName: z.string().min(2).optional().or(z.literal('')),
-  guarantorPhone: z.string().min(11).max(15).optional().or(z.literal('')),
-  guarantorCNIC: z.string().length(13).optional().or(z.literal('')),
+  guarantorPhone: pakistanPhoneOptionalSchema,
+  guarantorCNIC: cnicOptionalSchema,
   guarantorAddress: z.string().min(10).optional().or(z.literal('')),
   additionalNotes: z.string().optional(),
 });

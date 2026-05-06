@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  cnicSchema,
+  pakistanPhoneOptionalSchema,
+  pakistanPhoneSchema,
+} from './sharedValidators.js';
 
 // Multipart-aware: every numeric field uses z.coerce so the schema works
 // for both JSON and FormData callers.
@@ -22,7 +27,7 @@ export const createZakatPaymentSchema = z.object({
   nisabThreshold: positiveDecimal,
   totalWealth: decimalString,
   zakatAmount: decimalString,
-  contactPhone: z.string().min(10).max(20).optional(),
+  contactPhone: pakistanPhoneOptionalSchema,
   notes: z.string().optional(),
   paymentMarked: z
     .union([z.boolean(), z.string()])
@@ -39,10 +44,8 @@ export const zakatPaymentStatusSchema = z.object({
 
 export const createZakatApplicationSchema = z.object({
   applicantName: z.string().min(2, 'Name must be at least 2 characters'),
-  applicantPhone: z.string().min(10, 'Phone must be at least 10 digits').max(20),
-  applicantCNIC: z
-    .string()
-    .regex(/^\d{13}$/, 'CNIC must be exactly 13 digits (no dashes)'),
+  applicantPhone: pakistanPhoneSchema,
+  applicantCNIC: cnicSchema,
   applicantAddress: z.string().min(10, 'Address must be at least 10 characters'),
 
   familyMembers: z.coerce.number().int().min(1, 'At least 1 family member').max(50),

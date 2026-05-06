@@ -23,6 +23,10 @@ import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import * as extraDonationService from '../../services/extraDonationService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import {
+  pakistanPhoneSchema,
+  strictEmailOptionalSchema,
+} from '../../lib/validators';
 
 const CAMPAIGN_KEYS = [
   { key: 'floods', icon: Waves },
@@ -36,8 +40,8 @@ const QUICK_AMOUNTS = [1000, 2500, 5000, 10000, 25000, 50000];
 
 const schema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: z.string().min(10, 'Please enter a valid phone number').max(20),
-  donorEmail: z.string().email('Invalid email').optional().or(z.literal('')),
+  donorPhone: pakistanPhoneSchema,
+  donorEmail: strictEmailOptionalSchema,
   amount: z.coerce.number().positive('Amount must be greater than 0'),
   notes: z.string().optional(),
 });
