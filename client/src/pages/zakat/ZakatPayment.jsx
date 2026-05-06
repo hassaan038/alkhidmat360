@@ -25,6 +25,7 @@ import * as zakatService from '../../services/zakatService';
 import * as systemConfigService from '../../services/systemConfigService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { pakistanPhoneOptionalSchema } from '../../lib/validators';
 
 // Pakistan 2026 reference rates — UPDATE ANNUALLY (or expose to admin
 // settings). Donors can override the per-gram rate inline if their
@@ -320,6 +321,13 @@ export default function ZakatPayment() {
         description: isAboveNisab
           ? t('common.tryAgainLater')
           : t('zakatPayment.belowNisab'),
+      });
+      return;
+    }
+    const phoneCheck = pakistanPhoneOptionalSchema.safeParse(contactPhone);
+    if (!phoneCheck.success) {
+      toast.error(t('common.submissionFailed'), {
+        description: phoneCheck.error.issues[0].message,
       });
       return;
     }

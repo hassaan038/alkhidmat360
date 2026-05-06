@@ -12,14 +12,19 @@ import { toast } from 'sonner';
 import { UserPlus, Mail, Lock, User, Phone, CreditCard, ShieldCheck, Info, RotateCcw, ArrowRight } from 'lucide-react';
 import api from '../../services/api';
 import { useTranslation } from 'react-i18next';
+import {
+  cnicOptionalSchema,
+  pakistanPhoneSchema,
+  strictEmailSchema,
+} from '../../lib/validators';
 
 const createAdminSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: strictEmailSchema,
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-  phoneNumber: z.string().min(11).max(15),
-  cnic: z.string().length(13).optional().or(z.literal('')),
+  phoneNumber: pakistanPhoneSchema,
+  cnic: cnicOptionalSchema,
 }).refine((d) => d.password === d.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],

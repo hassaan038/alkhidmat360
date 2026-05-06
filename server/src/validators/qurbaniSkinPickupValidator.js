@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { pakistanPhoneSchema } from './sharedValidators.js';
 
 export const createSkinPickupSchema = z
   .object({
-    contactPhone: z.string().min(10, 'Please enter a valid phone number').max(20),
+    contactPhone: pakistanPhoneSchema,
     address: z.string().optional().nullable(),
     latitude: z.coerce
       .number()

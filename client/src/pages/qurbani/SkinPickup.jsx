@@ -28,12 +28,10 @@ import * as qurbaniSkinPickupService from '../../services/qurbaniSkinPickupServi
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import { formatDate, formatApiError } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
+import { pakistanPhoneSchema } from '../../lib/validators';
 
 const skinPickupSchema = z.object({
-  contactPhone: z
-    .string()
-    .min(10, 'Please enter a valid phone number')
-    .max(20, 'Phone number is too long'),
+  contactPhone: pakistanPhoneSchema,
   address: z.string().optional(),
   numberOfSkins: z.coerce.number().int().min(1, 'At least 1').max(50),
   preferredDate: z.string().optional(),

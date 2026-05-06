@@ -12,6 +12,7 @@ import { createOrphanRegistration } from '../../services/applicationService';
 import { toast } from 'sonner';
 import { Baby, User, Phone, CreditCard, School, Coins, Users, Info, RotateCcw, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { cnicSchema, pakistanPhoneSchema } from '../../lib/validators';
 
 const orphanRegistrationSchema = z.object({
   orphanName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -19,8 +20,8 @@ const orphanRegistrationSchema = z.object({
   orphanGender: z.enum(['MALE', 'FEMALE']),
   guardianRelation: z.string().min(2).max(50),
   guardianName: z.string().min(2, 'Name must be at least 2 characters'),
-  guardianPhone: z.string().min(11).max(15),
-  guardianCNIC: z.string().length(13, 'CNIC must be exactly 13 digits'),
+  guardianPhone: pakistanPhoneSchema,
+  guardianCNIC: cnicSchema,
   guardianAddress: z.string().min(10, 'Please provide a complete address'),
   monthlyIncome: z.coerce.number().nonnegative(),
   familyMembers: z.coerce.number().int().min(1),

@@ -12,6 +12,7 @@ import { createRamadanRationApplication } from '../../services/applicationServic
 import { toast } from 'sonner';
 import { Apple, User, Phone, CreditCard, Users, Info, RotateCcw, ArrowRight, Coins } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { cnicSchema, pakistanPhoneSchema } from '../../lib/validators';
 
 const ramadanRationSchema = z.object({
   familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member'),
@@ -19,8 +20,8 @@ const ramadanRationSchema = z.object({
   hasDisabledMembers: z.boolean(),
   disabilityDetails: z.string().optional(),
   applicantName: z.string().min(2, 'Name must be at least 2 characters'),
-  applicantPhone: z.string().min(11).max(15),
-  applicantCNIC: z.string().length(13, 'CNIC must be exactly 13 digits'),
+  applicantPhone: pakistanPhoneSchema,
+  applicantCNIC: cnicSchema,
   applicantAddress: z.string().min(10, 'Please provide a complete address'),
   reasonForApplication: z.string().min(10, 'Reason must be at least 10 characters'),
   previouslyReceived: z.boolean(),
