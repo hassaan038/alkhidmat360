@@ -9,7 +9,7 @@ import { z } from 'zod';
 // Spaces and dashes are stripped before matching.
 export const pakistanPhoneRegex = /^(?:\+92|92|0)\d{10}$/;
 const PHONE_INVALID_MSG =
-  'Enter a valid Pakistani phone number (e.g. 03001234567 or +923001234567)';
+  'Enter a valid phone number (e.g. 03001234567 or +923001234567)';
 
 export const pakistanPhoneSchema = z
   .string({ required_error: 'Phone number is required' })
