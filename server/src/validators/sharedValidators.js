@@ -5,15 +5,17 @@ import { z } from 'zod';
 // the auth, donor, beneficiary, volunteer, admin and qurbani validators.
 
 // --- Pakistani phone number -------------------------------------------------
-// Accepts the three formats users actually type:
+// Accepts only PK mobile numbers (the only contact format we collect):
 //   +923001234567   (13 chars, international with leading +)
 //    923001234567   (12 digits, international without +)
 //    03001234567    (11 digits, local — starts with 0)
-// Spaces and dashes are stripped before matching, so "+92 300-123 4567" is
-// accepted. Anything else (wrong length, bogus country code, letters) fails.
-export const pakistanPhoneRegex = /^(?:\+92|92|0)\d{10}$/;
+// The first digit after the country/local prefix must be 3 (PK mobile network
+// codes start with 3XX). Spaces and dashes are stripped before matching, so
+// "+92 300-123 4567" is accepted. Garbage like 01111111111 fails because it
+// doesn't start with 03.
+export const pakistanPhoneRegex = /^(?:\+92|92|0)3\d{9}$/;
 const PHONE_INVALID_MSG =
-  'Enter a valid phone number (e.g. 03001234567 or +923001234567)';
+  'Enter a valid mobile number (e.g. 03001234567 or +923001234567)';
 
 export const pakistanPhoneSchema = z
   .string({ required_error: 'Phone number is required' })
@@ -53,9 +55,11 @@ export const cnicOptionalSchema = z
 
 // --- Email ------------------------------------------------------------------
 // Zod's built-in `.email()` is permissive (accepts "a@b" with no TLD). We
-// layer a stricter regex on top so the address actually has a proper domain
-// and TLD (at least 2 letters after the dot).
-export const strictEmailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+// layer a stricter regex on top requiring:
+//   - at least one letter in the local part (rejects "123@gmail.com")
+//   - a real domain with a TLD of >= 2 letters
+export const strictEmailRegex =
+  /^(?=[^@]*[A-Za-z])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 const EMAIL_INVALID_MSG = 'Please enter a valid email address (e.g. you@example.com)';
 
 export const strictEmailSchema = z

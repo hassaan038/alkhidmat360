@@ -5,11 +5,12 @@ import { z } from 'zod';
 // either is updated.
 
 // --- Pakistani phone number -------------------------------------------------
-// Accepts: +923001234567, 923001234567, 03001234567 (mobile or landline).
-// Spaces and dashes are stripped before matching.
-export const pakistanPhoneRegex = /^(?:\+92|92|0)\d{10}$/;
+// PK mobile only: +923001234567 / 923001234567 / 03001234567. The first digit
+// after the country/local prefix must be 3 (PK mobile network codes start
+// with 3XX). Spaces and dashes are stripped before matching.
+export const pakistanPhoneRegex = /^(?:\+92|92|0)3\d{9}$/;
 const PHONE_INVALID_MSG =
-  'Enter a valid phone number (e.g. 03001234567 or +923001234567)';
+  'Enter a valid mobile number (e.g. 03001234567 or +923001234567)';
 
 export const pakistanPhoneSchema = z
   .string({ required_error: 'Phone number is required' })
@@ -47,8 +48,11 @@ export const cnicOptionalSchema = z
   .or(z.literal(''));
 
 // --- Email ------------------------------------------------------------------
-// Stricter than Zod's `.email()` — requires a real TLD (>= 2 chars after dot).
-export const strictEmailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+// Stricter than Zod's `.email()`. Requires:
+//   - at least one letter in the local part (rejects "123@gmail.com")
+//   - a real domain with a TLD of >= 2 letters
+export const strictEmailRegex =
+  /^(?=[^@]*[A-Za-z])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 const EMAIL_INVALID_MSG = 'Please enter a valid email address (e.g. you@example.com)';
 
 export const strictEmailSchema = z

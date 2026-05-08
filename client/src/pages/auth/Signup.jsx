@@ -15,6 +15,7 @@ import heroImage from '../../assets/alkhidmat_hero_image.png';
 import { cn } from '../../lib/utils';
 import {
   cnicOptionalSchema,
+  cnicSchema,
   pakistanPhoneSchema,
   strictEmailSchema,
 } from '../../lib/validators';
@@ -91,7 +92,9 @@ export default function Signup() {
       setValidationError(phoneResult.error.issues[0].message);
       return;
     }
-    const cnicResult = cnicOptionalSchema.safeParse(formData.cnic);
+    const cnicSchemaForRole =
+      formData.userType === 'BENEFICIARY' ? cnicSchema : cnicOptionalSchema;
+    const cnicResult = cnicSchemaForRole.safeParse(formData.cnic);
     if (!cnicResult.success) {
       setValidationError(cnicResult.error.issues[0].message);
       return;
@@ -242,8 +245,12 @@ export default function Signup() {
                 <Input id="phoneNumber" name="phoneNumber" type="tel" leftIcon={Phone} placeholder="+92-300-1234567" value={formData.phoneNumber} onChange={handleChange} required disabled={loading} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="cnic">{t('settings.cnic')} <span className="text-gray-400 dark:text-gray-500 font-normal">({t('common.optional')})</span></Label>
-                <Input id="cnic" name="cnic" type="text" leftIcon={CreditCard} placeholder="12345-1234567-1" value={formData.cnic} onChange={handleChange} disabled={loading} />
+                {formData.userType === 'BENEFICIARY' ? (
+                  <Label htmlFor="cnic" required>{t('settings.cnic')}</Label>
+                ) : (
+                  <Label htmlFor="cnic">{t('settings.cnic')} <span className="text-gray-400 dark:text-gray-500 font-normal">({t('common.optional')})</span></Label>
+                )}
+                <Input id="cnic" name="cnic" type="text" leftIcon={CreditCard} placeholder="12345-1234567-1" value={formData.cnic} onChange={handleChange} required={formData.userType === 'BENEFICIARY'} disabled={loading} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="password" required>{t('auth.login.passwordLabel')}</Label>
