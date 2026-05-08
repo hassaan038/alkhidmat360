@@ -8,19 +8,17 @@ import PageHeader from '../../components/ui/PageHeader';
 import FormSection, { FormGrid, FormField } from '../../components/ui/FormSection';
 import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Heart, Bot, Mountain, Beef, Info, RotateCcw, ArrowRight, User, Phone, Calendar, FileText } from 'lucide-react';
+import { Heart, Bot, Mountain, Beef, Info, RotateCcw, ArrowRight, User, Calendar, FileText } from 'lucide-react';
 import { createQurbaniDonation } from '../../services/donationService';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
-import { pakistanPhoneSchema } from '../../lib/validators';
 
 const qurbaniSchema = z.object({
   animalType: z.enum(['GOAT', 'CAMEL', 'COW'], { required_error: 'Please select an animal type' }),
   quantity: z.coerce.number().int().min(1).max(100),
   totalAmount: z.coerce.number().positive('Amount must be positive'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: pakistanPhoneSchema,
   donorAddress: z.string().min(10, 'Please provide a complete address'),
   deliveryDate: z.string().optional(),
   notes: z.string().optional(),
@@ -154,11 +152,8 @@ export default function QurbaniDonation() {
 
           <FormSection title={t('qurbaniDonation.donorInformation')} icon={User} description={t('qurbaniDonation.donorInformationDesc')}>
             <FormGrid cols={2}>
-              <FormField label={t('form.fullName')} required htmlFor="donorName" error={errors.donorName?.message}>
+              <FormField wide label={t('form.fullName')} required htmlFor="donorName" error={errors.donorName?.message}>
                 <Input id="donorName" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
-              </FormField>
-              <FormField label={t('form.phoneNumber')} required htmlFor="donorPhone" error={errors.donorPhone?.message}>
-                <Input id="donorPhone" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
               <FormField wide label={t('form.address')} required htmlFor="donorAddress" error={errors.donorAddress?.message}>
                 <Textarea id="donorAddress" rows={3} {...register('donorAddress')} placeholder={t('form.completeAddress')} />

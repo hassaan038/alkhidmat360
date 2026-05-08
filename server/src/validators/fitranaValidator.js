@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { pakistanPhoneOptionalSchema } from './sharedValidators.js';
 
 // Calculation bases we accept. Kept here (not as Prisma enum) so adding a
 // new basis later is a code-only change. Custom is allowed but the client
@@ -8,6 +7,9 @@ const ALLOWED_BASES = ['wheat', 'barley', 'dates', 'raisins', 'alkhidmat', 'cust
 
 // Coerced because the route accepts multipart (so payment screenshot can
 // optionally come along) — multipart bodies arrive as strings.
+//
+// contactPhone is no longer asked on the form; the service injects the
+// session user's phone.
 export const createFitranaSchema = z.object({
   numberOfPeople: z.coerce
     .number({ invalid_type_error: 'numberOfPeople must be a number' })
@@ -20,7 +22,6 @@ export const createFitranaSchema = z.object({
   amountPerPerson: z.coerce
     .number({ invalid_type_error: 'amountPerPerson must be a number' })
     .positive('amountPerPerson must be greater than 0'),
-  contactPhone: pakistanPhoneOptionalSchema,
   notes: z.string().optional(),
   paymentMarked: z
     .union([z.boolean(), z.string()])

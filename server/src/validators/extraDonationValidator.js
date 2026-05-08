@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import {
-  pakistanPhoneSchema,
-  strictEmailOptionalSchema,
-} from './sharedValidators.js';
+
+// Donor phone and email come from the session user record — the form no
+// longer collects them. Donor name stays editable so users can still
+// attribute a gift differently if they want.
 
 const paymentMarkedField = z
   .union([z.boolean(), z.string()])
@@ -16,8 +16,6 @@ const paymentMarkedField = z
 
 export const createSadqaSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: pakistanPhoneSchema,
-  donorEmail: strictEmailOptionalSchema,
   amount: z.coerce.number().positive('Amount must be greater than 0'),
   purpose: z.string().max(200).optional(),
   notes: z.string().optional(),
@@ -38,8 +36,6 @@ const ALLOWED_CAMPAIGNS = ['floods', 'earthquake', 'shelter', 'medical', 'genera
 
 export const createDisasterDonationSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: pakistanPhoneSchema,
-  donorEmail: strictEmailOptionalSchema,
   campaignKey: z.enum(ALLOWED_CAMPAIGNS, {
     errorMap: () => ({
       message: `Campaign must be one of: ${ALLOWED_CAMPAIGNS.join(', ')}`,

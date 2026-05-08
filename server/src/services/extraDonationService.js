@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { getUserContactInfo } from '../utils/userIdentity.js';
 import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
@@ -15,14 +16,13 @@ const userInclude = {
 export async function createSadqa(userId, data) {
   const {
     donorName,
-    donorPhone,
-    donorEmail,
     amount,
     purpose,
     notes,
     paymentMarked = false,
     paymentScreenshotUrl = null,
   } = data;
+  const contact = await getUserContactInfo(userId);
 
   // Cash donation — auto-confirm on payment so admin doesn't have to
   // approve every sadqa. Admin still sees the record for reconciliation.
@@ -30,8 +30,8 @@ export async function createSadqa(userId, data) {
     data: {
       userId,
       donorName,
-      donorPhone,
-      donorEmail: donorEmail || null,
+      donorPhone: contact.phoneNumber,
+      donorEmail: contact.email,
       amount,
       purpose: purpose || null,
       notes: notes || null,
@@ -87,8 +87,6 @@ export async function updateSadqaStatus(id, status) {
 export async function createDisasterDonation(userId, data) {
   const {
     donorName,
-    donorPhone,
-    donorEmail,
     campaignKey,
     campaignLabel,
     amount,
@@ -96,6 +94,7 @@ export async function createDisasterDonation(userId, data) {
     paymentMarked = false,
     paymentScreenshotUrl = null,
   } = data;
+  const contact = await getUserContactInfo(userId);
 
   // Cash donation — auto-confirm on payment so admin doesn't have to
   // approve every campaign donation. Admin still sees the record for
@@ -104,8 +103,8 @@ export async function createDisasterDonation(userId, data) {
     data: {
       userId,
       donorName,
-      donorPhone,
-      donorEmail: donorEmail || null,
+      donorPhone: contact.phoneNumber,
+      donorEmail: contact.email,
       campaignKey,
       campaignLabel,
       amount,

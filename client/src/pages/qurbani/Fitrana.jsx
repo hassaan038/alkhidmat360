@@ -33,7 +33,6 @@ import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import PaymentScreenshotPicker from '../../components/qurbani/PaymentScreenshotPicker';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
-import { pakistanPhoneOptionalSchema } from '../../lib/validators';
 
 // Pakistan 2026 fitrana rates per person (PKR). Sourced from religious
 // councils + Alkhidmat Foundation. Update these annually.
@@ -148,7 +147,6 @@ function PaymentModal({ open, onClose, calculation, onConfirmed }) {
       fd.append('numberOfPeople', String(calculation.numberOfPeople));
       fd.append('calculationBasis', calculation.calculationBasis);
       fd.append('amountPerPerson', String(calculation.amountPerPerson));
-      if (calculation.contactPhone) fd.append('contactPhone', calculation.contactPhone);
       if (calculation.notes) fd.append('notes', calculation.notes);
       fd.append('paymentMarked', 'true');
       if (screenshot) fd.append('paymentScreenshot', screenshot);
@@ -273,7 +271,6 @@ export default function Fitrana() {
   const [numberOfPeople, setNumberOfPeople] = useState(1);
   const [basisKey, setBasisKey] = useState('alkhidmat');
   const [amountPerPersonInput, setAmountPerPersonInput] = useState('600');
-  const [contactPhone, setContactPhone] = useState('');
   const [notes, setNotes] = useState('');
 
   const [paymentOpen, setPaymentOpen] = useState(false);
@@ -342,13 +339,6 @@ export default function Fitrana() {
     if (!canProceed) {
       toast.error(t('common.submissionFailed'), {
         description: t('common.tryAgainLater'),
-      });
-      return;
-    }
-    const phoneCheck = pakistanPhoneOptionalSchema.safeParse(contactPhone);
-    if (!phoneCheck.success) {
-      toast.error(t('common.submissionFailed'), {
-        description: phoneCheck.error.issues[0].message,
       });
       return;
     }
@@ -461,31 +451,17 @@ export default function Fitrana() {
                   </div>
 
                   {/* Optional details */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {t('skinPickup.contactPhone')} ({t('common.optional')})
-                      </label>
-                      <input
-                        type="tel"
-                        value={contactPhone}
-                        onChange={(e) => setContactPhone(e.target.value)}
-                        placeholder={t('form.phonePlaceholder')}
-                        className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {t('common.notes')} ({t('common.optional')})
-                      </label>
-                      <input
-                        type="text"
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder={t('form.specialInstructions')}
-                        className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      {t('common.notes')} ({t('common.optional')})
+                    </label>
+                    <input
+                      type="text"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder={t('form.specialInstructions')}
+                      className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
                   </div>
 
                   {/* Total + CTA */}
@@ -551,7 +527,6 @@ export default function Fitrana() {
                 calculationBasis: basisKey,
                 amountPerPerson,
                 totalAmount,
-                contactPhone,
                 notes,
               }
             : null

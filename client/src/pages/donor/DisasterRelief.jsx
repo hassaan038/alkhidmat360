@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import {
   Calendar, CheckCircle2, Waves, AlertTriangle, Home, HeartPulse, Shield, LifeBuoy,
-  User, Phone, Mail, RotateCcw, ArrowRight, Coins,
+  User, RotateCcw, ArrowRight, Coins,
 } from 'lucide-react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import PageContainer from '../../components/ui/PageContainer';
@@ -23,10 +23,6 @@ import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import * as extraDonationService from '../../services/extraDonationService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
-import {
-  pakistanPhoneSchema,
-  strictEmailOptionalSchema,
-} from '../../lib/validators';
 
 const CAMPAIGN_KEYS = [
   { key: 'floods', icon: Waves },
@@ -40,8 +36,6 @@ const QUICK_AMOUNTS = [1000, 2500, 5000, 10000, 25000, 50000];
 
 const schema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: pakistanPhoneSchema,
-  donorEmail: strictEmailOptionalSchema,
   amount: z.coerce.number().positive('Amount must be greater than 0'),
   notes: z.string().optional(),
 });
@@ -198,14 +192,8 @@ export default function DisasterRelief() {
 
           <FormSection title={t('disasterRelief.yourDetails')} icon={User}>
             <FormGrid cols={2}>
-              <FormField label={t('form.fullName')} required htmlFor="dn" error={errors.donorName?.message}>
+              <FormField wide label={t('form.fullName')} required htmlFor="dn" error={errors.donorName?.message}>
                 <Input id="dn" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
-              </FormField>
-              <FormField label={t('form.phoneNumber')} required htmlFor="dp" error={errors.donorPhone?.message}>
-                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder={t('form.phonePlaceholder')} />
-              </FormField>
-              <FormField wide label={t('form.email')} htmlFor="de" hint={t('form.optional')} error={errors.donorEmail?.message}>
-                <Input id="de" type="email" leftIcon={Mail} {...register('donorEmail')} placeholder={t('form.emailPlaceholder')} />
               </FormField>
               <FormField wide label={t('form.notes')} htmlFor="nt">
                 <Textarea id="nt" rows={2} {...register('notes')} placeholder={t('form.specialInstructions')} />

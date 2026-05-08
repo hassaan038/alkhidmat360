@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { getUserContactInfo } from '../utils/userIdentity.js';
 
 const prisma = new PrismaClient();
 
@@ -9,6 +10,7 @@ const prisma = new PrismaClient();
 
 export async function createQurbaniDonation(userId, donationData) {
   const { deliveryDate, paymentMarked = false, ...rest } = donationData;
+  const contact = await getUserContactInfo(userId);
 
   // Cash donation — auto-confirm when the donor marks payment so admin
   // doesn't have to approve every cash gift. Admin still sees the record
@@ -17,6 +19,7 @@ export async function createQurbaniDonation(userId, donationData) {
     data: {
       userId,
       ...rest,
+      donorPhone: contact.phoneNumber,
       deliveryDate: deliveryDate ? new Date(deliveryDate) : null,
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
@@ -42,12 +45,16 @@ export async function getUserQurbaniDonations(userId) {
 
 export async function createRationDonation(userId, donationData) {
   const { paymentMarked = false, ...rest } = donationData;
+  const contact = await getUserContactInfo(userId);
+
   // Cash donation — auto-confirm on payment so admin doesn't have to
   // approve. Distribution side is still tracked separately by ops.
   const donation = await prisma.rationDonation.create({
     data: {
       userId,
       ...rest,
+      donorPhone: contact.phoneNumber,
+      donorEmail: contact.email,
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
       status: paymentMarked ? 'confirmed' : 'pending',
@@ -72,11 +79,13 @@ export async function getUserRationDonations(userId) {
 
 export async function createSkinCollection(userId, collectionData) {
   const { preferredDate, ...rest } = collectionData;
+  const contact = await getUserContactInfo(userId);
 
   const collection = await prisma.skinCollection.create({
     data: {
       userId,
       ...rest,
+      donorPhone: contact.phoneNumber,
       preferredDate: new Date(preferredDate),
     },
   });
@@ -99,6 +108,7 @@ export async function getUserSkinCollections(userId) {
 
 export async function createOrphanSponsorship(userId, sponsorshipData) {
   const { startDate, paymentMarked = false, ...rest } = sponsorshipData;
+  const contact = await getUserContactInfo(userId);
 
   // Auto-confirm — first-month cash payment lands as a confirmed record.
   // Recipient assignment is handled out-of-band by the ops team.
@@ -106,6 +116,8 @@ export async function createOrphanSponsorship(userId, sponsorshipData) {
     data: {
       userId,
       ...rest,
+      sponsorPhone: contact.phoneNumber,
+      sponsorEmail: contact.email,
       startDate: startDate ? new Date(startDate) : null,
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,

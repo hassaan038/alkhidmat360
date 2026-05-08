@@ -12,7 +12,6 @@ import {
   Calendar,
   Phone,
   Camera,
-  Image as ImageIcon,
 } from 'lucide-react';
 import { imageUrl } from '../../lib/imageUrl';
 import DashboardLayout from '../../components/layout/DashboardLayout';
@@ -28,10 +27,8 @@ import * as qurbaniSkinPickupService from '../../services/qurbaniSkinPickupServi
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import { formatDate, formatApiError } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
-import { pakistanPhoneSchema } from '../../lib/validators';
 
 const skinPickupSchema = z.object({
-  contactPhone: pakistanPhoneSchema,
   address: z.string().optional(),
   numberOfSkins: z.coerce.number().int().min(1, 'At least 1').max(50),
   preferredDate: z.string().optional(),
@@ -238,7 +235,6 @@ export default function SkinPickup() {
     clearErrors('address');
 
     const fd = new FormData();
-    fd.append('contactPhone', data.contactPhone);
     if (trimmedAddress) fd.append('address', trimmedAddress);
     fd.append('numberOfSkins', String(data.numberOfSkins));
     if (coords?.lat != null) fd.append('latitude', String(coords.lat));
@@ -291,40 +287,22 @@ export default function SkinPickup() {
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          {t('skinPickup.contactPhone')} <span className="text-error">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          {...register('contactPhone')}
-                          placeholder="03001234567"
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        />
-                        {errors.contactPhone && (
-                          <p className="mt-1 text-xs text-error">
-                            {errors.contactPhone.message}
-                          </p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          {t('skinPickup.numberOfSkins')} <span className="text-error">*</span>
-                        </label>
-                        <input
-                          type="number"
-                          min={1}
-                          max={50}
-                          {...register('numberOfSkins')}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        />
-                        {errors.numberOfSkins && (
-                          <p className="mt-1 text-xs text-error">
-                            {errors.numberOfSkins.message}
-                          </p>
-                        )}
-                      </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        {t('skinPickup.numberOfSkins')} <span className="text-error">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={50}
+                        {...register('numberOfSkins')}
+                        className="w-full sm:w-48 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                      {errors.numberOfSkins && (
+                        <p className="mt-1 text-xs text-error">
+                          {errors.numberOfSkins.message}
+                        </p>
+                      )}
                     </div>
 
                     <div>

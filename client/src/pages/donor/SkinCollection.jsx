@@ -9,17 +9,15 @@ import FormSection, { FormGrid, FormField } from '../../components/ui/FormSectio
 import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { toast } from 'sonner';
-import { Scissors, Bot, Beef, Mountain, Info, User, Phone, Calendar, RotateCcw, ArrowRight } from 'lucide-react';
+import { Scissors, Bot, Beef, Mountain, Info, User, Calendar, RotateCcw, ArrowRight } from 'lucide-react';
 import { createSkinCollection } from '../../services/donationService';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
-import { pakistanPhoneSchema } from '../../lib/validators';
 
 const skinCollectionSchema = z.object({
   animalType: z.string().min(2).max(50),
   numberOfSkins: z.coerce.number().int().min(1).max(100),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorPhone: pakistanPhoneSchema,
   collectionAddress: z.string().min(10, 'Please provide a complete address'),
   preferredDate: z.string().min(1, 'Please select a preferred pickup date'),
   notes: z.string().optional(),
@@ -157,11 +155,8 @@ export default function SkinCollection() {
 
           <FormSection title={t('skinCollection.pickupInformation')} icon={User}>
             <FormGrid cols={2}>
-              <FormField label={t('form.fullName')} required htmlFor="dn" error={errors.donorName?.message}>
+              <FormField wide label={t('form.fullName')} required htmlFor="dn" error={errors.donorName?.message}>
                 <Input id="dn" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
-              </FormField>
-              <FormField label={t('form.phoneNumber')} required htmlFor="dp" error={errors.donorPhone?.message}>
-                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
               <FormField wide label={t('skinCollection.collectionAddress')} required htmlFor="ca" error={errors.collectionAddress?.message}>
                 <Textarea id="ca" rows={3} {...register('collectionAddress')} placeholder={t('skinCollection.pickupAddressPlaceholder')} />

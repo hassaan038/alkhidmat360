@@ -10,9 +10,8 @@ import Input, { Textarea, Select } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { createOrphanRegistration } from '../../services/applicationService';
 import { toast } from 'sonner';
-import { Baby, User, Phone, CreditCard, School, Coins, Users, Info, RotateCcw, ArrowRight } from 'lucide-react';
+import { Baby, User, School, Coins, Users, Info, RotateCcw, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { cnicSchema, pakistanPhoneSchema } from '../../lib/validators';
 
 const orphanRegistrationSchema = z.object({
   orphanName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -20,8 +19,6 @@ const orphanRegistrationSchema = z.object({
   orphanGender: z.enum(['MALE', 'FEMALE']),
   guardianRelation: z.string().min(2).max(50),
   guardianName: z.string().min(2, 'Name must be at least 2 characters'),
-  guardianPhone: pakistanPhoneSchema,
-  guardianCNIC: cnicSchema,
   guardianAddress: z.string().min(10, 'Please provide a complete address'),
   monthlyIncome: z.coerce.number().nonnegative(),
   familyMembers: z.coerce.number().int().min(1),
@@ -129,12 +126,6 @@ export default function OrphanRegistration() {
               </FormField>
               <FormField label={t('orphanReg.guardianRelation')} required htmlFor="gr" error={errors.guardianRelation?.message}>
                 <Input id="gr" {...register('guardianRelation')} placeholder={t('orphanReg.guardianRelation')} />
-              </FormField>
-              <FormField label={t('orphanReg.guardianPhone')} required htmlFor="gp" error={errors.guardianPhone?.message}>
-                <Input id="gp" type="tel" leftIcon={Phone} {...register('guardianPhone')} placeholder={t('form.phonePlaceholder')} />
-              </FormField>
-              <FormField label={t('orphanReg.guardianCNIC')} required htmlFor="gc" error={errors.guardianCNIC?.message}>
-                <Input id="gc" leftIcon={CreditCard} maxLength={13} {...register('guardianCNIC')} placeholder="1234567890123" />
               </FormField>
               <FormField wide label={t('orphanReg.guardianAddress')} required htmlFor="ga" error={errors.guardianAddress?.message}>
                 <Textarea id="ga" rows={3} {...register('guardianAddress')} placeholder={t('form.completeAddress')} />

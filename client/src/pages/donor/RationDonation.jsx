@@ -8,20 +8,17 @@ import PageHeader from '../../components/ui/PageHeader';
 import FormSection, { FormGrid, FormField } from '../../components/ui/FormSection';
 import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { Package, User, Phone, Mail, Calendar, Info, RotateCcw, ArrowRight } from 'lucide-react';
+import { Package, User, Calendar, Info, RotateCcw, ArrowRight } from 'lucide-react';
 import { createRationDonation } from '../../services/donationService';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
-import { pakistanPhoneSchema, strictEmailSchema } from '../../lib/validators';
 
 const rationSchema = z.object({
   packageType: z.string().min(2).max(50),
   quantity: z.coerce.number().int().min(1).max(1000),
   amount: z.coerce.number().positive('Amount must be positive'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  donorEmail: strictEmailSchema,
-  donorPhone: pakistanPhoneSchema,
   donorAddress: z.string().min(10, 'Please provide a complete address'),
   deliveryDate: z.string().optional(),
   notes: z.string().optional(),
@@ -70,8 +67,6 @@ export default function RationDonation() {
   const onSubmit = (data) => {
     const rationData = {
       donorName: data.donorName,
-      donorEmail: data.donorEmail,
-      donorPhone: data.donorPhone,
       amount: data.amount,
       rationItems: JSON.stringify({
         packageType: data.packageType,
@@ -180,12 +175,6 @@ export default function RationDonation() {
             <FormGrid cols={2}>
               <FormField label={t('form.fullName')} required htmlFor="dn" error={errors.donorName?.message}>
                 <Input id="dn" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
-              </FormField>
-              <FormField label={t('form.emailAddress')} required htmlFor="de" error={errors.donorEmail?.message}>
-                <Input id="de" type="email" leftIcon={Mail} {...register('donorEmail')} placeholder={t('form.emailPlaceholder')} />
-              </FormField>
-              <FormField label={t('form.phoneNumber')} required htmlFor="dp" error={errors.donorPhone?.message}>
-                <Input id="dp" type="tel" leftIcon={Phone} {...register('donorPhone')} placeholder={t('form.phonePlaceholder')} />
               </FormField>
               <FormField label={t('form.preferredDeliveryDate')} htmlFor="dd" hint={t('form.optional')}>
                 <Input id="dd" type="date" leftIcon={Calendar} {...register('deliveryDate')} />

@@ -26,12 +26,9 @@ import * as zakatService from '../../services/zakatService';
 import { formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
 import { useTranslation } from 'react-i18next';
-import { cnicSchema, pakistanPhoneSchema } from '../../lib/validators';
 
 const applicationSchema = z.object({
   applicantName: z.string().min(2, 'Name must be at least 2 characters'),
-  applicantPhone: pakistanPhoneSchema,
-  applicantCNIC: cnicSchema,
   applicantAddress: z.string().min(10, 'Address must be at least 10 characters'),
 
   familyMembers: z.coerce.number().int().min(1, 'At least 1').max(50),
@@ -238,33 +235,6 @@ export default function ZakatApplication() {
                     <input {...register('applicantName')} className={inputClass} />
                     {errors.applicantName && (
                       <p className="mt-1 text-xs text-error">{errors.applicantName.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('zakatApplication.applicantPhone')} <span className="text-error">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder={t('form.phonePlaceholder')}
-                      {...register('applicantPhone')}
-                      className={inputClass}
-                    />
-                    {errors.applicantPhone && (
-                      <p className="mt-1 text-xs text-error">{errors.applicantPhone.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {t('zakatApplication.applicantCNIC')} <span className="text-error">*</span>
-                    </label>
-                    <input
-                      placeholder="4210112345671"
-                      {...register('applicantCNIC')}
-                      className={inputClass}
-                    />
-                    {errors.applicantCNIC && (
-                      <p className="mt-1 text-xs text-error">{errors.applicantCNIC.message}</p>
                     )}
                   </div>
                   <div>

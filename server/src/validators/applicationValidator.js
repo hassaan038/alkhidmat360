@@ -1,10 +1,15 @@
 import { z } from 'zod';
 import {
   cnicOptionalSchema,
-  cnicSchema,
   pakistanPhoneOptionalSchema,
-  pakistanPhoneSchema,
 } from './sharedValidators.js';
+
+// Applicant / guardian phone, email and CNIC are no longer collected on
+// these forms — the service injects them from the session user record.
+// Beneficiary signups now require a CNIC so it's always available.
+//
+// Guarantor fields (loan applications) describe a third party so they stay
+// on the form.
 
 // ============================================
 // LOAN APPLICATION VALIDATOR
@@ -20,8 +25,6 @@ export const loanApplicationSchema = z.object({
   employmentStatus: z.string().min(2).max(50),
   purposeDescription: z.string().min(10, 'Purpose description must be at least 10 characters'),
   applicantName: z.string().min(2),
-  applicantPhone: pakistanPhoneSchema,
-  applicantCNIC: cnicSchema,
   applicantAddress: z.string().min(10),
   guarantorName: z.union([z.string().min(2), z.literal('')]).optional(),
   guarantorPhone: pakistanPhoneOptionalSchema,
@@ -40,8 +43,6 @@ export const ramadanRationSchema = z.object({
   hasDisabledMembers: z.boolean(),
   disabilityDetails: z.string().optional(),
   applicantName: z.string().min(2),
-  applicantPhone: pakistanPhoneSchema,
-  applicantCNIC: cnicSchema,
   applicantAddress: z.string().min(10),
   reasonForApplication: z.string().min(10, 'Reason must be at least 10 characters'),
   previouslyReceived: z.boolean(),
@@ -60,8 +61,6 @@ export const orphanRegistrationSchema = z.object({
   }),
   guardianRelation: z.string().min(2).max(50),
   guardianName: z.string().min(2),
-  guardianPhone: pakistanPhoneSchema,
-  guardianCNIC: cnicSchema,
   guardianAddress: z.string().min(10),
   monthlyIncome: z.number().nonnegative('Monthly income must be non-negative'),
   familyMembers: z.number().int().min(1, 'Must have at least 1 family member'),

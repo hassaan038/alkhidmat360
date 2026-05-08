@@ -10,9 +10,8 @@ import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { createRamadanRationApplication } from '../../services/applicationService';
 import { toast } from 'sonner';
-import { Apple, User, Phone, CreditCard, Users, Info, RotateCcw, ArrowRight, Coins } from 'lucide-react';
+import { Apple, User, Users, Info, RotateCcw, ArrowRight, Coins } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { cnicSchema, pakistanPhoneSchema } from '../../lib/validators';
 
 const ramadanRationSchema = z.object({
   familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member'),
@@ -20,8 +19,6 @@ const ramadanRationSchema = z.object({
   hasDisabledMembers: z.boolean(),
   disabilityDetails: z.string().optional(),
   applicantName: z.string().min(2, 'Name must be at least 2 characters'),
-  applicantPhone: pakistanPhoneSchema,
-  applicantCNIC: cnicSchema,
   applicantAddress: z.string().min(10, 'Please provide a complete address'),
   reasonForApplication: z.string().min(10, 'Reason must be at least 10 characters'),
   previouslyReceived: z.boolean(),
@@ -100,12 +97,6 @@ export default function RamadanRationApplication() {
             <FormGrid cols={2}>
               <FormField wide label={t('ramadanRation.applicantName')} required htmlFor="an" error={errors.applicantName?.message}>
                 <Input id="an" leftIcon={User} {...register('applicantName')} placeholder={t('form.yourFullName')} />
-              </FormField>
-              <FormField label={t('ramadanRation.applicantPhone')} required htmlFor="ap" error={errors.applicantPhone?.message}>
-                <Input id="ap" type="tel" leftIcon={Phone} {...register('applicantPhone')} placeholder={t('form.phonePlaceholder')} />
-              </FormField>
-              <FormField label={t('ramadanRation.applicantCNIC')} required htmlFor="ac" error={errors.applicantCNIC?.message}>
-                <Input id="ac" leftIcon={CreditCard} maxLength={13} {...register('applicantCNIC')} placeholder="1234567890123" />
               </FormField>
               <FormField wide label={t('ramadanRation.applicantAddress')} required htmlFor="aa" error={errors.applicantAddress?.message}>
                 <Textarea id="aa" rows={3} {...register('applicantAddress')} placeholder={t('form.completeAddress')} />

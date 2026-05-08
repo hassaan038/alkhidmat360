@@ -18,9 +18,7 @@ import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
 import {
   cnicOptionalSchema,
-  cnicSchema,
   pakistanPhoneOptionalSchema,
-  pakistanPhoneSchema,
 } from '../../lib/validators';
 
 const loanApplicationSchema = z.object({
@@ -31,8 +29,6 @@ const loanApplicationSchema = z.object({
   employmentStatus: z.string().min(2).max(50),
   purposeDescription: z.string().min(10, 'Purpose description must be at least 10 characters'),
   applicantName: z.string().min(2),
-  applicantPhone: pakistanPhoneSchema,
-  applicantCNIC: cnicSchema,
   applicantAddress: z.string().min(10, 'Please provide a complete address'),
   guarantorName: z.string().min(2).optional().or(z.literal('')),
   guarantorPhone: pakistanPhoneOptionalSchema,
@@ -158,12 +154,6 @@ export default function LoanApplication() {
             <FormGrid cols={2}>
               <FormField wide label={t('loanApplication.applicantName')} required htmlFor="an" error={errors.applicantName?.message}>
                 <Input id="an" leftIcon={User} {...register('applicantName')} placeholder={t('form.yourFullName')} />
-              </FormField>
-              <FormField label={t('loanApplication.applicantPhone')} required htmlFor="ap" error={errors.applicantPhone?.message}>
-                <Input id="ap" type="tel" leftIcon={Phone} {...register('applicantPhone')} placeholder={t('form.phonePlaceholder')} />
-              </FormField>
-              <FormField label={t('loanApplication.applicantCNIC')} required htmlFor="ac" error={errors.applicantCNIC?.message}>
-                <Input id="ac" leftIcon={CreditCard} maxLength={13} {...register('applicantCNIC')} placeholder="1234567890123" />
               </FormField>
               <FormField wide label={t('loanApplication.applicantAddress')} required htmlFor="aa" error={errors.applicantAddress?.message}>
                 <Textarea id="aa" rows={3} {...register('applicantAddress')} placeholder={t('form.completeAddress')} />

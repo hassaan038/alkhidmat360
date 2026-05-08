@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { pakistanPhoneSchema } from './sharedValidators.js';
 
+// contactPhone comes from the session user record — the form no longer asks
+// for it.
 export const createSkinPickupSchema = z
   .object({
-    contactPhone: pakistanPhoneSchema,
     address: z.string().optional().nullable(),
     latitude: z.coerce
       .number()

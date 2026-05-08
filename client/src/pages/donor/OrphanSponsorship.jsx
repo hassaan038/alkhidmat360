@@ -9,11 +9,10 @@ import FormSection, { FormGrid, FormField } from '../../components/ui/FormSectio
 import Input, { Textarea, Select } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { createOrphanSponsorship } from '../../services/donationService';
-import { Baby, Heart, User, Phone, Mail, RotateCcw, ArrowRight } from 'lucide-react';
+import { Baby, Heart, User, RotateCcw, ArrowRight } from 'lucide-react';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
-import { pakistanPhoneSchema, strictEmailSchema } from '../../lib/validators';
 
 const orphanSponsorshipSchema = z.object({
   sponsorshipType: z.string().min(2).max(50),
@@ -21,8 +20,6 @@ const orphanSponsorshipSchema = z.object({
   duration: z.coerce.number().int().min(1).max(120),
   totalAmount: z.coerce.number().positive('Total amount must be positive'),
   sponsorName: z.string().min(2, 'Name must be at least 2 characters'),
-  sponsorPhone: pakistanPhoneSchema,
-  sponsorEmail: strictEmailSchema,
   sponsorAddress: z.string().min(10, 'Please provide a complete address'),
   orphanAge: z.string().optional(),
   orphanGender: z.string().optional(),
@@ -184,12 +181,6 @@ export default function OrphanSponsorship() {
             <FormGrid cols={2}>
               <FormField wide label={t('form.fullName')} required htmlFor="sn" error={errors.sponsorName?.message}>
                 <Input id="sn" leftIcon={User} {...register('sponsorName')} placeholder={t('form.yourFullName')} />
-              </FormField>
-              <FormField label={t('form.phoneNumber')} required htmlFor="sp" error={errors.sponsorPhone?.message}>
-                <Input id="sp" type="tel" leftIcon={Phone} {...register('sponsorPhone')} placeholder={t('form.phonePlaceholder')} />
-              </FormField>
-              <FormField label={t('form.emailAddress')} required htmlFor="se" error={errors.sponsorEmail?.message}>
-                <Input id="se" type="email" leftIcon={Mail} {...register('sponsorEmail')} placeholder={t('form.emailPlaceholder')} />
               </FormField>
               <FormField wide label={t('form.address')} required htmlFor="sa" error={errors.sponsorAddress?.message}>
                 <Textarea id="sa" rows={3} {...register('sponsorAddress')} placeholder={t('orphanSponsorship.completeMailingAddress')} />

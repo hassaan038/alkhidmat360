@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { getUserContactInfo } from '../utils/userIdentity.js';
 
 const prisma = new PrismaClient();
 
@@ -8,11 +9,14 @@ const prisma = new PrismaClient();
 
 export async function createVolunteerTask(userId, taskData) {
   const { skills, experience, preferredLocation, ...rest } = taskData;
+  const contact = await getUserContactInfo(userId);
 
   const task = await prisma.volunteerTask.create({
     data: {
       userId,
       ...rest,
+      volunteerPhone: contact.phoneNumber,
+      volunteerEmail: contact.email,
       skills: skills || null,
       experience: experience || null,
       preferredLocation: preferredLocation || null,

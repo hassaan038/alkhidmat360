@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { getUserContactInfo } from '../utils/userIdentity.js';
 import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
@@ -27,7 +28,6 @@ export async function createZakatPayment(userId, data) {
     nisabThreshold,
     totalWealth,
     zakatAmount,
-    contactPhone,
     notes,
     paymentMarked = false,
     paymentScreenshotUrl = null,
@@ -35,6 +35,8 @@ export async function createZakatPayment(userId, data) {
 
   if (!nisabBasis) throw new ApiError(400, 'nisabBasis is required');
   if (zakatAmount == null) throw new ApiError(400, 'zakatAmount is required');
+
+  const contact = await getUserContactInfo(userId);
 
   // Religious obligation (not a free-form gift) — admin verifies the
   // payment before confirming, so status stays 'pending' regardless of
@@ -55,7 +57,7 @@ export async function createZakatPayment(userId, data) {
       nisabThreshold,
       totalWealth,
       zakatAmount,
-      contactPhone: contactPhone || null,
+      contactPhone: contact.phoneNumber,
       notes: notes || null,
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,
@@ -108,8 +110,6 @@ export async function updateZakatPaymentStatus(id, status) {
 export async function createZakatApplication(userId, data) {
   const {
     applicantName,
-    applicantPhone,
-    applicantCNIC,
     applicantAddress,
     familyMembers,
     monthlyIncome,
@@ -123,12 +123,20 @@ export async function createZakatApplication(userId, data) {
     cnicDocumentUrl,
   } = data;
 
+  const contact = await getUserContactInfo(userId);
+  if (!contact.cnic) {
+    throw new ApiError(
+      400,
+      'Your account is missing a CNIC. Please add one in Settings before submitting this application.'
+    );
+  }
+
   return prisma.zakatApplication.create({
     data: {
       userId,
       applicantName,
-      applicantPhone,
-      applicantCNIC,
+      applicantPhone: contact.phoneNumber,
+      applicantCNIC: contact.cnic,
       applicantAddress,
       familyMembers,
       monthlyIncome,

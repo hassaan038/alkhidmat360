@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { getUserContactInfo } from '../utils/userIdentity.js';
 import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
@@ -8,9 +9,8 @@ const userInclude = {
   user: { select: { id: true, email: true, fullName: true, phoneNumber: true } },
 };
 
-function buildPickupData(userId, data) {
+export async function createPickup(userId, data) {
   const {
-    contactPhone,
     address,
     latitude,
     longitude,
@@ -19,23 +19,20 @@ function buildPickupData(userId, data) {
     additionalDetails,
     housePhotoUrl,
   } = data;
+  const contact = await getUserContactInfo(userId);
 
-  return {
-    userId,
-    contactPhone,
-    address: (address || '').trim(),
-    latitude: latitude != null ? latitude : null,
-    longitude: longitude != null ? longitude : null,
-    numberOfSkins,
-    preferredDate: preferredDate ? new Date(preferredDate) : null,
-    additionalDetails: additionalDetails || null,
-    housePhotoUrl: housePhotoUrl || null,
-  };
-}
-
-export async function createPickup(userId, data) {
   return prisma.qurbaniSkinPickup.create({
-    data: buildPickupData(userId, data),
+    data: {
+      userId,
+      contactPhone: contact.phoneNumber,
+      address: (address || '').trim(),
+      latitude: latitude != null ? latitude : null,
+      longitude: longitude != null ? longitude : null,
+      numberOfSkins,
+      preferredDate: preferredDate ? new Date(preferredDate) : null,
+      additionalDetails: additionalDetails || null,
+      housePhotoUrl: housePhotoUrl || null,
+    },
   });
 }
 

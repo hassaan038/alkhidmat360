@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ApiError } from '../utils/ApiResponse.js';
+import { getUserContactInfo } from '../utils/userIdentity.js';
 import { sendStatusEmail } from './emailService.js';
 
 const prisma = new PrismaClient();
@@ -13,7 +14,6 @@ export async function createFitrana(userId, data) {
     numberOfPeople,
     calculationBasis,
     amountPerPerson,
-    contactPhone,
     notes,
     paymentMarked = false,
     paymentScreenshotUrl = null,
@@ -27,6 +27,7 @@ export async function createFitrana(userId, data) {
   }
 
   const totalAmount = Number(numberOfPeople) * Number(amountPerPerson);
+  const contact = await getUserContactInfo(userId);
 
   // Religious obligation (not a free-form gift) — admin verifies the
   // payment before confirming, so status stays 'pending' regardless of
@@ -38,7 +39,7 @@ export async function createFitrana(userId, data) {
       calculationBasis,
       amountPerPerson,
       totalAmount,
-      contactPhone: contactPhone || null,
+      contactPhone: contact.phoneNumber,
       notes: notes || null,
       paymentMarked,
       paymentMarkedAt: paymentMarked ? new Date() : null,

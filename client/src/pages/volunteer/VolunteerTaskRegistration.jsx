@@ -10,15 +10,13 @@ import Input, { Textarea, Select } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { createVolunteerTask } from '../../services/volunteerService';
 import { toast } from 'sonner';
-import { HandHeart, User, Phone, Mail, Calendar, MapPin, Info, RotateCcw, ArrowRight, Shield, Briefcase } from 'lucide-react';
+import { HandHeart, User, Calendar, MapPin, Info, RotateCcw, ArrowRight, Shield, Briefcase } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
-import { pakistanPhoneSchema, strictEmailSchema } from '../../lib/validators';
+import { pakistanPhoneSchema } from '../../lib/validators';
 
 const volunteerTaskSchema = z.object({
   volunteerName: z.string().min(2, 'Name must be at least 2 characters'),
-  volunteerPhone: pakistanPhoneSchema,
-  volunteerEmail: strictEmailSchema,
   volunteerAddress: z.string().min(10, 'Please provide a complete address'),
   taskCategory: z.enum(['DISTRIBUTION', 'FUNDRAISING', 'AWARENESS', 'ADMINISTRATIVE', 'FIELD_WORK', 'EVENT_SUPPORT']),
   availability: z.array(z.string()).min(1, 'Select at least one day'),
@@ -100,12 +98,6 @@ export default function VolunteerTaskRegistration() {
             <FormGrid cols={2}>
               <FormField wide label={t('volunteer.volunteerName')} required htmlFor="vn" error={errors.volunteerName?.message}>
                 <Input id="vn" leftIcon={User} {...register('volunteerName')} placeholder={t('form.yourFullName')} />
-              </FormField>
-              <FormField label={t('volunteer.volunteerPhone')} required htmlFor="vp" error={errors.volunteerPhone?.message}>
-                <Input id="vp" type="tel" leftIcon={Phone} {...register('volunteerPhone')} placeholder={t('form.phonePlaceholder')} />
-              </FormField>
-              <FormField label={t('volunteer.volunteerEmail')} required htmlFor="ve" error={errors.volunteerEmail?.message}>
-                <Input id="ve" type="email" leftIcon={Mail} {...register('volunteerEmail')} placeholder={t('form.emailPlaceholder')} />
               </FormField>
               <FormField wide label={t('volunteer.volunteerAddress')} required htmlFor="va" error={errors.volunteerAddress?.message}>
                 <Textarea id="va" rows={3} {...register('volunteerAddress')} placeholder={t('form.completeAddress')} />
