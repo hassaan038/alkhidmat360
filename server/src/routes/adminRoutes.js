@@ -25,6 +25,12 @@ import {
   sadqaStatusSchema,
   disasterDonationStatusSchema,
 } from '../validators/extraDonationValidator.js';
+import * as volunteerAssignmentController from '../controllers/volunteerAssignmentController.js';
+import {
+  createAssignmentSchema,
+  updateAssignmentSchema,
+  adminStatusSchema as assignmentAdminStatusSchema,
+} from '../validators/volunteerAssignmentValidator.js';
 
 const router = express.Router();
 
@@ -111,6 +117,43 @@ router.patch(
   '/volunteers/tasks/:id/status',
   validateRequest(statusUpdateSchema),
   adminController.updateVolunteerTaskStatus
+);
+
+// ============================================
+// VOLUNTEER ASSIGNMENTS (admin → volunteer task allocation)
+// ============================================
+
+router.get(
+  '/volunteer-assignments/volunteers',
+  volunteerAssignmentController.adminListVolunteers
+);
+
+router.get(
+  '/volunteer-assignments',
+  volunteerAssignmentController.adminListAssignments
+);
+
+router.post(
+  '/volunteer-assignments',
+  validateRequest(createAssignmentSchema),
+  volunteerAssignmentController.adminCreateAssignment
+);
+
+router.patch(
+  '/volunteer-assignments/:id',
+  validateRequest(updateAssignmentSchema),
+  volunteerAssignmentController.adminUpdateAssignment
+);
+
+router.delete(
+  '/volunteer-assignments/:id',
+  volunteerAssignmentController.adminDeleteAssignment
+);
+
+router.patch(
+  '/volunteer-assignments/:id/status',
+  validateRequest(assignmentAdminStatusSchema),
+  volunteerAssignmentController.adminUpdateAssignmentStatus
 );
 
 // ============================================

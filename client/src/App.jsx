@@ -24,12 +24,14 @@ import OrphanRegistration from './pages/beneficiary/OrphanRegistration';
 
 // Volunteer Pages
 import VolunteerTaskRegistration from './pages/volunteer/VolunteerTaskRegistration';
+import MyAssignments from './pages/volunteer/MyAssignments';
 
 // Admin Pages
 import UserManagement from './pages/admin/UserManagement';
 import DonationsManagement from './pages/admin/DonationsManagement';
 import ApplicationsManagement from './pages/admin/ApplicationsManagement';
 import VolunteersManagement from './pages/admin/VolunteersManagement';
+import VolunteerAssignments from './pages/admin/VolunteerAssignments';
 import CreateAdmin from './pages/admin/CreateAdmin';
 import QurbaniListings from './pages/admin/QurbaniListings';
 import QurbaniBookings from './pages/admin/QurbaniBookings';
@@ -174,6 +176,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/dashboard/user/my-tasks"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['VOLUNTEER']}>
+                  <MyAssignments />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Qurbani Module (shared: donor, beneficiary, volunteer) */}
           <Route
@@ -308,6 +320,16 @@ function App() {
               <ProtectedRoute>
                 <RoleBasedRoute allowedRoles={['ADMIN']}>
                   <VolunteersManagement />
+                </RoleBasedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/admin/volunteer-assignments"
+            element={
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={['ADMIN']}>
+                  <VolunteerAssignments />
                 </RoleBasedRoute>
               </ProtectedRoute>
             }

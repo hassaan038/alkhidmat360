@@ -121,6 +121,7 @@ export default function Sidebar({ isOpen, onClose }) {
         {
           heading: t('sidebar.volunteer'),
           items: [
+            { label: 'My Tasks', icon: ClipboardList, path: '/dashboard/user/my-tasks', tone: 'volunteer' },
             { label: t('sidebar.registerForTasks'), icon: HandHeart, path: '/dashboard/user/volunteer-task', tone: 'volunteer' },
           ],
         },
@@ -137,6 +138,7 @@ export default function Sidebar({ isOpen, onClose }) {
             { label: t('sidebar.donations'), icon: Heart, path: '/dashboard/admin/donations', tone: 'primary' },
             { label: t('sidebar.applications'), icon: Package, path: '/dashboard/admin/applications', tone: 'loan' },
             { label: t('sidebar.volunteers'), icon: HandHeart, path: '/dashboard/admin/volunteers', tone: 'volunteer' },
+            { label: 'Assign Tasks', icon: ClipboardList, path: '/dashboard/admin/volunteer-assignments', tone: 'volunteer' },
           ],
         },
         {

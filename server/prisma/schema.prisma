@@ -42,6 +42,8 @@ model User {
   ramadanRations        RamadanRationApplication[]
   orphanRegistrations   OrphanRegistration[]
   volunteerTasks        VolunteerTask[]
+  volunteerAssignments  VolunteerAssignment[] @relation("VolunteerAssignments")
+  assignedTasks         VolunteerAssignment[] @relation("AssignedByAdmin")
   qurbaniHissaBookings  QurbaniHissaBooking[]
   qurbaniSkinPickups    QurbaniSkinPickup[]
   fitranaCollections    Fitrana[]
@@ -566,4 +568,43 @@ model Session {
   data      String? @db.MediumText
 
   @@map("sessions")
+}
+
+// ============================================
+// VOLUNTEER ASSIGNMENTS (admin → volunteer task assignment)
+// ============================================
+//
+// Distinct from `VolunteerTask` (which is the volunteer's self-registration
+// of availability/skills). An assignment is a concrete piece of work the
+// admin allocates to a specific volunteer who then marks it in-progress
+// and complete from their dashboard.
+
+model VolunteerAssignment {
+  id              Int          @id @default(autoincrement())
+
+  volunteerId     Int
+  volunteer       User         @relation("VolunteerAssignments", fields: [volunteerId], references: [id], onDelete: Cascade)
+
+  assignedById    Int?
+  assignedBy      User?        @relation("AssignedByAdmin", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  title           String
+  description     String       @db.Text
+  category        TaskCategory
+  priority        String       @default("normal") // low | normal | high
+  location        String?
+  dueDate         DateTime?
+
+  // assigned (default) | in_progress | completed | cancelled
+  status          String       @default("assigned")
+  startedAt       DateTime?
+  completedAt     DateTime?
+  completionNotes String?      @db.Text
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([volunteerId])
+  @@index([assignedById])
+  @@index([status])
 }
