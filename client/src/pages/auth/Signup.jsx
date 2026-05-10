@@ -17,8 +17,11 @@ import {
   cnicOptionalSchema,
   cnicSchema,
   pakistanPhoneSchema,
+  passwordRules,
   strictEmailSchema,
+  strongPasswordSchema,
 } from '../../lib/validators';
+import { X } from 'lucide-react';
 
 const userTypesMeta = [
   { value: 'DONOR', icon: Heart, tone: 'primary' },
@@ -97,6 +100,13 @@ export default function Signup() {
     const cnicResult = cnicSchemaForRole.safeParse(formData.cnic);
     if (!cnicResult.success) {
       setValidationError(cnicResult.error.issues[0].message);
+      return;
+    }
+    const passwordResult = strongPasswordSchema.safeParse(formData.password);
+    if (!passwordResult.success) {
+      setValidationError(
+        'Password is not strong enough — please satisfy every rule shown below the field.'
+      );
       return;
     }
 
@@ -252,10 +262,10 @@ export default function Signup() {
                 )}
                 <Input id="cnic" name="cnic" type="text" leftIcon={CreditCard} placeholder="12345-1234567-1" value={formData.cnic} onChange={handleChange} required={formData.userType === 'BENEFICIARY'} disabled={loading} />
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="password" required>{t('auth.login.passwordLabel')}</Label>
                 <div className="relative">
-                  <Input id="password" name="password" type={showPassword ? 'text' : 'password'} leftIcon={Lock} placeholder="Minimum 6 characters" value={formData.password} onChange={handleChange} required minLength={6} autoComplete="new-password" disabled={loading} className="pr-10" />
+                  <Input id="password" name="password" type={showPassword ? 'text' : 'password'} leftIcon={Lock} placeholder="Use 8+ chars with a mix of cases, a number and a symbol" value={formData.password} onChange={handleChange} required minLength={8} autoComplete="new-password" disabled={loading} className="pr-10" />
                   <button
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
@@ -265,10 +275,31 @@ export default function Signup() {
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                <ul className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                  {passwordRules.map((rule) => {
+                    const ok = rule.test(formData.password);
+                    return (
+                      <li
+                        key={rule.key}
+                        className={cn(
+                          'flex items-center gap-1.5',
+                          ok ? 'text-success-dark' : 'text-gray-500 dark:text-gray-400'
+                        )}
+                      >
+                        {ok ? (
+                          <Check className="h-3.5 w-3.5 flex-shrink-0" />
+                        ) : (
+                          <X className="h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-gray-600" />
+                        )}
+                        <span>{rule.label}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="confirmPassword" required>{t('auth.signup.confirmPassword')}</Label>
-                <Input id="confirmPassword" name="confirmPassword" type={showPassword ? 'text' : 'password'} leftIcon={Lock} placeholder="Re-enter password" value={formData.confirmPassword} onChange={handleChange} required minLength={6} autoComplete="new-password" disabled={loading} />
+                <Input id="confirmPassword" name="confirmPassword" type={showPassword ? 'text' : 'password'} leftIcon={Lock} placeholder="Re-enter password" value={formData.confirmPassword} onChange={handleChange} required minLength={8} autoComplete="new-password" disabled={loading} />
               </div>
             </div>
 

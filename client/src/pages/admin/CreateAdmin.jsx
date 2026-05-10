@@ -15,12 +15,16 @@ import { useTranslation } from 'react-i18next';
 import {
   cnicOptionalSchema,
   pakistanPhoneSchema,
+  passwordRules,
   strictEmailSchema,
+  strongPasswordSchema,
 } from '../../lib/validators';
+import { Check, X } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 const createAdminSchema = z.object({
   email: strictEmailSchema,
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: strongPasswordSchema,
   confirmPassword: z.string(),
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   phoneNumber: pakistanPhoneSchema,
@@ -34,9 +38,10 @@ export default function CreateAdmin() {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+  const { register, handleSubmit, watch, formState: { errors }, reset } = useForm({
     resolver: zodResolver(createAdminSchema),
   });
+  const password = watch('password') || '';
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
@@ -83,12 +88,33 @@ export default function CreateAdmin() {
           <FormSection title={t('createAdmin.password')} icon={Lock}>
             <FormGrid cols={2}>
               <FormField label={t('createAdmin.password')} required htmlFor="pw" error={errors.password?.message}>
-                <Input id="pw" type="password" leftIcon={Lock} {...register('password')} placeholder={t('createAdmin.passwordHint')} />
+                <Input id="pw" type="password" leftIcon={Lock} {...register('password')} placeholder="8+ chars, mixed case, number, symbol" />
               </FormField>
               <FormField label={t('settings.confirmPassword')} required htmlFor="cpw" error={errors.confirmPassword?.message}>
                 <Input id="cpw" type="password" leftIcon={Lock} {...register('confirmPassword')} placeholder={t('settings.confirmPassword')} />
               </FormField>
             </FormGrid>
+            <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs">
+              {passwordRules.map((rule) => {
+                const ok = rule.test(password);
+                return (
+                  <li
+                    key={rule.key}
+                    className={cn(
+                      'flex items-center gap-1.5',
+                      ok ? 'text-success-dark' : 'text-gray-500 dark:text-gray-400'
+                    )}
+                  >
+                    {ok ? (
+                      <Check className="h-3.5 w-3.5 flex-shrink-0" />
+                    ) : (
+                      <X className="h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-gray-600" />
+                    )}
+                    <span>{rule.label}</span>
+                  </li>
+                );
+              })}
+            </ul>
           </FormSection>
 
           <div className="rounded-2xl border border-primary-100 bg-primary-50/60 p-5">

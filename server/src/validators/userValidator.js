@@ -3,6 +3,7 @@ import {
   cnicOptionalSchema,
   pakistanPhoneOptionalSchema,
   strictEmailSchema,
+  strongPasswordSchema,
 } from './sharedValidators.js';
 
 // Update profile — all fields optional, but if provided must be valid.
@@ -17,7 +18,7 @@ export const updateProfileSchema = z.object({
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z.string().min(6, 'New password must be at least 6 characters'),
+    newPassword: strongPasswordSchema,
     confirmPassword: z.string(),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {

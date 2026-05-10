@@ -65,3 +65,32 @@ export const strictEmailSchema = z
 export const strictEmailOptionalSchema = z
   .union([z.literal(''), strictEmailSchema])
   .optional();
+
+// --- Password strength ------------------------------------------------------
+// Mirrors server/src/validators/sharedValidators.js. The Signup page renders
+// `passwordRules` directly as a live checklist, so reordering or relabelling
+// here changes the UI.
+export const passwordRules = [
+  { key: 'length', label: 'At least 8 characters', test: (v) => v.length >= 8 },
+  { key: 'upper', label: 'One uppercase letter (A–Z)', test: (v) => /[A-Z]/.test(v) },
+  { key: 'lower', label: 'One lowercase letter (a–z)', test: (v) => /[a-z]/.test(v) },
+  { key: 'digit', label: 'One number (0–9)', test: (v) => /\d/.test(v) },
+  {
+    key: 'special',
+    label: 'One special character (e.g. ! @ # $ %)',
+    test: (v) => /[^A-Za-z0-9]/.test(v),
+  },
+];
+
+export const strongPasswordSchema = z
+  .string({ required_error: 'Password is required' })
+  .superRefine((value, ctx) => {
+    for (const rule of passwordRules) {
+      if (!rule.test(value)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Password must include: ${rule.label.toLowerCase()}`,
+        });
+      }
+    }
+  });

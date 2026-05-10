@@ -72,3 +72,32 @@ export const strictEmailSchema = z
 export const strictEmailOptionalSchema = z
   .union([z.literal(''), strictEmailSchema])
   .optional();
+
+// --- Password strength ------------------------------------------------------
+// Rules mirrored on the client so the live hint UI stays in sync. Keep
+// passwordRules and strongPasswordSchema together — adding a rule here
+// without updating the client list will silently let the form submit.
+export const passwordRules = [
+  { key: 'length', label: 'At least 8 characters', test: (v) => v.length >= 8 },
+  { key: 'upper', label: 'One uppercase letter (A–Z)', test: (v) => /[A-Z]/.test(v) },
+  { key: 'lower', label: 'One lowercase letter (a–z)', test: (v) => /[a-z]/.test(v) },
+  { key: 'digit', label: 'One number (0–9)', test: (v) => /\d/.test(v) },
+  {
+    key: 'special',
+    label: 'One special character (e.g. ! @ # $ %)',
+    test: (v) => /[^A-Za-z0-9]/.test(v),
+  },
+];
+
+export const strongPasswordSchema = z
+  .string({ required_error: 'Password is required' })
+  .superRefine((value, ctx) => {
+    for (const rule of passwordRules) {
+      if (!rule.test(value)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Password must include: ${rule.label.toLowerCase()}`,
+        });
+      }
+    }
+  });

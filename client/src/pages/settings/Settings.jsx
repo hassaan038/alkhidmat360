@@ -24,8 +24,11 @@ import { cn, formatApiError, formatDate } from '../../lib/utils';
 import {
   cnicOptionalSchema,
   pakistanPhoneSchema,
+  passwordRules,
   strictEmailSchema,
+  strongPasswordSchema,
 } from '../../lib/validators';
+import { Check, X } from 'lucide-react';
 
 const profileSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -37,7 +40,7 @@ const profileSchema = z.object({
 const passwordSchema = z
   .object({
     currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z.string().min(6, 'New password must be at least 6 characters'),
+    newPassword: strongPasswordSchema,
     confirmPassword: z.string(),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {
@@ -126,9 +129,10 @@ function ProfileSection({ profile, onUpdated, t }) {
 }
 
 function PasswordSection({ t }) {
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, reset, watch, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(passwordSchema),
   });
+  const newPassword = watch('newPassword') || '';
 
   const onSubmit = async (data) => {
     try {
@@ -148,12 +152,33 @@ function PasswordSection({ t }) {
         </FormField>
         <FormGrid cols={2}>
           <FormField label={t('settings.newPassword')} required htmlFor="np" error={errors.newPassword?.message}>
-            <Input id="np" type="password" leftIcon={Lock} {...register('newPassword')} placeholder={t('auth.login.passwordHint')} />
+            <Input id="np" type="password" leftIcon={Lock} {...register('newPassword')} placeholder="8+ chars, mixed case, number, symbol" />
           </FormField>
           <FormField label={t('settings.confirmPassword')} required htmlFor="cpw" error={errors.confirmPassword?.message}>
             <Input id="cpw" type="password" leftIcon={Lock} {...register('confirmPassword')} />
           </FormField>
         </FormGrid>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs">
+          {passwordRules.map((rule) => {
+            const ok = rule.test(newPassword);
+            return (
+              <li
+                key={rule.key}
+                className={cn(
+                  'flex items-center gap-1.5',
+                  ok ? 'text-success-dark' : 'text-gray-500 dark:text-gray-400'
+                )}
+              >
+                {ok ? (
+                  <Check className="h-3.5 w-3.5 flex-shrink-0" />
+                ) : (
+                  <X className="h-3.5 w-3.5 flex-shrink-0 text-gray-300 dark:text-gray-600" />
+                )}
+                <span>{rule.label}</span>
+              </li>
+            );
+          })}
+        </ul>
         <div className="flex justify-end pt-2">
           <Button type="submit" loading={isSubmitting} leftIcon={CheckCircle2}>
             {t('settings.changePassword')}

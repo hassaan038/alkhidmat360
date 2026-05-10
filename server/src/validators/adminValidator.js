@@ -3,6 +3,7 @@ import {
   cnicOptionalSchema,
   pakistanPhoneSchema,
   strictEmailSchema,
+  strongPasswordSchema,
 } from './sharedValidators.js';
 
 // Validation schema for status updates
@@ -13,7 +14,7 @@ export const statusUpdateSchema = z.object({
 // Validation schema for creating admin users
 export const createAdminSchema = z.object({
   email: strictEmailSchema,
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: strongPasswordSchema,
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   phoneNumber: pakistanPhoneSchema,
   cnic: cnicOptionalSchema,
