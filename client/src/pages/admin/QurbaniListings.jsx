@@ -21,6 +21,7 @@ import { SkeletonRow } from '../../components/ui/Skeleton';
 import EmptyState from '../../components/common/EmptyState';
 import * as qurbaniModuleService from '../../services/qurbaniModuleService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
+import { futureOrTodayDateSchema, todayIso } from '../../lib/validators';
 import { imageUrl } from '../../lib/imageUrl';
 import { useTranslation } from 'react-i18next';
 
@@ -45,7 +46,7 @@ const statusBadgeClass = (status) => {
 const listingSchema = z.object({
   weightKg: z.coerce.number().positive('Weight must be positive'),
   bullPrice: z.coerce.number().positive('Estimated bull price must be greater than 0'),
-  pickupDate: z.string().min(1, 'Pickup date is required'),
+  pickupDate: futureOrTodayDateSchema,
   pickupLocation: z.string().min(5, 'Pickup location must be at least 5 characters'),
   description: z.string().optional().default(''),
 });
@@ -145,6 +146,7 @@ function ListingForm({ mode, initial, onCancel, onSaved }) {
           </label>
           <input
             type="date"
+            min={todayIso()}
             {...register('pickupDate')}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />

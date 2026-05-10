@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { futureOrTodayDateOptionalSchema, todayIso } from '../../lib/validators';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import PageContainer from '../../components/ui/PageContainer';
 import PageHeader from '../../components/ui/PageHeader';
@@ -20,7 +21,7 @@ const rationSchema = z.object({
   amount: z.coerce.number().positive('Amount must be positive'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   donorAddress: z.string().min(10, 'Please provide a complete address'),
-  deliveryDate: z.string().optional(),
+  deliveryDate: futureOrTodayDateOptionalSchema,
   notes: z.string().optional(),
 });
 
@@ -177,7 +178,7 @@ export default function RationDonation() {
                 <Input id="dn" leftIcon={User} {...register('donorName')} placeholder={t('form.yourFullName')} />
               </FormField>
               <FormField label={t('form.preferredDeliveryDate')} htmlFor="dd" hint={t('form.optional')}>
-                <Input id="dd" type="date" leftIcon={Calendar} {...register('deliveryDate')} />
+                <Input id="dd" type="date" leftIcon={Calendar} min={todayIso()} {...register('deliveryDate')} />
               </FormField>
               <FormField wide label={t('form.address')} required htmlFor="da" error={errors.donorAddress?.message}>
                 <Textarea id="da" rows={3} {...register('donorAddress')} placeholder={t('form.completeAddress')} />

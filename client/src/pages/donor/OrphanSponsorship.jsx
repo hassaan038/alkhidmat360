@@ -12,6 +12,7 @@ import { createOrphanSponsorship } from '../../services/donationService';
 import { Baby, Heart, User, RotateCcw, ArrowRight } from 'lucide-react';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
+import { futureOrTodayDateOptionalSchema, todayIso } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const orphanSponsorshipSchema = z.object({
@@ -23,7 +24,7 @@ const orphanSponsorshipSchema = z.object({
   sponsorAddress: z.string().min(10, 'Please provide a complete address'),
   orphanAge: z.string().optional(),
   orphanGender: z.string().optional(),
-  startDate: z.string().optional(),
+  startDate: futureOrTodayDateOptionalSchema,
   notes: z.string().optional(),
 });
 
@@ -207,7 +208,7 @@ export default function OrphanSponsorship() {
                 </Select>
               </FormField>
               <FormField label={t('orphanSponsorship.startDate')} htmlFor="sd">
-                <Input id="sd" type="date" {...register('startDate')} />
+                <Input id="sd" type="date" min={todayIso()} {...register('startDate')} />
               </FormField>
               <FormField wide label={t('form.additionalNotes')} htmlFor="nt">
                 <Textarea id="nt" rows={2} {...register('notes')} placeholder={t('orphanSponsorship.specialMessagePlaceholder')} />

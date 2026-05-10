@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+  futureOrTodayDateOptionalSchema,
+  futureOrTodayDateSchema,
+} from './sharedValidators.js';
 
 // Multipart-aware: forms that accept payment screenshots send multipart,
 // so numeric/boolean fields are coerced from strings.
@@ -26,12 +30,18 @@ export const qurbaniDonationSchema = z.object({
   totalAmount: z.coerce.number().positive('Amount must be greater than 0'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   donorAddress: z.string().min(10, 'Address must be at least 10 characters'),
-  deliveryDate: z.string().optional(),
+  deliveryDate: futureOrTodayDateOptionalSchema,
   notes: z.string().optional(),
   paymentMarked: paymentMarkedField,
 });
 
+// (qurbaniDonationSchema.deliveryDate uses futureOrTodayDateOptionalSchema
+// above so past dates are rejected.)
+
 // Ration Donation Validator
+// NOTE: the client form has a "delivery date" picker but the column doesn't
+// exist on the model — Zod strips it before the service sees it. Don't add
+// it here without also adding the column to RationDonation in Prisma.
 export const rationDonationSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   amount: z.coerce.number().positive('Amount must be greater than 0'),
@@ -93,7 +103,7 @@ export const orphanSponsorshipSchema = z.object({
     .max(36, 'Duration cannot exceed 36 months (3 years)'),
   orphanAge: z.string().optional(),
   orphanGender: z.string().optional(),
-  startDate: z.string().optional(),
+  startDate: futureOrTodayDateOptionalSchema,
   notes: z.string().optional(),
   paymentMarked: paymentMarkedField,
 });

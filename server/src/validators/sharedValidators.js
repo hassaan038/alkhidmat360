@@ -89,6 +89,34 @@ export const passwordRules = [
   },
 ];
 
+// --- Date (no past dates) ---------------------------------------------------
+// Accepts ISO date strings ("YYYY-MM-DD") from <input type="date"> and ISO
+// datetimes from <input type="datetime-local">. Rejects anything that
+// resolves to a calendar day before today (host time). Use the optional
+// variant for fields that can be left blank.
+const PAST_DATE_MSG = 'Date cannot be in the past';
+
+const isPastDate = (value) => {
+  if (!value) return false;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return true;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  parsed.setHours(0, 0, 0, 0);
+  return parsed < today;
+};
+
+export const futureOrTodayDateSchema = z
+  .string({ required_error: 'Date is required' })
+  .min(1, 'Date is required')
+  .refine((v) => !isPastDate(v), { message: PAST_DATE_MSG });
+
+export const futureOrTodayDateOptionalSchema = z
+  .string()
+  .optional()
+  .nullable()
+  .refine((v) => !v || !isPastDate(v), { message: PAST_DATE_MSG });
+
 export const strongPasswordSchema = z
   .string({ required_error: 'Password is required' })
   .superRefine((value, ctx) => {

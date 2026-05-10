@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { futureOrTodayDateSchema } from './sharedValidators.js';
 
 // ============================================
 // LISTINGS (admin) — multipart bodies coerce strings to numbers
@@ -19,7 +20,7 @@ export const createListingSchema = z.object({
   pricePerHissa: z.coerce
     .number()
     .positive('Price per hissa must be greater than 0'),
-  pickupDate: z.string().min(1, 'Pickup date is required'),
+  pickupDate: futureOrTodayDateSchema,
   pickupLocation: z
     .string()
     .min(5, 'Pickup location must be at least 5 characters'),

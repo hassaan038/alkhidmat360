@@ -82,6 +82,35 @@ export const passwordRules = [
   },
 ];
 
+// --- Date (no past dates) ---------------------------------------------------
+// Mirrors server/src/validators/sharedValidators.js. Accepts ISO date
+// strings from <input type="date">; rejects anything before today.
+const PAST_DATE_MSG = 'Date cannot be in the past';
+
+const isPastDate = (value) => {
+  if (!value) return false;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return true;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  parsed.setHours(0, 0, 0, 0);
+  return parsed < today;
+};
+
+export const futureOrTodayDateSchema = z
+  .string({ required_error: 'Date is required' })
+  .min(1, 'Date is required')
+  .refine((v) => !isPastDate(v), { message: PAST_DATE_MSG });
+
+export const futureOrTodayDateOptionalSchema = z
+  .string()
+  .optional()
+  .nullable()
+  .refine((v) => !v || !isPastDate(v), { message: PAST_DATE_MSG });
+
+// Returns YYYY-MM-DD for use as an HTML <input min={todayIso()}> attribute.
+export const todayIso = () => new Date().toISOString().slice(0, 10);
+
 export const strongPasswordSchema = z
   .string({ required_error: 'Password is required' })
   .superRefine((value, ctx) => {

@@ -26,12 +26,13 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import * as qurbaniSkinPickupService from '../../services/qurbaniSkinPickupService';
 import useQurbaniModuleStore from '../../store/qurbaniModuleStore';
 import { formatDate, formatApiError } from '../../lib/utils';
+import { futureOrTodayDateOptionalSchema, todayIso } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const skinPickupSchema = z.object({
   address: z.string().optional(),
   numberOfSkins: z.coerce.number().int().min(1, 'At least 1').max(50),
-  preferredDate: z.string().optional(),
+  preferredDate: futureOrTodayDateOptionalSchema,
   additionalDetails: z.string().optional(),
 });
 
@@ -384,9 +385,13 @@ export default function SkinPickup() {
                       </label>
                       <input
                         type="date"
+                        min={todayIso()}
                         {...register('preferredDate')}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
+                      {errors.preferredDate && (
+                        <p className="mt-1 text-xs text-error">{errors.preferredDate.message}</p>
+                      )}
                     </div>
 
                     <div>

@@ -12,6 +12,7 @@ import { Heart, Bot, Mountain, Beef, Info, RotateCcw, ArrowRight, User, Calendar
 import { createQurbaniDonation } from '../../services/donationService';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
+import { futureOrTodayDateOptionalSchema, todayIso } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const qurbaniSchema = z.object({
@@ -20,7 +21,7 @@ const qurbaniSchema = z.object({
   totalAmount: z.coerce.number().positive('Amount must be positive'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   donorAddress: z.string().min(10, 'Please provide a complete address'),
-  deliveryDate: z.string().optional(),
+  deliveryDate: futureOrTodayDateOptionalSchema,
   notes: z.string().optional(),
 });
 
@@ -159,7 +160,7 @@ export default function QurbaniDonation() {
                 <Textarea id="donorAddress" rows={3} {...register('donorAddress')} placeholder={t('form.completeAddress')} />
               </FormField>
               <FormField label={t('form.preferredDeliveryDate')} htmlFor="deliveryDate" hint={t('form.optionalSubject')}>
-                <Input id="deliveryDate" type="date" leftIcon={Calendar} {...register('deliveryDate')} />
+                <Input id="deliveryDate" type="date" leftIcon={Calendar} min={todayIso()} {...register('deliveryDate')} />
               </FormField>
               <FormField label={t('form.notes')} htmlFor="notes" hint={t('form.specialInstructions')}>
                 <Input id="notes" leftIcon={FileText} {...register('notes')} placeholder={t('form.optionalNotes')} />

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { futureOrTodayDateOptionalSchema } from './sharedValidators.js';
 
 // contactPhone comes from the session user record — the form no longer asks
 // for it.
@@ -18,7 +19,7 @@ export const createSkinPickupSchema = z
       .optional()
       .nullable(),
     numberOfSkins: z.coerce.number().int().min(1, 'At least 1 skin').max(50).default(1),
-    preferredDate: z.string().optional().nullable(),
+    preferredDate: futureOrTodayDateOptionalSchema,
     additionalDetails: z.string().optional().nullable(),
   })
   .superRefine((data, ctx) => {
