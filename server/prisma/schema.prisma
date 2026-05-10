@@ -124,7 +124,12 @@ model SkinCollection {
   collectionAddress String   @db.Text
   numberOfSkins     Int
   animalType        String   // goat, cow, camel, etc.
-  preferredDate     DateTime
+  // Either preferredDate (regular pickup) OR eidDay (Eid Qurbani —
+  // DAY_1 | DAY_2 | DAY_3) is set, never both. Stored as a string tag
+  // rather than a real date because the actual Gregorian date of each
+  // Eid day shifts year-to-year and is decided at ops level.
+  preferredDate     DateTime?
+  eidDay            String?
   notes             String?  @db.Text
 
   status            String   @default("pending")

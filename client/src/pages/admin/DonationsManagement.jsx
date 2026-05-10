@@ -32,7 +32,16 @@ export default function DonationsManagement() {
       { key: 'donorName', label: t('roles.DONOR') },
       { key: 'numberOfSkins', label: t('skinCollection.numberOfSkins') },
       { key: 'animalType', label: t('skinCollection.animalType') },
-      { key: 'preferredDate', label: t('skinCollection.preferredDate'), render: (row) => new Date(row.preferredDate).toLocaleDateString() },
+      {
+        key: 'preferredDate',
+        label: t('skinCollection.preferredDate'),
+        render: (row) =>
+          row.eidDay
+            ? `Eid Day ${row.eidDay.replace('DAY_', '')}`
+            : row.preferredDate
+              ? new Date(row.preferredDate).toLocaleDateString()
+              : '—',
+      },
     ],
     sponsorship: [
       { key: 'sponsorName', label: t('orphanSponsorship.sponsorName') },

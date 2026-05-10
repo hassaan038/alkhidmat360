@@ -78,7 +78,7 @@ export async function getUserRationDonations(userId) {
 // ============================================
 
 export async function createSkinCollection(userId, collectionData) {
-  const { preferredDate, ...rest } = collectionData;
+  const { preferredDate, eidDay, ...rest } = collectionData;
   const contact = await getUserContactInfo(userId);
 
   const collection = await prisma.skinCollection.create({
@@ -86,7 +86,8 @@ export async function createSkinCollection(userId, collectionData) {
       userId,
       ...rest,
       donorPhone: contact.phoneNumber,
-      preferredDate: new Date(preferredDate),
+      preferredDate: preferredDate ? new Date(preferredDate) : null,
+      eidDay: eidDay || null,
     },
   });
 

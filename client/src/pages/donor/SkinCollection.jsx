@@ -9,19 +9,50 @@ import FormSection, { FormGrid, FormField } from '../../components/ui/FormSectio
 import Input, { Textarea } from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import { toast } from 'sonner';
-import { Scissors, Bot, Beef, Mountain, Info, User, Calendar, RotateCcw, ArrowRight } from 'lucide-react';
+import { Scissors, Bot, Beef, Mountain, Info, User, Calendar, RotateCcw, ArrowRight, Moon } from 'lucide-react';
 import { createSkinCollection } from '../../services/donationService';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
 
-const skinCollectionSchema = z.object({
-  animalType: z.string().min(2).max(50),
-  numberOfSkins: z.coerce.number().int().min(1, 'Number of skins must be at least 1').max(50, 'Number of skins cannot exceed 50'),
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  collectionAddress: z.string().min(10, 'Please provide a complete address'),
-  preferredDate: z.string().min(1, 'Please select a preferred pickup date'),
-  notes: z.string().optional(),
-});
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
+const EID_DAYS = [
+  { value: 'DAY_1', label: 'Eid Day 1' },
+  { value: 'DAY_2', label: 'Eid Day 2' },
+  { value: 'DAY_3', label: 'Eid Day 3' },
+  { value: 'DAY_4', label: 'Eid Day 4' },
+  { value: 'DAY_5', label: 'Eid Day 5' },
+];
+
+const skinCollectionSchema = z
+  .object({
+    animalType: z.string().min(2).max(50),
+    numberOfSkins: z.coerce.number().int().min(1, 'Number of skins must be at least 1').max(50, 'Number of skins cannot exceed 50'),
+    donorName: z.string().min(2, 'Name must be at least 2 characters'),
+    collectionAddress: z.string().min(10, 'Please provide a complete address'),
+    forEidQurbani: z.boolean(),
+    preferredDate: z.string().optional(),
+    eidDay: z.enum(['DAY_1', 'DAY_2', 'DAY_3', 'DAY_4', 'DAY_5']).optional(),
+    notes: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.forEidQurbani) {
+      if (!data.eidDay) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['eidDay'], message: 'Please pick one of the 5 Eid days' });
+      }
+    } else {
+      if (!data.preferredDate) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['preferredDate'], message: 'Please select a preferred pickup date' });
+        return;
+      }
+      const picked = new Date(data.preferredDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (picked < today) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['preferredDate'], message: 'Pickup date cannot be in the past' });
+      }
+    }
+  });
 
 export default function SkinCollection() {
   const { t } = useTranslation();
@@ -42,10 +73,21 @@ export default function SkinCollection() {
     t('skinCollection.info4'),
   ], [t]);
 
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({
+  const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm({
     resolver: zodResolver(skinCollectionSchema),
-    defaultValues: { numberOfSkins: 1 },
+    defaultValues: { numberOfSkins: 1, forEidQurbani: false, eidDay: undefined, preferredDate: '' },
   });
+  const forEidQurbani = watch('forEidQurbani');
+  const eidDay = watch('eidDay');
+
+  const toggleEidMode = (next) => {
+    setValue('forEidQurbani', next, { shouldValidate: false });
+    if (next) {
+      setValue('preferredDate', '', { shouldValidate: false });
+    } else {
+      setValue('eidDay', undefined, { shouldValidate: false });
+    }
+  };
 
   const handleSkinSelect = (skin) => {
     setSelectedSkin(skin.id);
@@ -62,11 +104,15 @@ export default function SkinCollection() {
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      await createSkinCollection(data);
+      const { forEidQurbani: _eid, ...rest } = data;
+      const payload = forEidQurbani
+        ? { ...rest, preferredDate: undefined }
+        : { ...rest, eidDay: undefined };
+      await createSkinCollection(payload);
       toast.success(t('skinCollection.pickupRequestSubmitted'), {
         description: t('skinCollection.pickupRequestSubmittedDesc'),
       });
-      reset();
+      reset({ numberOfSkins: 1, forEidQurbani: false, eidDay: undefined, preferredDate: '' });
       setSelectedSkin('');
       setCustomMode(false);
     } catch (error) {
@@ -161,9 +207,73 @@ export default function SkinCollection() {
               <FormField wide label={t('skinCollection.collectionAddress')} required htmlFor="ca" error={errors.collectionAddress?.message}>
                 <Textarea id="ca" rows={3} {...register('collectionAddress')} placeholder={t('skinCollection.pickupAddressPlaceholder')} />
               </FormField>
-              <FormField label={t('skinCollection.preferredDate')} required htmlFor="pd" error={errors.preferredDate?.message} hint={t('skinCollection.preferredDateHint')}>
-                <Input id="pd" type="date" leftIcon={Calendar} {...register('preferredDate')} />
-              </FormField>
+            </FormGrid>
+
+            <div className="mt-5 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-50 flex items-center gap-2">
+                    <Moon className="h-4 w-4 text-qurbani-600" />
+                    Skin from Eid Qurbani animal?
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Toggle on if this skin is from an animal sacrificed on one of the Eid days.
+                    We&apos;ll schedule pickup for that Eid day instead of asking for a calendar date.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={forEidQurbani}
+                  onClick={() => toggleEidMode(!forEidQurbani)}
+                  className={cn(
+                    'relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors cursor-pointer',
+                    forEidQurbani ? 'bg-qurbani-600' : 'bg-gray-300 dark:bg-gray-700'
+                  )}
+                >
+                  <span
+                    className={cn(
+                      'inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform',
+                      forEidQurbani ? 'translate-x-5' : 'translate-x-0.5'
+                    )}
+                  />
+                </button>
+              </div>
+
+              {forEidQurbani ? (
+                <div className="mt-4">
+                  <FormField label="Eid day" required error={errors.eidDay?.message}>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                      {EID_DAYS.map((d) => {
+                        const selected = eidDay === d.value;
+                        return (
+                          <label
+                            key={d.value}
+                            className={cn(
+                              'cursor-pointer rounded-lg border p-3 text-center text-sm font-medium transition-colors',
+                              selected
+                                ? 'border-qurbani-500 bg-qurbani-50 dark:bg-qurbani-500/10 text-qurbani-700 dark:text-qurbani-200 ring-1 ring-inset ring-qurbani-200 dark:ring-qurbani-700/40'
+                                : 'border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 hover:border-qurbani-300 hover:bg-gray-50'
+                            )}
+                          >
+                            <input type="radio" value={d.value} {...register('eidDay')} className="sr-only" />
+                            {d.label}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </FormField>
+                </div>
+              ) : (
+                <div className="mt-4">
+                  <FormField label={t('skinCollection.preferredDate')} required htmlFor="pd" error={errors.preferredDate?.message} hint={t('skinCollection.preferredDateHint')}>
+                    <Input id="pd" type="date" leftIcon={Calendar} min={todayIso()} {...register('preferredDate')} />
+                  </FormField>
+                </div>
+              )}
+            </div>
+
+            <FormGrid cols={1} className="mt-5">
               <FormField wide label={t('form.additionalNotes')} htmlFor="nt">
                 <Textarea id="nt" rows={2} {...register('notes')} placeholder={t('skinCollection.specialInstructionsPlaceholder')} />
               </FormField>

@@ -42,18 +42,45 @@ export const rationDonationSchema = z.object({
 
 // Skin Collection Validator — NO payment fields. Donor donates the
 // physical skin and we collect it for free.
-export const skinCollectionSchema = z.object({
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  collectionAddress: z.string().min(10, 'Address must be at least 10 characters'),
-  numberOfSkins: z.coerce
-    .number()
-    .int()
-    .min(1, 'Number of skins must be at least 1')
-    .max(50, 'Number of skins cannot exceed 50 in one submission'),
-  animalType: z.string().min(2, 'Please specify the animal type'),
-  preferredDate: z.string().min(1, 'Please select a preferred date'),
-  notes: z.string().optional(),
-});
+//
+// Two modes:
+//   - Regular pickup → caller posts `preferredDate` (ISO date string).
+//   - Eid Qurbani pickup → caller posts `eidDay`
+//     ('DAY_1'..'DAY_5') and omits `preferredDate`. We don't store a
+//     calendar date because the Gregorian date of each Eid day shifts
+//     year-to-year.
+export const skinCollectionSchema = z
+  .object({
+    donorName: z.string().min(2, 'Name must be at least 2 characters'),
+    collectionAddress: z.string().min(10, 'Address must be at least 10 characters'),
+    numberOfSkins: z.coerce
+      .number()
+      .int()
+      .min(1, 'Number of skins must be at least 1')
+      .max(50, 'Number of skins cannot exceed 50 in one submission'),
+    animalType: z.string().min(2, 'Please specify the animal type'),
+    preferredDate: z.string().optional(),
+    eidDay: z.enum(['DAY_1', 'DAY_2', 'DAY_3', 'DAY_4', 'DAY_5']).optional(),
+    notes: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const hasDate = !!(data.preferredDate && data.preferredDate.trim());
+    const hasEid = !!data.eidDay;
+    if (hasDate && hasEid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['eidDay'],
+        message: 'Choose either a preferred date or an Eid day, not both',
+      });
+    }
+    if (!hasDate && !hasEid) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['preferredDate'],
+        message: 'Please select a preferred date or an Eid day',
+      });
+    }
+  });
 
 // Orphan Sponsorship Validator
 export const orphanSponsorshipSchema = z.object({
