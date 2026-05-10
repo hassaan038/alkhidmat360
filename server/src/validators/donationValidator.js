@@ -18,7 +18,11 @@ export const qurbaniDonationSchema = z.object({
   animalType: z.enum(['GOAT', 'CAMEL', 'COW'], {
     errorMap: () => ({ message: 'Please select a valid animal type' }),
   }),
-  quantity: z.coerce.number().int().min(1, 'Quantity must be at least 1'),
+  quantity: z.coerce
+    .number()
+    .int()
+    .min(1, 'Quantity must be at least 1')
+    .max(100, 'Quantity cannot exceed 100 animals in one submission'),
   totalAmount: z.coerce.number().positive('Amount must be greater than 0'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   donorAddress: z.string().min(10, 'Address must be at least 10 characters'),
@@ -41,7 +45,11 @@ export const rationDonationSchema = z.object({
 export const skinCollectionSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   collectionAddress: z.string().min(10, 'Address must be at least 10 characters'),
-  numberOfSkins: z.coerce.number().int().min(1, 'Number of skins must be at least 1'),
+  numberOfSkins: z.coerce
+    .number()
+    .int()
+    .min(1, 'Number of skins must be at least 1')
+    .max(50, 'Number of skins cannot exceed 50 in one submission'),
   animalType: z.string().min(2, 'Please specify the animal type'),
   preferredDate: z.string().min(1, 'Please select a preferred date'),
   notes: z.string().optional(),
@@ -51,7 +59,11 @@ export const skinCollectionSchema = z.object({
 export const orphanSponsorshipSchema = z.object({
   sponsorName: z.string().min(2, 'Name must be at least 2 characters'),
   monthlyAmount: z.coerce.number().positive('Monthly amount must be greater than 0'),
-  duration: z.coerce.number().int().min(1, 'Duration must be at least 1 month'),
+  duration: z.coerce
+    .number()
+    .int()
+    .min(1, 'Duration must be at least 1 month')
+    .max(36, 'Duration cannot exceed 36 months (3 years)'),
   orphanAge: z.string().optional(),
   orphanGender: z.string().optional(),
   startDate: z.string().optional(),

@@ -25,7 +25,7 @@ const loanApplicationSchema = z.object({
   loanType: z.enum(['BUSINESS', 'EDUCATION', 'MEDICAL', 'HOUSING', 'MARRIAGE', 'OTHER']),
   requestedAmount: z.coerce.number().positive('Requested amount must be positive'),
   monthlyIncome: z.coerce.number().nonnegative('Monthly income must be non-negative'),
-  familyMembers: z.coerce.number().int().min(1),
+  familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),
   employmentStatus: z.string().min(2).max(50),
   purposeDescription: z.string().min(10, 'Purpose description must be at least 10 characters'),
   applicantName: z.string().min(2),
@@ -131,7 +131,7 @@ export default function LoanApplication() {
                 <Input id="mi" type="number" min={0} {...register('monthlyIncome')} placeholder="30000" />
               </FormField>
               <FormField label={t('loanApplication.familyMembers')} required htmlFor="fm" error={errors.familyMembers?.message}>
-                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="5" />
+                <Input id="fm" type="number" min={1} max={50} {...register('familyMembers')} placeholder="5" />
               </FormField>
               <FormField label={t('loanApplication.employmentStatus')} required htmlFor="es" error={errors.employmentStatus?.message}>
                 <Select id="es" {...register('employmentStatus')}>

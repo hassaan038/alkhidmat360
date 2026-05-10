@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 const orphanSponsorshipSchema = z.object({
   sponsorshipType: z.string().min(2).max(50),
   monthlyAmount: z.coerce.number().positive('Monthly amount must be positive'),
-  duration: z.coerce.number().int().min(1).max(120),
+  duration: z.coerce.number().int().min(1, 'Duration must be at least 1 month').max(36, 'Duration cannot exceed 36 months (3 years)'),
   totalAmount: z.coerce.number().positive('Total amount must be positive'),
   sponsorName: z.string().min(2, 'Name must be at least 2 characters'),
   sponsorAddress: z.string().min(10, 'Please provide a complete address'),
@@ -169,7 +169,7 @@ export default function OrphanSponsorship() {
                 <Input id="ma" type="number" min={1} {...register('monthlyAmount')} />
               </FormField>
               <FormField label={t('orphanSponsorship.duration')} required htmlFor="du" error={errors.duration?.message}>
-                <Input id="du" type="number" min={1} {...register('duration', { onChange: handleDurationChange })} />
+                <Input id="du" type="number" min={1} max={36} {...register('duration', { onChange: handleDurationChange })} />
               </FormField>
               <FormField label={t('orphanSponsorship.totalCol')} required htmlFor="ta" error={errors.totalAmount?.message} hint={t('orphanSponsorship.autoCalculated')}>
                 <Input id="ta" type="number" readOnly {...register('totalAmount')} className="bg-gray-50 dark:bg-gray-900" />

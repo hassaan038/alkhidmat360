@@ -21,7 +21,7 @@ export const loanApplicationSchema = z.object({
   }),
   requestedAmount: z.number().positive('Requested amount must be positive'),
   monthlyIncome: z.number().nonnegative('Monthly income must be non-negative'),
-  familyMembers: z.number().int().min(1, 'Must have at least 1 family member'),
+  familyMembers: z.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),
   employmentStatus: z.string().min(2).max(50),
   purposeDescription: z.string().min(10, 'Purpose description must be at least 10 characters'),
   applicantName: z.string().min(2),
@@ -38,7 +38,7 @@ export const loanApplicationSchema = z.object({
 // ============================================
 
 export const ramadanRationSchema = z.object({
-  familyMembers: z.number().int().min(1, 'Must have at least 1 family member'),
+  familyMembers: z.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),
   monthlyIncome: z.number().nonnegative('Monthly income must be non-negative'),
   hasDisabledMembers: z.boolean(),
   disabilityDetails: z.string().optional(),
@@ -63,7 +63,7 @@ export const orphanRegistrationSchema = z.object({
   guardianName: z.string().min(2),
   guardianAddress: z.string().min(10),
   monthlyIncome: z.number().nonnegative('Monthly income must be non-negative'),
-  familyMembers: z.number().int().min(1, 'Must have at least 1 family member'),
+  familyMembers: z.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),
   educationLevel: z.string().min(2).max(50),
   schoolName: z.string().min(2).optional(),
   healthCondition: z.string().optional(),

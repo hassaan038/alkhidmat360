@@ -131,7 +131,7 @@ export default function QurbaniDonation() {
 
             <FormGrid cols={2} className="mt-5">
               <FormField label={t('qurbaniDonation.quantity')} required htmlFor="qty" error={errors.quantity?.message}>
-                <Input id="qty" type="number" min={1} {...register('quantity')} placeholder={t('qurbaniDonation.enterQuantity')} />
+                <Input id="qty" type="number" min={1} max={100} {...register('quantity')} placeholder={t('qurbaniDonation.enterQuantity')} />
               </FormField>
               <FormField
                 label={t('qurbaniDonation.totalAmount')}

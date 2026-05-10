@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 
 const skinCollectionSchema = z.object({
   animalType: z.string().min(2).max(50),
-  numberOfSkins: z.coerce.number().int().min(1).max(100),
+  numberOfSkins: z.coerce.number().int().min(1, 'Number of skins must be at least 1').max(50, 'Number of skins cannot exceed 50'),
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   collectionAddress: z.string().min(10, 'Please provide a complete address'),
   preferredDate: z.string().min(1, 'Please select a preferred pickup date'),
@@ -148,7 +148,7 @@ export default function SkinCollection() {
 
             <FormGrid cols={2} className="mt-5">
               <FormField label={t('skinCollection.numberOfSkins')} required htmlFor="ns" error={errors.numberOfSkins?.message}>
-                <Input id="ns" type="number" min={1} {...register('numberOfSkins')} />
+                <Input id="ns" type="number" min={1} max={50} {...register('numberOfSkins')} />
               </FormField>
             </FormGrid>
           </FormSection>

@@ -21,7 +21,7 @@ const orphanRegistrationSchema = z.object({
   guardianName: z.string().min(2, 'Name must be at least 2 characters'),
   guardianAddress: z.string().min(10, 'Please provide a complete address'),
   monthlyIncome: z.coerce.number().nonnegative(),
-  familyMembers: z.coerce.number().int().min(1),
+  familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),
   educationLevel: z.string().min(2).max(50),
   schoolName: z.string().min(2).optional().or(z.literal('')),
   healthCondition: z.string().optional(),
@@ -139,7 +139,7 @@ export default function OrphanRegistration() {
                 <Input id="mi" type="number" min={0} leftIcon={Coins} {...register('monthlyIncome')} placeholder="20000" />
               </FormField>
               <FormField label={t('orphanReg.familyMembers')} required htmlFor="fm" error={errors.familyMembers?.message}>
-                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="6" />
+                <Input id="fm" type="number" min={1} max={50} {...register('familyMembers')} placeholder="6" />
               </FormField>
               <FormField wide label={t('orphanReg.additionalNotes')} htmlFor="an">
                 <Textarea id="an" rows={3} {...register('additionalNotes')} placeholder={t('form.specialInstructions')} />

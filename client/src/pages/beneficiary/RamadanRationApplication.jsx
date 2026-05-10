@@ -14,7 +14,7 @@ import { Apple, User, Users, Info, RotateCcw, ArrowRight, Coins } from 'lucide-r
 import { useTranslation } from 'react-i18next';
 
 const ramadanRationSchema = z.object({
-  familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member'),
+  familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),
   monthlyIncome: z.coerce.number().nonnegative('Monthly income must be non-negative'),
   hasDisabledMembers: z.boolean(),
   disabilityDetails: z.string().optional(),
@@ -69,7 +69,7 @@ export default function RamadanRationApplication() {
           <FormSection title={t('ramadanRation.familyInformation')} icon={Users}>
             <FormGrid cols={2}>
               <FormField label={t('ramadanRation.familyMembers')} required htmlFor="fm" error={errors.familyMembers?.message}>
-                <Input id="fm" type="number" min={1} {...register('familyMembers')} placeholder="5" />
+                <Input id="fm" type="number" min={1} max={50} {...register('familyMembers')} placeholder="5" />
               </FormField>
               <FormField label={t('ramadanRation.monthlyIncome')} required htmlFor="mi" error={errors.monthlyIncome?.message}>
                 <Input id="mi" type="number" min={0} leftIcon={Coins} {...register('monthlyIncome')} placeholder="15000" />
