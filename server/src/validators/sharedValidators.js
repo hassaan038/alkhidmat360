@@ -50,7 +50,22 @@ export const cnicRegex = /^[1-7]\d{12}$/;
 const CNIC_INVALID_MSG =
   'CNIC must be 13 digits and start with a valid province code 1–7 (e.g. 35202-1234567-1)';
 
-const isValidCnic = (v) => cnicRegex.test(v) && !/^(\d)\1{12}$/.test(v);
+// Reject 1234567890123, 9876543210987, and other pure +/-1 sequences
+// (also catches the 9→0 wrap so 1234567890123 fails).
+const isPureSequential = (s) => {
+  const step = ((s.charCodeAt(1) - s.charCodeAt(0)) + 10) % 10;
+  if (step !== 1 && step !== 9) return false;
+  for (let i = 1; i < s.length - 1; i++) {
+    if (((s.charCodeAt(i + 1) - s.charCodeAt(i)) + 10) % 10 !== step) return false;
+  }
+  return true;
+};
+
+const isValidCnic = (v) =>
+  cnicRegex.test(v) &&
+  !/^(\d)\1{12}$/.test(v) && // all-same-digit (1111111111111)
+  v[1] !== '0' && // 2nd digit is the division code — no valid one starts with X0
+  !isPureSequential(v); // 1234567890123 / 9876543210987 / etc.
 
 export const cnicSchema = z
   .string({ required_error: 'CNIC is required' })
