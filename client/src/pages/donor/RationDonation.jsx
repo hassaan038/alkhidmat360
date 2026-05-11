@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { futureOrTodayDateOptionalSchema, todayIso } from '../../lib/validators';
+import { donationAmountSchema, futureOrTodayDateOptionalSchema, MAX_DONATION_AMOUNT, todayIso } from '../../lib/validators';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import PageContainer from '../../components/ui/PageContainer';
 import PageHeader from '../../components/ui/PageHeader';
@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 const rationSchema = z.object({
   packageType: z.string().min(2).max(50),
   quantity: z.coerce.number().int().min(1).max(1000),
-  amount: z.coerce.number().positive('Amount must be positive'),
+  amount: donationAmountSchema,
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   donorAddress: z.string().min(10, 'Please provide a complete address'),
   deliveryDate: futureOrTodayDateOptionalSchema,
@@ -167,7 +167,7 @@ export default function RationDonation() {
                 <Input id="qty" type="number" min={1} {...register('quantity')} />
               </FormField>
               <FormField label={t('qurbaniDonation.totalAmount')} required htmlFor="amt" error={errors.amount?.message}>
-                <Input id="amt" type="number" min={1} {...register('amount')} />
+                <Input id="amt" type="number" min={1} max={MAX_DONATION_AMOUNT} {...register('amount')} />
               </FormField>
             </FormGrid>
           </FormSection>

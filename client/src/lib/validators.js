@@ -71,6 +71,16 @@ export const strictEmailOptionalSchema = z
   .union([z.literal(''), strictEmailSchema])
   .optional();
 
+// --- Donation amount cap ----------------------------------------------------
+// Single-entry cap on donor money — matches the server policy. Donors who
+// want to give more should be routed to the office directly.
+export const MAX_DONATION_AMOUNT = 300000; // PKR 3 lakh
+
+export const donationAmountSchema = z.coerce
+  .number({ invalid_type_error: 'Amount must be a number' })
+  .positive('Amount must be greater than 0')
+  .max(MAX_DONATION_AMOUNT, 'Amount cannot exceed PKR 3,00,000 (3 lakh)');
+
 // --- Password strength ------------------------------------------------------
 // Mirrors server/src/validators/sharedValidators.js. The Signup page renders
 // `passwordRules` directly as a live checklist, so reordering or relabelling

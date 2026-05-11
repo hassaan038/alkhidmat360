@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { donationAmountSchema } from './sharedValidators.js';
 
 // Donor phone and email come from the session user record — the form no
 // longer collects them. Donor name stays editable so users can still
@@ -16,7 +17,7 @@ const paymentMarkedField = z
 
 export const createSadqaSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  amount: z.coerce.number().positive('Amount must be greater than 0'),
+  amount: donationAmountSchema,
   purpose: z.string().max(200).optional(),
   notes: z.string().optional(),
   paymentMarked: paymentMarkedField,
@@ -42,7 +43,7 @@ export const createDisasterDonationSchema = z.object({
     }),
   }),
   campaignLabel: z.string().min(2, 'Campaign label is required'),
-  amount: z.coerce.number().positive('Amount must be greater than 0'),
+  amount: donationAmountSchema,
   notes: z.string().optional(),
   paymentMarked: paymentMarkedField,
 });

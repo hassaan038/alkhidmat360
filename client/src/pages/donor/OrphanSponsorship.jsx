@@ -12,12 +12,12 @@ import { createOrphanSponsorship } from '../../services/donationService';
 import { Baby, Heart, User, RotateCcw, ArrowRight } from 'lucide-react';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
-import { futureOrTodayDateOptionalSchema, todayIso } from '../../lib/validators';
+import { donationAmountSchema, futureOrTodayDateOptionalSchema, MAX_DONATION_AMOUNT, todayIso } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const orphanSponsorshipSchema = z.object({
   sponsorshipType: z.string().min(2).max(50),
-  monthlyAmount: z.coerce.number().positive('Monthly amount must be positive'),
+  monthlyAmount: donationAmountSchema,
   duration: z.coerce.number().int().min(1, 'Duration must be at least 1 month').max(36, 'Duration cannot exceed 36 months (3 years)'),
   totalAmount: z.coerce.number().positive('Total amount must be positive'),
   sponsorName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -167,7 +167,7 @@ export default function OrphanSponsorship() {
 
             <FormGrid cols={3} className="mt-5">
               <FormField label={t('orphanSponsorship.monthlyAmount')} required htmlFor="ma" error={errors.monthlyAmount?.message}>
-                <Input id="ma" type="number" min={1} {...register('monthlyAmount')} />
+                <Input id="ma" type="number" min={1} max={MAX_DONATION_AMOUNT} {...register('monthlyAmount')} />
               </FormField>
               <FormField label={t('orphanSponsorship.duration')} required htmlFor="du" error={errors.duration?.message}>
                 <Input id="du" type="number" min={1} max={36} {...register('duration', { onChange: handleDurationChange })} />

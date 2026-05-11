@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  donationAmountSchema,
   futureOrTodayDateOptionalSchema,
   futureOrTodayDateSchema,
 } from './sharedValidators.js';
@@ -27,7 +28,7 @@ export const qurbaniDonationSchema = z.object({
     .int()
     .min(1, 'Quantity must be at least 1')
     .max(100, 'Quantity cannot exceed 100 animals in one submission'),
-  totalAmount: z.coerce.number().positive('Amount must be greater than 0'),
+  totalAmount: donationAmountSchema,
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
   donorAddress: z.string().min(10, 'Address must be at least 10 characters'),
   deliveryDate: futureOrTodayDateOptionalSchema,
@@ -44,7 +45,7 @@ export const qurbaniDonationSchema = z.object({
 // it here without also adding the column to RationDonation in Prisma.
 export const rationDonationSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  amount: z.coerce.number().positive('Amount must be greater than 0'),
+  amount: donationAmountSchema,
   rationItems: z.string().optional(),
   notes: z.string().optional(),
   paymentMarked: paymentMarkedField,
@@ -95,7 +96,7 @@ export const skinCollectionSchema = z
 // Orphan Sponsorship Validator
 export const orphanSponsorshipSchema = z.object({
   sponsorName: z.string().min(2, 'Name must be at least 2 characters'),
-  monthlyAmount: z.coerce.number().positive('Monthly amount must be greater than 0'),
+  monthlyAmount: donationAmountSchema,
   duration: z.coerce
     .number()
     .int()

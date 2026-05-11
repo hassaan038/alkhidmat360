@@ -18,11 +18,12 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import * as extraDonationService from '../../services/extraDonationService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
+import { donationAmountSchema, MAX_DONATION_AMOUNT } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const sadqaSchema = z.object({
   donorName: z.string().min(2, 'Name must be at least 2 characters'),
-  amount: z.coerce.number().positive('Amount must be greater than 0'),
+  amount: donationAmountSchema,
   purpose: z.string().max(200).optional(),
   notes: z.string().optional(),
 });
@@ -128,7 +129,7 @@ export default function Sadqa() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <FormSection title={t('sadqa.amount')} icon={Coins}>
             <FormField label={t('sadqa.amountPkr')} required htmlFor="amt" error={errors.amount?.message}>
-              <Input id="amt" type="number" min={1} {...register('amount')} placeholder={t('qurbaniDonation.enterAmount')} />
+              <Input id="amt" type="number" min={1} max={MAX_DONATION_AMOUNT} {...register('amount')} placeholder={t('qurbaniDonation.enterAmount')} />
             </FormField>
             <div className="flex flex-wrap gap-2 mt-3">
               {QUICK_AMOUNTS.map((amt) => (

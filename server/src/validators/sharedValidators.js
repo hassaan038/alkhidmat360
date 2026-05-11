@@ -86,6 +86,17 @@ export const strictEmailOptionalSchema = z
   .union([z.literal(''), strictEmailSchema])
   .optional();
 
+// --- Donation amount cap ----------------------------------------------------
+// Ops cap on a single donation entry. Donors who want to give more should
+// reach out to the office directly instead of posting a 7-figure amount
+// through the public form.
+export const MAX_DONATION_AMOUNT = 300000; // PKR 3 lakh
+
+export const donationAmountSchema = z.coerce
+  .number({ invalid_type_error: 'Amount must be a number' })
+  .positive('Amount must be greater than 0')
+  .max(MAX_DONATION_AMOUNT, 'Amount cannot exceed PKR 3,00,000 (3 lakh)');
+
 // --- Password strength ------------------------------------------------------
 // Rules mirrored on the client so the live hint UI stays in sync. Keep
 // passwordRules and strongPasswordSchema together — adding a rule here
