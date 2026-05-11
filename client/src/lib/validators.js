@@ -29,21 +29,26 @@ export const pakistanPhoneOptionalSchema = z
   .or(z.literal(''));
 
 // --- CNIC -------------------------------------------------------------------
-// 13 digits, no dashes. Dashes are stripped so users can paste 12345-1234567-1.
-export const cnicRegex = /^\d{13}$/;
-const CNIC_INVALID_MSG = 'CNIC must be exactly 13 digits (e.g. 1234512345671)';
+// 13 digits, no dashes. First digit is NADRA's province code (1–7):
+//   1 KPK · 2 FATA · 3 Punjab · 4 Sindh · 5 Balochistan · 6 ICT · 7 GB/AJK
+// Anything starting with 0, 8 or 9 cannot be a real CNIC.
+export const cnicRegex = /^[1-7]\d{12}$/;
+const CNIC_INVALID_MSG =
+  'CNIC must be 13 digits and start with a valid province code 1–7 (e.g. 35202-1234567-1)';
+
+const isValidCnic = (v) => cnicRegex.test(v) && !/^(\d)\1{12}$/.test(v);
 
 export const cnicSchema = z
   .string({ required_error: 'CNIC is required' })
   .trim()
   .transform((v) => v.replace(/[\s-]/g, ''))
-  .refine((v) => cnicRegex.test(v), { message: CNIC_INVALID_MSG });
+  .refine(isValidCnic, { message: CNIC_INVALID_MSG });
 
 export const cnicOptionalSchema = z
   .string()
   .trim()
   .transform((v) => v.replace(/[\s-]/g, ''))
-  .refine((v) => v === '' || cnicRegex.test(v), { message: CNIC_INVALID_MSG })
+  .refine((v) => v === '' || isValidCnic(v), { message: CNIC_INVALID_MSG })
   .optional()
   .or(z.literal(''));
 

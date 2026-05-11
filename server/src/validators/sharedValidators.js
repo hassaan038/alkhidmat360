@@ -36,20 +36,33 @@ export const pakistanPhoneOptionalSchema = z
 // --- CNIC -------------------------------------------------------------------
 // Pakistan National Identity Card — 13 digits, no dashes. We strip dashes
 // before validating so users can paste "12345-1234567-1" and we'll accept it.
-export const cnicRegex = /^\d{13}$/;
-const CNIC_INVALID_MSG = 'CNIC must be exactly 13 digits (e.g. 1234512345671)';
+//
+// NADRA assigns the first digit by province / region:
+//   1 = Khyber Pakhtunkhwa     5 = Balochistan
+//   2 = FATA                   6 = Islamabad Capital Territory
+//   3 = Punjab                 7 = Gilgit-Baltistan / AJK
+//   4 = Sindh
+//
+// Anything starting with 0, 8 or 9 cannot be a real CNIC, so we reject those
+// as a lightweight sanity check (catches the obvious "1111111111111" /
+// "0000000000000" garbage without needing the full NADRA tehsil database).
+export const cnicRegex = /^[1-7]\d{12}$/;
+const CNIC_INVALID_MSG =
+  'CNIC must be 13 digits and start with a valid province code 1–7 (e.g. 35202-1234567-1)';
+
+const isValidCnic = (v) => cnicRegex.test(v) && !/^(\d)\1{12}$/.test(v);
 
 export const cnicSchema = z
   .string({ required_error: 'CNIC is required' })
   .trim()
   .transform((v) => v.replace(/[\s-]/g, ''))
-  .refine((v) => cnicRegex.test(v), { message: CNIC_INVALID_MSG });
+  .refine(isValidCnic, { message: CNIC_INVALID_MSG });
 
 export const cnicOptionalSchema = z
   .string()
   .trim()
   .transform((v) => v.replace(/[\s-]/g, ''))
-  .refine((v) => v === '' || cnicRegex.test(v), { message: CNIC_INVALID_MSG })
+  .refine((v) => v === '' || isValidCnic(v), { message: CNIC_INVALID_MSG })
   .optional()
   .or(z.literal(''));
 
