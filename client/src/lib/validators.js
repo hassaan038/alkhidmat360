@@ -48,12 +48,12 @@ export const cnicOptionalSchema = z
   .or(z.literal(''));
 
 // --- Email ------------------------------------------------------------------
-// Stricter than Zod's `.email()`. Requires:
-//   - at least one letter in the local part (rejects "123@gmail.com")
-//   - a real domain with a TLD of >= 2 letters
+// Only @gmail.com / @hotmail.com / @yahoo.com — mirror of the server rule.
+// Local part still needs a letter so "123@gmail.com" fails.
 export const strictEmailRegex =
-  /^(?=[^@]*[A-Za-z])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const EMAIL_INVALID_MSG = 'Please enter a valid email address (e.g. you@example.com)';
+  /^(?=[^@]*[A-Za-z])[A-Za-z0-9._%+-]+@(gmail|hotmail|yahoo)\.com$/i;
+const EMAIL_INVALID_MSG =
+  'Please use a Gmail, Hotmail or Yahoo email (e.g. you@gmail.com)';
 
 export const strictEmailSchema = z
   .string({ required_error: 'Email is required' })

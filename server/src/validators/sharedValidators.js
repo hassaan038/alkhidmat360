@@ -54,13 +54,13 @@ export const cnicOptionalSchema = z
   .or(z.literal(''));
 
 // --- Email ------------------------------------------------------------------
-// Zod's built-in `.email()` is permissive (accepts "a@b" with no TLD). We
-// layer a stricter regex on top requiring:
-//   - at least one letter in the local part (rejects "123@gmail.com")
-//   - a real domain with a TLD of >= 2 letters
+// Only @gmail.com / @hotmail.com / @yahoo.com are accepted (matches policy
+// agreed with ops — they don't want to chase typos on custom domains). The
+// local part still needs at least one letter so "123@gmail.com" fails.
 export const strictEmailRegex =
-  /^(?=[^@]*[A-Za-z])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
-const EMAIL_INVALID_MSG = 'Please enter a valid email address (e.g. you@example.com)';
+  /^(?=[^@]*[A-Za-z])[A-Za-z0-9._%+-]+@(gmail|hotmail|yahoo)\.com$/i;
+const EMAIL_INVALID_MSG =
+  'Please use a Gmail, Hotmail or Yahoo email (e.g. you@gmail.com)';
 
 export const strictEmailSchema = z
   .string({ required_error: 'Email is required' })
