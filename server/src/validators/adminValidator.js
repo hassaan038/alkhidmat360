@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   cnicOptionalSchema,
+  fullNameSchema,
   pakistanPhoneSchema,
   strictEmailSchema,
   strongPasswordSchema,
@@ -15,7 +16,7 @@ export const statusUpdateSchema = z.object({
 export const createAdminSchema = z.object({
   email: strictEmailSchema,
   password: strongPasswordSchema,
-  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
+  fullName: fullNameSchema,
   phoneNumber: pakistanPhoneSchema,
   cnic: cnicOptionalSchema,
 });

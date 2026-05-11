@@ -18,6 +18,7 @@ import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
 import {
   cnicOptionalSchema,
+  fullNameSchema,
   pakistanPhoneOptionalSchema,
 } from '../../lib/validators';
 
@@ -28,7 +29,7 @@ const loanApplicationSchema = z.object({
   familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),
   employmentStatus: z.string().min(2).max(50),
   purposeDescription: z.string().min(10, 'Purpose description must be at least 10 characters'),
-  applicantName: z.string().min(2),
+  applicantName: fullNameSchema,
   applicantAddress: z.string().min(10, 'Please provide a complete address'),
   guarantorName: z.string().min(2).optional().or(z.literal('')),
   guarantorPhone: pakistanPhoneOptionalSchema,

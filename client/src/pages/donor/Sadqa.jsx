@@ -18,11 +18,11 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import * as extraDonationService from '../../services/extraDonationService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
-import { donationAmountSchema, MAX_DONATION_AMOUNT } from '../../lib/validators';
+import { donationAmountSchema, fullNameSchema, MAX_DONATION_AMOUNT } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const sadqaSchema = z.object({
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
+  donorName: fullNameSchema,
   amount: donationAmountSchema,
   purpose: z.string().max(200).optional(),
   notes: z.string().optional(),

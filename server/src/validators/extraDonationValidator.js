@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { donationAmountSchema } from './sharedValidators.js';
+import { donationAmountSchema, fullNameSchema } from './sharedValidators.js';
 
 // Donor phone and email come from the session user record — the form no
 // longer collects them. Donor name stays editable so users can still
@@ -16,7 +16,7 @@ const paymentMarkedField = z
 // ============================================
 
 export const createSadqaSchema = z.object({
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
+  donorName: fullNameSchema,
   amount: donationAmountSchema,
   purpose: z.string().max(200).optional(),
   notes: z.string().optional(),
@@ -36,7 +36,7 @@ export const sadqaStatusSchema = z.object({
 const ALLOWED_CAMPAIGNS = ['floods', 'earthquake', 'shelter', 'medical', 'general'];
 
 export const createDisasterDonationSchema = z.object({
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
+  donorName: fullNameSchema,
   campaignKey: z.enum(ALLOWED_CAMPAIGNS, {
     errorMap: () => ({
       message: `Campaign must be one of: ${ALLOWED_CAMPAIGNS.join(', ')}`,

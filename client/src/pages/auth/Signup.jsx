@@ -16,6 +16,7 @@ import { cn } from '../../lib/utils';
 import {
   cnicOptionalSchema,
   cnicSchema,
+  fullNameSchema,
   pakistanPhoneSchema,
   passwordRules,
   strictEmailSchema,
@@ -85,6 +86,11 @@ export default function Signup() {
       return;
     }
 
+    const nameResult = fullNameSchema.safeParse(formData.fullName);
+    if (!nameResult.success) {
+      setValidationError(nameResult.error.issues[0].message);
+      return;
+    }
     const emailResult = strictEmailSchema.safeParse(formData.email);
     if (!emailResult.success) {
       setValidationError(emailResult.error.issues[0].message);

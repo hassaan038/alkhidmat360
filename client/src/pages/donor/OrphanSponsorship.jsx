@@ -12,7 +12,7 @@ import { createOrphanSponsorship } from '../../services/donationService';
 import { Baby, Heart, User, RotateCcw, ArrowRight } from 'lucide-react';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
-import { donationAmountSchema, futureOrTodayDateOptionalSchema, MAX_DONATION_AMOUNT, todayIso } from '../../lib/validators';
+import { donationAmountSchema, fullNameSchema, futureOrTodayDateOptionalSchema, MAX_DONATION_AMOUNT, todayIso } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const orphanSponsorshipSchema = z.object({
@@ -20,7 +20,7 @@ const orphanSponsorshipSchema = z.object({
   monthlyAmount: donationAmountSchema,
   duration: z.coerce.number().int().min(1, 'Duration must be at least 1 month').max(36, 'Duration cannot exceed 36 months (3 years)'),
   totalAmount: z.coerce.number().positive('Total amount must be positive'),
-  sponsorName: z.string().min(2, 'Name must be at least 2 characters'),
+  sponsorName: fullNameSchema,
   sponsorAddress: z.string().min(10, 'Please provide a complete address'),
   orphanAge: z.string().optional(),
   orphanGender: z.string().optional(),

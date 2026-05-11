@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { pakistanPhoneSchema } from './sharedValidators.js';
+import { fullNameSchema, pakistanPhoneSchema } from './sharedValidators.js';
 
 // Volunteer phone and email come from the session user record. emergencyContact
 // describes a different person (next-of-kin) so it stays on the form.
 export const volunteerTaskSchema = z.object({
-  volunteerName: z.string().min(2, 'Name must be at least 2 characters'),
+  volunteerName: fullNameSchema,
   volunteerAddress: z.string().min(10, 'Please provide a complete address'),
   taskCategory: z.enum([
     'DISTRIBUTION',

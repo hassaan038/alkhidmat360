@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   cnicOptionalSchema,
   cnicRegex,
+  fullNameSchema,
   pakistanPhoneSchema,
   strictEmailSchema,
   strongPasswordSchema,
@@ -14,7 +15,7 @@ export const signupSchema = z
   .object({
     email: strictEmailSchema,
     password: strongPasswordSchema,
-    fullName: z.string().min(2, 'Full name must be at least 2 characters'),
+    fullName: fullNameSchema,
     phoneNumber: pakistanPhoneSchema,
     cnic: cnicOptionalSchema,
     userType: z.enum(['DONOR', 'BENEFICIARY', 'VOLUNTEER'], {

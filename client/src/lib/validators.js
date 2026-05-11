@@ -66,12 +66,13 @@ export const cnicOptionalSchema = z
   .or(z.literal(''));
 
 // --- Email ------------------------------------------------------------------
-// Only @gmail.com / @hotmail.com / @yahoo.com — mirror of the server rule.
-// Local part still needs a letter so "123@gmail.com" fails.
+// Only @gmail.com / @hotmail.com / @yahoo.com. Local part must start with a
+// letter and be at least 3 characters long, so "1ali@gmail.com" and
+// "ab@gmail.com" both fail.
 export const strictEmailRegex =
-  /^(?=[^@]*[A-Za-z])[A-Za-z0-9._%+-]+@(gmail|hotmail|yahoo)\.com$/i;
+  /^[A-Za-z][A-Za-z0-9._%+-]{2,}@(gmail|hotmail|yahoo)\.com$/i;
 const EMAIL_INVALID_MSG =
-  'Please use a Gmail, Hotmail or Yahoo email (e.g. you@gmail.com)';
+  'Email must start with a letter, have at least 3 characters before @, and use gmail / hotmail / yahoo .com';
 
 export const strictEmailSchema = z
   .string({ required_error: 'Email is required' })
@@ -83,6 +84,19 @@ export const strictEmailSchema = z
 export const strictEmailOptionalSchema = z
   .union([z.literal(''), strictEmailSchema])
   .optional();
+
+// --- Person name ------------------------------------------------------------
+// Letters and single internal spaces only. Trimmed length >= 3.
+const NAME_INVALID_MSG =
+  'Name must be at least 3 letters and contain only letters and spaces';
+
+export const fullNameSchema = z
+  .string({ required_error: 'Name is required' })
+  .trim()
+  .min(3, NAME_INVALID_MSG)
+  .refine((v) => /^[A-Za-z]+(?: [A-Za-z]+)*$/.test(v), {
+    message: NAME_INVALID_MSG,
+  });
 
 // --- Donation amount cap ----------------------------------------------------
 // Single-entry cap on donor money — matches the server policy. Donors who

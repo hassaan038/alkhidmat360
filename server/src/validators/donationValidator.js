@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import {
   donationAmountSchema,
+  fullNameSchema,
   futureOrTodayDateOptionalSchema,
-  futureOrTodayDateSchema,
 } from './sharedValidators.js';
 
 // Multipart-aware: forms that accept payment screenshots send multipart,
@@ -29,7 +29,7 @@ export const qurbaniDonationSchema = z.object({
     .min(1, 'Quantity must be at least 1')
     .max(100, 'Quantity cannot exceed 100 animals in one submission'),
   totalAmount: donationAmountSchema,
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
+  donorName: fullNameSchema,
   donorAddress: z.string().min(10, 'Address must be at least 10 characters'),
   deliveryDate: futureOrTodayDateOptionalSchema,
   notes: z.string().optional(),
@@ -44,7 +44,7 @@ export const qurbaniDonationSchema = z.object({
 // exist on the model — Zod strips it before the service sees it. Don't add
 // it here without also adding the column to RationDonation in Prisma.
 export const rationDonationSchema = z.object({
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
+  donorName: fullNameSchema,
   amount: donationAmountSchema,
   rationItems: z.string().optional(),
   notes: z.string().optional(),
@@ -62,7 +62,7 @@ export const rationDonationSchema = z.object({
 //     year-to-year.
 export const skinCollectionSchema = z
   .object({
-    donorName: z.string().min(2, 'Name must be at least 2 characters'),
+    donorName: fullNameSchema,
     collectionAddress: z.string().min(10, 'Address must be at least 10 characters'),
     numberOfSkins: z.coerce
       .number()
@@ -95,7 +95,7 @@ export const skinCollectionSchema = z
 
 // Orphan Sponsorship Validator
 export const orphanSponsorshipSchema = z.object({
-  sponsorName: z.string().min(2, 'Name must be at least 2 characters'),
+  sponsorName: fullNameSchema,
   monthlyAmount: donationAmountSchema,
   duration: z.coerce
     .number()

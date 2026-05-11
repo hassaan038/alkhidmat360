@@ -23,6 +23,7 @@ import useAuthStore from '../../store/authStore';
 import { cn, formatApiError, formatDate } from '../../lib/utils';
 import {
   cnicOptionalSchema,
+  fullNameSchema,
   pakistanPhoneSchema,
   passwordRules,
   strictEmailSchema,
@@ -31,7 +32,7 @@ import {
 import { Check, X } from 'lucide-react';
 
 const profileSchema = z.object({
-  fullName: z.string().min(2, 'Name must be at least 2 characters'),
+  fullName: fullNameSchema,
   email: strictEmailSchema,
   phoneNumber: pakistanPhoneSchema,
   cnic: cnicOptionalSchema,

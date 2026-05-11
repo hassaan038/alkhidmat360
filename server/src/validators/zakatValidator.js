@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { fullNameSchema } from './sharedValidators.js';
 
 // Multipart-aware: every numeric field uses z.coerce so the schema works
 // for both JSON and FormData callers.
@@ -40,7 +41,7 @@ export const zakatPaymentStatusSchema = z.object({
 });
 
 export const createZakatApplicationSchema = z.object({
-  applicantName: z.string().min(2, 'Name must be at least 2 characters'),
+  applicantName: fullNameSchema,
   applicantAddress: z.string().min(10, 'Address must be at least 10 characters'),
 
   familyMembers: z.coerce.number().int().min(1, 'At least 1 family member').max(50),

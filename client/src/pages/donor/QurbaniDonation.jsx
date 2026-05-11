@@ -12,14 +12,14 @@ import { Heart, Bot, Mountain, Beef, Info, RotateCcw, ArrowRight, User, Calendar
 import { createQurbaniDonation } from '../../services/donationService';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import { cn } from '../../lib/utils';
-import { donationAmountSchema, futureOrTodayDateOptionalSchema, MAX_DONATION_AMOUNT, todayIso } from '../../lib/validators';
+import { donationAmountSchema, fullNameSchema, futureOrTodayDateOptionalSchema, MAX_DONATION_AMOUNT, todayIso } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const qurbaniSchema = z.object({
   animalType: z.enum(['GOAT', 'CAMEL', 'COW'], { required_error: 'Please select an animal type' }),
   quantity: z.coerce.number().int().min(1).max(100),
   totalAmount: donationAmountSchema,
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
+  donorName: fullNameSchema,
   donorAddress: z.string().min(10, 'Please provide a complete address'),
   deliveryDate: futureOrTodayDateOptionalSchema,
   notes: z.string().optional(),

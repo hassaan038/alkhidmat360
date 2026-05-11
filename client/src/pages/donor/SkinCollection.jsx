@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { Scissors, Bot, Beef, Mountain, Info, User, Calendar, RotateCcw, ArrowRight, Moon } from 'lucide-react';
 import { createSkinCollection } from '../../services/donationService';
 import { cn } from '../../lib/utils';
+import { fullNameSchema } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
@@ -28,7 +29,7 @@ const skinCollectionSchema = z
   .object({
     animalType: z.string().min(2).max(50),
     numberOfSkins: z.coerce.number().int().min(1, 'Number of skins must be at least 1').max(50, 'Number of skins cannot exceed 50'),
-    donorName: z.string().min(2, 'Name must be at least 2 characters'),
+    donorName: fullNameSchema,
     collectionAddress: z.string().min(10, 'Please provide a complete address'),
     forEidQurbani: z.boolean(),
     preferredDate: z.string().optional(),

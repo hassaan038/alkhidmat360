@@ -25,10 +25,11 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import * as zakatService from '../../services/zakatService';
 import { formatCurrency, formatDate, formatApiError } from '../../lib/utils';
 import { imageUrl } from '../../lib/imageUrl';
+import { fullNameSchema } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const applicationSchema = z.object({
-  applicantName: z.string().min(2, 'Name must be at least 2 characters'),
+  applicantName: fullNameSchema,
   applicantAddress: z.string().min(10, 'Address must be at least 10 characters'),
 
   familyMembers: z.coerce.number().int().min(1, 'At least 1').max(50),

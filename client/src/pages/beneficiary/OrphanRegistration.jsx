@@ -12,13 +12,14 @@ import { createOrphanRegistration } from '../../services/applicationService';
 import { toast } from 'sonner';
 import { Baby, User, School, Coins, Users, Info, RotateCcw, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { fullNameSchema } from '../../lib/validators';
 
 const orphanRegistrationSchema = z.object({
-  orphanName: z.string().min(2, 'Name must be at least 2 characters'),
+  orphanName: fullNameSchema,
   orphanAge: z.coerce.number().int().min(0).max(18, 'Orphan must be 18 or younger'),
   orphanGender: z.enum(['MALE', 'FEMALE']),
   guardianRelation: z.string().min(2).max(50),
-  guardianName: z.string().min(2, 'Name must be at least 2 characters'),
+  guardianName: fullNameSchema,
   guardianAddress: z.string().min(10, 'Please provide a complete address'),
   monthlyIncome: z.coerce.number().nonnegative(),
   familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),

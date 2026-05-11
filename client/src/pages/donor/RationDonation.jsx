@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { donationAmountSchema, futureOrTodayDateOptionalSchema, MAX_DONATION_AMOUNT, todayIso } from '../../lib/validators';
+import { donationAmountSchema, fullNameSchema, futureOrTodayDateOptionalSchema, MAX_DONATION_AMOUNT, todayIso } from '../../lib/validators';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import PageContainer from '../../components/ui/PageContainer';
 import PageHeader from '../../components/ui/PageHeader';
@@ -19,7 +19,7 @@ const rationSchema = z.object({
   packageType: z.string().min(2).max(50),
   quantity: z.coerce.number().int().min(1).max(1000),
   amount: donationAmountSchema,
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
+  donorName: fullNameSchema,
   donorAddress: z.string().min(10, 'Please provide a complete address'),
   deliveryDate: futureOrTodayDateOptionalSchema,
   notes: z.string().optional(),

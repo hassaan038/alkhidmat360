@@ -22,7 +22,7 @@ import { SkeletonStatCard } from '../../components/ui/Skeleton';
 import PaymentConfirmModal from '../../components/payments/PaymentConfirmModal';
 import * as extraDonationService from '../../services/extraDonationService';
 import { cn, formatCurrency, formatDate, formatApiError } from '../../lib/utils';
-import { donationAmountSchema, MAX_DONATION_AMOUNT } from '../../lib/validators';
+import { donationAmountSchema, fullNameSchema, MAX_DONATION_AMOUNT } from '../../lib/validators';
 import { useTranslation } from 'react-i18next';
 
 const CAMPAIGN_KEYS = [
@@ -36,7 +36,7 @@ const CAMPAIGN_KEYS = [
 const QUICK_AMOUNTS = [1000, 2500, 5000, 10000, 25000, 50000];
 
 const schema = z.object({
-  donorName: z.string().min(2, 'Name must be at least 2 characters'),
+  donorName: fullNameSchema,
   amount: donationAmountSchema,
   notes: z.string().optional(),
 });

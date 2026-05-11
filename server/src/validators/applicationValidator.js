@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   cnicOptionalSchema,
+  fullNameSchema,
   pakistanPhoneOptionalSchema,
 } from './sharedValidators.js';
 
@@ -24,7 +25,7 @@ export const loanApplicationSchema = z.object({
   familyMembers: z.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),
   employmentStatus: z.string().min(2).max(50),
   purposeDescription: z.string().min(10, 'Purpose description must be at least 10 characters'),
-  applicantName: z.string().min(2),
+  applicantName: fullNameSchema,
   applicantAddress: z.string().min(10),
   guarantorName: z.union([z.string().min(2), z.literal('')]).optional(),
   guarantorPhone: pakistanPhoneOptionalSchema,
@@ -42,7 +43,7 @@ export const ramadanRationSchema = z.object({
   monthlyIncome: z.number().nonnegative('Monthly income must be non-negative'),
   hasDisabledMembers: z.boolean(),
   disabilityDetails: z.string().optional(),
-  applicantName: z.string().min(2),
+  applicantName: fullNameSchema,
   applicantAddress: z.string().min(10),
   reasonForApplication: z.string().min(10, 'Reason must be at least 10 characters'),
   previouslyReceived: z.boolean(),
@@ -54,13 +55,13 @@ export const ramadanRationSchema = z.object({
 // ============================================
 
 export const orphanRegistrationSchema = z.object({
-  orphanName: z.string().min(2),
+  orphanName: fullNameSchema,
   orphanAge: z.number().int().min(0).max(18, 'Orphan must be 18 or younger'),
   orphanGender: z.enum(['MALE', 'FEMALE'], {
     required_error: 'Gender is required',
   }),
   guardianRelation: z.string().min(2).max(50),
-  guardianName: z.string().min(2),
+  guardianName: fullNameSchema,
   guardianAddress: z.string().min(10),
   monthlyIncome: z.number().nonnegative('Monthly income must be non-negative'),
   familyMembers: z.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),

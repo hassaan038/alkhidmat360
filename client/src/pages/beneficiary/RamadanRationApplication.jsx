@@ -12,13 +12,14 @@ import { createRamadanRationApplication } from '../../services/applicationServic
 import { toast } from 'sonner';
 import { Apple, User, Users, Info, RotateCcw, ArrowRight, Coins } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { fullNameSchema } from '../../lib/validators';
 
 const ramadanRationSchema = z.object({
   familyMembers: z.coerce.number().int().min(1, 'Must have at least 1 family member').max(50, 'Family members cannot exceed 50'),
   monthlyIncome: z.coerce.number().nonnegative('Monthly income must be non-negative'),
   hasDisabledMembers: z.boolean(),
   disabilityDetails: z.string().optional(),
-  applicantName: z.string().min(2, 'Name must be at least 2 characters'),
+  applicantName: fullNameSchema,
   applicantAddress: z.string().min(10, 'Please provide a complete address'),
   reasonForApplication: z.string().min(10, 'Reason must be at least 10 characters'),
   previouslyReceived: z.boolean(),

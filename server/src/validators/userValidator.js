@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   cnicOptionalSchema,
+  fullNameSchema,
   pakistanPhoneOptionalSchema,
   strictEmailSchema,
   strongPasswordSchema,
@@ -9,7 +10,7 @@ import {
 // Update profile — all fields optional, but if provided must be valid.
 // Email uniqueness is checked in the service (DB lookup); CNIC same.
 export const updateProfileSchema = z.object({
-  fullName: z.string().min(2, 'Name must be at least 2 characters').optional(),
+  fullName: fullNameSchema.optional(),
   email: strictEmailSchema.optional(),
   phoneNumber: pakistanPhoneOptionalSchema,
   cnic: cnicOptionalSchema,

@@ -82,13 +82,15 @@ export const cnicOptionalSchema = z
   .or(z.literal(''));
 
 // --- Email ------------------------------------------------------------------
-// Only @gmail.com / @hotmail.com / @yahoo.com are accepted (matches policy
-// agreed with ops — they don't want to chase typos on custom domains). The
-// local part still needs at least one letter so "123@gmail.com" fails.
+// Only @gmail.com / @hotmail.com / @yahoo.com are accepted. The local part
+// must:
+//   - start with a letter (no leading digit or punctuation)
+//   - be at least 3 characters long total
+// so "1ali@gmail.com" and "ab@gmail.com" both fail.
 export const strictEmailRegex =
-  /^(?=[^@]*[A-Za-z])[A-Za-z0-9._%+-]+@(gmail|hotmail|yahoo)\.com$/i;
+  /^[A-Za-z][A-Za-z0-9._%+-]{2,}@(gmail|hotmail|yahoo)\.com$/i;
 const EMAIL_INVALID_MSG =
-  'Please use a Gmail, Hotmail or Yahoo email (e.g. you@gmail.com)';
+  'Email must start with a letter, have at least 3 characters before @, and use gmail / hotmail / yahoo .com';
 
 export const strictEmailSchema = z
   .string({ required_error: 'Email is required' })
@@ -100,6 +102,22 @@ export const strictEmailSchema = z
 export const strictEmailOptionalSchema = z
   .union([z.literal(''), strictEmailSchema])
   .optional();
+
+// --- Person name ------------------------------------------------------------
+// Letters and single spaces only — no digits, no punctuation. Must be at
+// least 3 characters after trimming, and can't start or end with a space.
+// Apostrophes and hyphens are deliberately excluded since the user's
+// requirement was "letters only".
+const NAME_INVALID_MSG =
+  'Name must be at least 3 letters and contain only letters and spaces';
+
+export const fullNameSchema = z
+  .string({ required_error: 'Name is required' })
+  .trim()
+  .min(3, NAME_INVALID_MSG)
+  .refine((v) => /^[A-Za-z]+(?: [A-Za-z]+)*$/.test(v), {
+    message: NAME_INVALID_MSG,
+  });
 
 // --- Donation amount cap ----------------------------------------------------
 // Ops cap on a single donation entry. Donors who want to give more should

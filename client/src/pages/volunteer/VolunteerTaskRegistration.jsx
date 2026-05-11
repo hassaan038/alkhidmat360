@@ -13,10 +13,10 @@ import { toast } from 'sonner';
 import { HandHeart, User, Calendar, MapPin, Info, RotateCcw, ArrowRight, Shield, Briefcase } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useTranslation } from 'react-i18next';
-import { pakistanPhoneSchema } from '../../lib/validators';
+import { fullNameSchema, pakistanPhoneSchema } from '../../lib/validators';
 
 const volunteerTaskSchema = z.object({
-  volunteerName: z.string().min(2, 'Name must be at least 2 characters'),
+  volunteerName: fullNameSchema,
   volunteerAddress: z.string().min(10, 'Please provide a complete address'),
   taskCategory: z.enum(['DISTRIBUTION', 'FUNDRAISING', 'AWARENESS', 'ADMINISTRATIVE', 'FIELD_WORK', 'EVENT_SUPPORT']),
   availability: z.array(z.string()).min(1, 'Select at least one day'),

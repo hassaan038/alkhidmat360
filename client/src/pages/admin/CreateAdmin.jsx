@@ -14,6 +14,7 @@ import api from '../../services/api';
 import { useTranslation } from 'react-i18next';
 import {
   cnicOptionalSchema,
+  fullNameSchema,
   pakistanPhoneSchema,
   passwordRules,
   strictEmailSchema,
@@ -26,7 +27,7 @@ const createAdminSchema = z.object({
   email: strictEmailSchema,
   password: strongPasswordSchema,
   confirmPassword: z.string(),
-  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
+  fullName: fullNameSchema,
   phoneNumber: pakistanPhoneSchema,
   cnic: cnicOptionalSchema,
 }).refine((d) => d.password === d.confirmPassword, {
